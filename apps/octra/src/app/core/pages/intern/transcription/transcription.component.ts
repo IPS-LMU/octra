@@ -97,10 +97,10 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
   private audioManager: AudioManager;
 
   private isLevelSupportedByEditor(editor: typeof OCTRAEditor) {
-    return editor.meta?.supportedLevelTypes.includes(this.annotationStoreService.transcript.currentLevel.type);
+    return editor.meta?.supportedLevelTypes.includes(this.annotationStoreService!.transcript!.currentLevel!.type);
   }
 
-  private onAltSend = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent) => {
+  private onAltSend = (keyboardEvent: KeyboardEvent | undefined, shortcut: Shortcut, hotKeyEvent?: HotkeysEvent) => {
     if (this._useMode === LoginMode.ONLINE || this._useMode === LoginMode.DEMO) {
       if (['SHIFT + ALT + 1', 'SHIFT + ALT + 2', 'SHIFT + ALT + 3'].includes(shortcut.keys.mac!)) {
         this.appStorage
@@ -157,10 +157,10 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     }
   };
 
-  private onSearchShortcut = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent) => {
-    keyboardEvent.preventDefault();
-    keyboardEvent.stopPropagation();
-    keyboardEvent.stopImmediatePropagation();
+  private onSearchShortcut = (keyboardEvent: KeyboardEvent | undefined, shortcut: Shortcut, hotKeyEvent?: HotkeysEvent) => {
+    keyboardEvent?.preventDefault();
+    keyboardEvent?.stopPropagation();
+    keyboardEvent?.stopImmediatePropagation();
 
     this.openRegReplaceModal();
   };
@@ -313,7 +313,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
 
     this.subscribe(this.audioManager.statechange, {
       next: async (state) => {
-        if (!appStorage.playOnHover && !this.annotationStoreService.modalVisibilities.overview) {
+        if (!appStorage.playOnHover && !this.annotationStoreService.modalVisibilities!.overview) {
           let caretpos = undefined;
 
           if (this.currentEditor !== undefined && (this.currentEditor.instance as any).editor !== undefined) {
@@ -403,9 +403,9 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
         for (const searchGroup of searchGroups) {
           if (searchGroup.enabled === true) {
             for (const item of searchGroup.items) {
-              const keys: string[] = Object.keys(item.keys).map((a) => item.keys[a]);
-              if (keys.includes(shortcut)) {
-                item.callback(undefined, item, undefined, searchGroup);
+              const keys: string[] = Object.keys(item.keys).map((a) => (item.keys as any)[a]);
+              if (keys.includes(shortcut) && item.callback) {
+                item.callback(undefined, item!, undefined, searchGroup!);
                 return;
               }
             }
@@ -529,7 +529,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
         let waitTime = this.settingsService.appSettings.octra.inactivityNotice.showAfter;
         waitTime = waitTime * 60 * 1000;
         this.subscribe(interval(5000), () => {
-          if (Date.now() - this.uiService.lastAction > waitTime && !this.annotationStoreService.modalVisibilities.inactivity) {
+          if (Date.now() - this.uiService.lastAction > waitTime && !this.annotationStoreService.modalVisibilities?.inactivity) {
             if (this.inactivityModal === undefined && !this.isInactivityModalVisible) {
               this.isInactivityModalVisible = true;
               this.modService
@@ -635,15 +635,15 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
             } else {
               this._currentEditor = viewContainerRef.createComponent<UnsupportedLevelPlaceholderComponent>(UnsupportedLevelPlaceholderComponent);
               this._currentEditor.instance.editorName = this.interface;
-              this._currentEditor.instance.levelType = this.annotationStoreService.transcript.currentLevel.type;
+              this._currentEditor.instance.levelType = this.annotationStoreService.transcript!.currentLevel!.type;
               this.editorloaded = true;
-              const currentLevelindex = this.annotationStoreService.transcript.selectedLevelIndex;
+              const currentLevelindex = this.annotationStoreService.transcript!.selectedLevelIndex;
               this.subscribe(
                 this.annotationStoreService.transcript$,
                 {
                   next: async (anno) => {
-                    if (currentLevelindex !== anno.selectedLevelIndex) {
-                      await this.changeEditor(this.interface, false);
+                    if (currentLevelindex !== anno?.selectedLevelIndex) {
+                      await this.changeEditor(this.interface!, false);
                     }
                   },
                 },
@@ -725,8 +725,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
 
   closeTranscriptionAndGetNew() {
     // close current session
-    if (this._useMode === LoginMode.ONLINE) {
-    } else if (this._useMode === LoginMode.DEMO) {
+    if (this._useMode === LoginMode.DEMO) {
       this.reloadDemo();
     }
   }

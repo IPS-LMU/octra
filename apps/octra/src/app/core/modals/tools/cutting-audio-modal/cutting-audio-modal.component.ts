@@ -433,9 +433,9 @@ export class CuttingAudioModalComponent
         this.state.zippingSpeed = zipFactor;
 
         cuttingStarted = Date.now();
-        this.state.cutter.cutChannelDataSequentially(
+        this.state.cutter!.cutChannelDataSequentially(
           this.namingConvention.namingConvention,
-          this.audio.audioManager.channel,
+          this.audio!.audioManager.channel!,
           cutList,
         );
       })

@@ -72,8 +72,8 @@
               <div class="col-auto text-right">
                 <ngb-pagination
                   [size]="'sm'"
-                  [page]="currentPage.page"
-                  [collectionSize]="currentPage.collectionSize"
+                  [page]="currentPage!.page"
+                  [collectionSize]="currentPage!.collectionSize"
                   [pageSize]="itemsPerPage"
                   (pageChange)="showProjects($event)"
                 ></ngb-pagination>
@@ -179,7 +179,7 @@
                                             : {
                                                 locale: (
                                                   authStoreService.me$ | async
-                                                ).locale,
+                                                )?.locale,
                                               }
                                       }}
                                     </span>

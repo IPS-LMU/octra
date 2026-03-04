@@ -319,7 +319,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
 
   public onSegmentClicked(itemID: number) {
     this.segmentclicked.emit({
-      levelID: this.currentLevel.id,
+      levelID: this.currentLevel!.id!,
       itemID,
     });
   }
@@ -717,7 +717,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       if (index < 0) {
         result.push({
           id: validationArrayElement.level,
-          level: this.annotationStoreService.transcript.levels.find((a) => a.id === validationArrayElement.level)!.name,
+          level: this.annotationStoreService?.transcript?.levels?.find((a) => a.id === validationArrayElement.level)!.name!,
           errors: validationArrayElement.validation.length,
         });
       } else {

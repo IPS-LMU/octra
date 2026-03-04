@@ -34,7 +34,7 @@ export class OctraDropzoneService {
   private modService = inject(OctraModalService);
   private store = inject<Store<RootState>>(Store);
 
-  get oannotation(): OAnnotJSON {
+  get oannotation(): OAnnotJSON | undefined {
     return this._oannotation;
   }
   get oldFiles(): {
@@ -57,11 +57,11 @@ export class OctraDropzoneService {
   get statistics(): DropzoneStatistics {
     return this._statistics;
   }
-  get oaudiofile(): OAudiofile {
+  get oaudiofile(): OAudiofile | undefined {
     return this._oaudiofile;
   }
 
-  get audioManager(): AudioManager {
+  get audioManager(): AudioManager | undefined {
     return this._audioManager;
   }
 
@@ -104,18 +104,9 @@ export class OctraDropzoneService {
       file: new FileInfo(file.name, file.type, file.size, file),
     };
 
-    const isValidaAudioFile = AudioManager.isValidAudioFileName(
-      progressFile.file.fullname,
-      AppInfo.audioformats,
-    );
+    const isValidaAudioFile = AudioManager.isValidAudioFileName(progressFile.file.fullname, AppInfo.audioformats);
 
-    if (
-      isValidaAudioFile ||
-      !(
-        progressFile.file.type.includes('video') ||
-        progressFile.file.type.includes('image')
-      )
-    ) {
+    if (isValidaAudioFile || !(progressFile.file.type.includes('video') || progressFile.file.type.includes('image'))) {
       const typeToDrop = isValidaAudioFile ? 'audio' : 'transcript';
       this.dropFiles(typeToDrop);
       this._files.push(progressFile);
@@ -153,12 +144,7 @@ export class OctraDropzoneService {
     fileProgress.status = 'progress';
     this.updateStatistics();
 
-    if (
-      AudioManager.isValidAudioFileName(
-        fileProgress.file.fullname,
-        AppInfo.audioformats,
-      )
-    ) {
+    if (AudioManager.isValidAudioFileName(fileProgress.file.fullname, AppInfo.audioformats)) {
       // process as audio
       return this.readAudioFile(fileProgress);
     }
@@ -192,14 +178,7 @@ export class OctraDropzoneService {
           break;
       }
 
-      if (
-        !this.oldFiles.some(
-          (a) =>
-            a.type === file.file.type &&
-            a.name === file.file.fullname &&
-            a.size === file.file.size,
-        )
-      ) {
+      if (!this.oldFiles.some((a) => a.type === file.file.type && a.name === file.file.fullname && a.size === file.file.size)) {
         result.new++;
       }
     }
@@ -214,22 +193,15 @@ export class OctraDropzoneService {
   private readAudioFile(fileProgress: FileProgress) {
     this._oaudiofile = undefined;
 
-    const supportedAudioFormats = [
-      ...AppInfo.audioformats.map((a) => a.supportedFormats),
-    ].flat();
-    const formatLimitation = supportedAudioFormats.find((a) =>
-      fileProgress.file.fullname.includes(a.extension),
-    );
+    const supportedAudioFormats = [...AppInfo.audioformats.map((a) => a.supportedFormats)].flat();
+    const formatLimitation = supportedAudioFormats.find((a) => fileProgress.file.fullname.includes(a.extension));
 
-    if (
-      !formatLimitation ||
-      fileProgress.file.size > formatLimitation.maxFileSize
-    ) {
+    if (!formatLimitation || fileProgress.file.size > formatLimitation.maxFileSize) {
       return throwError(() => Error('Invalid file size'));
     }
 
     return forkJoin([
-      readFile<ArrayBuffer>(fileProgress.file.file, 'arraybuffer').pipe(
+      readFile<ArrayBuffer>(fileProgress.file.file!, 'arraybuffer').pipe(
         map((a) => {
           fileProgress.progress = a.progress * 0.5;
           return a;
@@ -239,9 +211,7 @@ export class OctraDropzoneService {
       exhaustMap(([reading]) => {
         // completed
         if (fileProgress.file.size <= AppInfo.maxAudioFileSize * 1024 * 1024) {
-          return forkJoin([
-            this.decodeArrayBuffer(reading.result!, fileProgress),
-          ]).pipe(
+          return forkJoin([this.decodeArrayBuffer(reading.result!, fileProgress)]).pipe(
             map(([result]) => {
               // audio decoding completed
               this._audioManager = result.audioManager;
@@ -257,8 +227,7 @@ export class OctraDropzoneService {
                 this._oaudiofile = new OAudiofile();
                 this._oaudiofile.name = fileProgress.file.fullname;
                 this._oaudiofile.size = fileProgress.file.size;
-                this._oaudiofile.duration =
-                  this._audioManager.resource.info.duration.samples;
+                this._oaudiofile.duration = this._audioManager.resource.info.duration.samples;
                 this._oaudiofile.sampleRate = this._audioManager.sampleRate;
                 this._oaudiofile.arraybuffer = reading.result;
 
@@ -271,12 +240,7 @@ export class OctraDropzoneService {
           fileProgress.status = 'invalid';
           fileProgress.error = `The file size is bigger than ${AppInfo.maxAudioFileSize} MB.`;
           this.updateStatistics();
-          return throwError(
-            () =>
-              new Error(
-                `The file size is bigger than ${AppInfo.maxAudioFileSize} MB.`,
-              ),
-          );
+          return throwError(() => new Error(`The file size is bigger than ${AppInfo.maxAudioFileSize} MB.`));
         }
       }),
     );
@@ -284,7 +248,7 @@ export class OctraDropzoneService {
 
   private readTextFile(fileProgress: FileProgress) {
     return forkJoin([
-      readFile<string>(fileProgress.file.file, 'text', 'utf-8').pipe(
+      readFile<string>(fileProgress.file.file!, 'text', 'utf-8').pipe(
         map((a) => {
           fileProgress.progress = a.progress;
           return a;
@@ -303,12 +267,7 @@ export class OctraDropzoneService {
 
   private stopFileProcessing(fileProgress: FileProgress) {
     this._subscrManager.removeByTag(`fileProgress${fileProgress.id}`);
-    if (
-      AudioManager.isValidAudioFileName(
-        fileProgress.file.fullname,
-        AppInfo.audioformats,
-      )
-    ) {
+    if (AudioManager.isValidAudioFileName(fileProgress.file.fullname, AppInfo.audioformats)) {
       this._oaudiofile = undefined;
       this._audioManager?.stopDecoding();
     } else {
@@ -319,17 +278,8 @@ export class OctraDropzoneService {
   private async checkForValidFiles(showOptionsModal = true) {
     for (const fileProgress of this._files) {
       if (fileProgress.status !== 'progress') {
-        const isAudioFile = AudioManager.isValidAudioFileName(
-          fileProgress.file.fullname,
-          AppInfo.audioformats,
-        );
-        if (
-          !isAudioFile &&
-          !(
-            fileProgress.file.type.includes('image') ||
-            fileProgress.file.type.includes('video')
-          )
-        ) {
+        const isAudioFile = AudioManager.isValidAudioFileName(fileProgress.file.fullname, AppInfo.audioformats);
+        if (!isAudioFile && !(fileProgress.file.type.includes('image') || fileProgress.file.type.includes('video'))) {
           if (!this._oaudiofile) {
             fileProgress.status = 'waiting';
             this.updateStatistics();
@@ -340,11 +290,9 @@ export class OctraDropzoneService {
           for (let i = 0; i < AppInfo.converters.length; i++) {
             converter = AppInfo.converters[i];
             if (
-              new RegExp(
-                `${converter.extensions
-                  .map((a) => `(?:${escapeRegex(a.toLowerCase())})`)
-                  .join('|')}$`,
-              ).exec(fileProgress.file.fullname.toLowerCase()) !== null
+              new RegExp(`${converter.extensions.map((a) => `(?:${escapeRegex(a.toLowerCase())})`).join('|')}$`).exec(
+                fileProgress.file.fullname.toLowerCase(),
+              ) !== null
             ) {
               if (converter.conversion.import) {
                 const ofile: IFile = {
@@ -354,10 +302,7 @@ export class OctraDropzoneService {
                   encoding: converter.encoding,
                 };
 
-                const optionsSchema: any = converter.needsOptionsForImport(
-                  ofile,
-                  this._oaudiofile!,
-                );
+                const optionsSchema: any = converter.needsOptionsForImport(ofile, this._oaudiofile!);
                 fileProgress.needsOptions = optionsSchema;
                 fileProgress.converter = converter;
 
@@ -365,11 +310,7 @@ export class OctraDropzoneService {
                   await this.openImportOptionsModal(fileProgress);
                 }
 
-                const importResult: ImportResult | undefined = converter.import(
-                  ofile,
-                  this._oaudiofile!,
-                  fileProgress.options,
-                );
+                const importResult: ImportResult | undefined = converter.import(ofile, this._oaudiofile!, fileProgress.options);
 
                 if (importResult && !importResult.error) {
                   if (importResult.audiofile !== undefined) {
@@ -390,11 +331,7 @@ export class OctraDropzoneService {
                       addedFiles: this._files,
                     });
                   } else {
-                    await this.setAnnotation(
-                      fileProgress,
-                      converter,
-                      importResult,
-                    );
+                    await this.setAnnotation(fileProgress, converter, importResult);
                     if (this._oannotation) {
                       break;
                     }
@@ -430,23 +367,12 @@ export class OctraDropzoneService {
     this.updateStatistics();
   }
 
-  private setAnnotation = async (
-    fileProgress: FileProgress,
-    converter: Converter,
-    importResult?: ImportResult,
-  ) => {
-    if (
-      this._oaudiofile !== undefined &&
-      importResult !== undefined &&
-      importResult.annotjson !== undefined &&
-      !importResult.error
-    ) {
+  private setAnnotation = async (fileProgress: FileProgress, converter: Converter, importResult?: ImportResult) => {
+    if (this._oaudiofile !== undefined && importResult !== undefined && importResult.annotjson !== undefined && !importResult.error) {
       const audioName = this._oaudiofile.name.replace(/\.[^.]+$/g, '');
 
       const regexStr = `${escapeRegex(audioName)}${converter.extensions
-        .map(
-          (a) => `((?:${escapeRegex(a)})|(?:${escapeRegex(a.toLowerCase())}))`,
-        )
+        .map((a) => `((?:${escapeRegex(a)})|(?:${escapeRegex(a.toLowerCase())}))`)
         .join('|')}$`;
       if (new RegExp(regexStr).exec(fileProgress.file.fullname) === null) {
         fileProgress.warning = 'File names are not the same.';
@@ -457,17 +383,8 @@ export class OctraDropzoneService {
 
           if (level.items[0].sampleStart !== 0) {
             let temp = [];
-            temp.push(
-              new OSegment(0, 0, level.items[0].sampleStart!, [
-                new OLabel(level.name, ''),
-              ]),
-            );
-            temp = temp.concat(
-              level.items.map(
-                (a) =>
-                  new OSegment(a.id, a.sampleStart!, a.sampleDur!, a.labels),
-              ),
-            );
+            temp.push(new OSegment(0, 0, level.items[0].sampleStart!, [new OLabel(level.name, '')]));
+            temp = temp.concat(level.items.map((a) => new OSegment(a.id, a.sampleStart!, a.sampleDur!, a.labels)));
             level.items = temp;
 
             for (let j = 1; j < level.items.length + 1; j++) {
@@ -476,16 +393,12 @@ export class OctraDropzoneService {
           }
 
           const last = level.items[level.items.length - 1];
-          if (
-            last.sampleStart! + last.sampleDur! !==
-            this._oaudiofile.duration
-          ) {
+          if (last.sampleStart! + last.sampleDur! !== this._oaudiofile.duration) {
             level.items.push(
               new OSegment(
                 last.id + 1,
                 last.sampleStart! + last.sampleDur!,
-                this._oaudiofile.duration! * this._oaudiofile.sampleRate -
-                  (last.sampleStart! + last.sampleDur!),
+                this._oaudiofile.duration! * this._oaudiofile.sampleRate - (last.sampleStart! + last.sampleDur!),
                 [new OLabel(level.name, '')],
               ),
             );
@@ -496,10 +409,7 @@ export class OctraDropzoneService {
       fileProgress.status = 'valid';
       this.updateStatistics();
     } else {
-      if (
-        fileProgress.checked_converters >= AppInfo.converters.length ||
-        converter.name === 'BundleJSON'
-      ) {
+      if (fileProgress.checked_converters >= AppInfo.converters.length || converter.name === 'BundleJSON') {
         // last converter to check
         fileProgress.status = 'invalid';
         fileProgress.error = importResult?.error;
@@ -516,18 +426,9 @@ export class OctraDropzoneService {
 
   private dropFiles(type: 'audio' | 'transcript') {
     this._files = this._files.filter((a) => {
-      if (
-        type === 'audio' &&
-        AudioManager.isValidAudioFileName(a.file.fullname, AppInfo.audioformats)
-      ) {
+      if (type === 'audio' && AudioManager.isValidAudioFileName(a.file.fullname, AppInfo.audioformats)) {
         return false;
-      } else if (
-        type === 'transcript' &&
-        !AudioManager.isValidAudioFileName(
-          a.file.fullname,
-          AppInfo.audioformats,
-        )
-      ) {
+      } else if (type === 'transcript' && !AudioManager.isValidAudioFileName(a.file.fullname, AppInfo.audioformats)) {
         return false;
       }
       return true;
@@ -537,11 +438,7 @@ export class OctraDropzoneService {
   private decodeArrayBuffer(buffer: ArrayBuffer, fileProgress: FileProgress) {
     fileProgress.progress = 0.5;
 
-    return AudioManager.create(
-      fileProgress.file.fullname,
-      fileProgress.file.type,
-      buffer,
-    ).pipe(
+    return AudioManager.create(fileProgress.file.fullname, fileProgress.file.type, buffer).pipe(
       map((result) => {
         fileProgress.progress = 0.5 + 0.5 * result.progress;
         return result;
@@ -550,25 +447,26 @@ export class OctraDropzoneService {
   }
 
   async openImportOptionsModal(fileProgress: FileProgress) {
-    const result = await this.modService.openModal<
-      typeof ImportOptionsModalComponent,
-      any
-    >(ImportOptionsModalComponent, ImportOptionsModalComponent.options, {
-      schema: fileProgress.needsOptions,
-      value: fileProgress.options,
-      converter: fileProgress.converter,
-    });
+    const result = await this.modService.openModal<typeof ImportOptionsModalComponent, any>(
+      ImportOptionsModalComponent,
+      ImportOptionsModalComponent.options,
+      {
+        schema: fileProgress.needsOptions,
+        value: fileProgress.options,
+        converter: fileProgress.converter,
+      },
+    );
 
     if (result.action === 'apply') {
       fileProgress.options = result.result;
     }
 
-    const importOptions = {};
-    importOptions[fileProgress.converter.name] = fileProgress.options;
+    const importOptions: any = {};
+    importOptions[fileProgress.converter!.name!] = fileProgress.options;
     this.store.dispatch(
       LoginModeActions.setImportConverter.do({
         mode: LoginMode.LOCAL,
-        importConverter: fileProgress.converter.name,
+        importConverter: fileProgress.converter!.name,
       }),
     );
     this.store.dispatch(

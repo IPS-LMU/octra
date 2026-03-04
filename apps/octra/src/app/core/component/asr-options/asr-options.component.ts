@@ -1,23 +1,9 @@
 import { NgClass } from '@angular/common';
-import {
-  Component,
-  EventEmitter,
-  inject,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbDropdown, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import {
-  ASROptionsTranslations,
-  OctraASRLanguageSelectComponent,
-  OctraProviderSelectComponent,
-  ServiceProvider,
-} from '@octra/ngx-components';
+import { ASROptionsTranslations, OctraASRLanguageSelectComponent, OctraProviderSelectComponent, ServiceProvider } from '@octra/ngx-components';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 
 const defaultI18n: ASROptionsTranslations = {
@@ -33,43 +19,38 @@ const defaultI18n: ASROptionsTranslations = {
   selector: 'octra-asr-options',
   templateUrl: './asr-options.component.html',
   styleUrls: ['./asr-options.component.scss'],
-  imports: [
-    FormsModule,
-    NgClass,
-    OctraASRLanguageSelectComponent,
-    TranslocoPipe,
-    OctraProviderSelectComponent,
-  ],
+  imports: [FormsModule, NgClass, OctraASRLanguageSelectComponent, TranslocoPipe, OctraProviderSelectComponent],
 })
-export class AsrOptionsComponent
-  extends SubscriberComponent
-  implements OnChanges
-{
+export class AsrOptionsComponent extends SubscriberComponent implements OnChanges {
   public settings = {
     onlyForThisOne: false,
     allSegmentsNext: false,
   };
 
-  @Input() manualURL = '';
+  @Input() manualURL?: string | null;
   @Input() languageSettings?: {
     services: ServiceProvider[];
-  };
-  @Input() asrLanguages?: {
-    value: string;
-    providersOnly?: string[];
-    description: string;
-  }[];
-  @Input() mausLanguages?: {
-    value: string;
-    providersOnly?: string[];
-    description: string;
-  }[];
+  } | null;
+  @Input() asrLanguages?:
+    | {
+        value: string;
+        providersOnly?: string[];
+        description: string;
+      }[]
+    | null;
+  @Input() mausLanguages?:
+    | {
+        value: string;
+        providersOnly?: string[];
+        description: string;
+      }[]
+    | null;
   @Input() options?: {
     accessCode?: string;
     selectedMausLanguage?: string;
     selectedASRLanguage?: string;
     selectedServiceProvider?: ServiceProvider;
-  };
+  } | null;
   @Output() optionsChange = new EventEmitter<{
     accessCode?: string;
     selectedMausLanguage?: string;
@@ -181,8 +162,10 @@ export class AsrOptionsComponent
   }
 
   selectAll() {
-    for (const key of Object.keys(this.form.controls)) {
-      this.form.controls[key].markAsTouched();
+    if (this.form) {
+      for (const key of Object.keys(this.form.controls)) {
+        this.form.controls[key].markAsTouched();
+      }
     }
   }
 }

@@ -11,7 +11,8 @@
       "options": {
         "outputPath": "dist/libs/annotation",
         "tsConfig": "libs/annotation/tsconfig.lib.json"
-      }
+      },
+      "dependsOn": ["media:build", "utilities:build"]
     },
     "lint": {
       "executor": "@nx/eslint:lint",

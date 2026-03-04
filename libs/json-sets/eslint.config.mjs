@@ -1,6 +1,6 @@
-const baseConfig = require('../../eslint.config.cjs');
+import baseConfig from '../../eslint.config.mjs';
 
-module.exports = [
+export default [
   ...baseConfig,
   {
     files: ['**/*.json'],
@@ -9,14 +9,14 @@ module.exports = [
         'error',
         {
           ignoredFiles: [
-            '{projectRoot}/eslint.config.{js,cjs,mjs}',
+            '{projectRoot}/eslint.config.{js,cjs,mjs,ts,cts,mts}',
             '{projectRoot}/vite.config.{js,ts,mjs,mts}',
           ],
         },
       ],
     },
     languageOptions: {
-      parser: require('jsonc-eslint-parser'),
+      parser: await import('jsonc-eslint-parser'),
     },
   },
 ];

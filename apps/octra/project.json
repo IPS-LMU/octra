@@ -7,14 +7,24 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@angular-devkit/build-angular:browser",
+      "executor": "@angular/build:application",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/octra",
         "index": "apps/octra/src/index.html",
-        "main": "apps/octra/src/main.ts",
-        "polyfills": ["zone.js"],
+        "browser": "apps/octra/src/main.ts",
         "tsConfig": "apps/octra/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [
+          "apps/octra/src/assets",
+          "apps/octra/src/config",
+          "apps/octra/src/media",
+          "apps/octra/src/LICENSE.txt",
+          "apps/octra/src/.htaccess",
+          "apps/octra/src/ocb_info.json",
+          "apps/octra/src/manifest.json"
+        ],
+        "styles": ["node_modules/video.js/dist/video-js.min.css", "node_modules/jodit/es2021/jodit.min.css", "apps/octra/src/styles.scss"],
         "allowedCommonJsDependencies": [
           "jodit-angular",
           "ajv",
@@ -26,32 +36,14 @@
           "mux.js",
           "videojs-vtt.js"
         ],
-        "assets": [
-          "apps/octra/src/assets",
-          "apps/octra/src/config",
-          "apps/octra/src/media",
-          "apps/octra/src/LICENSE.txt",
-          "apps/octra/src/.htaccess",
-          "apps/octra/src/ocb_info.json",
-          "apps/octra/src/manifest.json"
-        ],
-        "styles": [
-          "node_modules/video.js/dist/video-js.min.css",
-          "node_modules/jodit/es2021/jodit.min.css",
-          "apps/octra/src/styles.scss"
-        ],
-        "scripts": [
-          "apps/octra/src/assets/js/modernizr.js",
-          "node_modules/hammerjs/hammer.min.js"
-        ],
+        "scripts": ["apps/octra/src/assets/js/modernizr.js", "node_modules/hammerjs/hammer.min.js"],
         "extractLicenses": true,
-        "serviceWorker": true,
-        "ngswConfigPath": "apps/octra/ngsw-config.json"
+        "serviceWorker": "apps/octra/ngsw-config.json",
+        "polyfills": ["zone.js", "@angular/localize/init"]
       },
       "configurations": {
         "production": {
           "optimization": true,
-          "buildOptimizer": true,
           "budgets": [
             {
               "type": "initial",
@@ -70,10 +62,10 @@
               "with": "apps/octra/src/environments/environment.prod.ts"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "all",
+          "sourceMap": false
         },
         "beta": {
-          "buildOptimizer": true,
           "optimization": true,
           "budgets": [
             {
@@ -96,7 +88,6 @@
           "outputHashing": "all"
         },
         "beta-dev": {
-          "buildOptimizer": false,
           "optimization": false,
           "sourceMap": true,
           "fileReplacements": [
@@ -108,9 +99,7 @@
           "outputHashing": "none"
         },
         "development": {
-          "buildOptimizer": false,
           "optimization": false,
-          "vendorChunk": true,
           "extractLicenses": false,
           "sourceMap": true,
           "namedChunks": true,
@@ -123,9 +112,7 @@
         },
         "public-development": {
           "outputHashing": "none",
-          "buildOptimizer": false,
           "optimization": false,
-          "vendorChunk": true,
           "extractLicenses": false,
           "sourceMap": true,
           "namedChunks": true,
@@ -137,10 +124,11 @@
           ]
         }
       },
-      "defaultConfiguration": "production"
+      "defaultConfiguration": "production",
+      "dependsOn": ["ngx-components:build"]
     },
     "serve": {
-      "executor": "@angular-devkit/build-angular:dev-server",
+      "executor": "@angular/build:dev-server",
       "configurations": {
         "production": {
           "port": 5321,
@@ -153,31 +141,19 @@
           "buildTarget": "octra:build:development"
         }
       },
-      "defaultConfiguration": "development",
-      "continuous": true
-    },
-    "extract-i18n": {
-      "executor": "@angular-devkit/build-angular:extract-i18n",
-      "options": {
-        "buildTarget": "octra:build"
-      }
+      "defaultConfiguration": "development"
     },
     "lint": {
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"]
     },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "options": {
-        "jestConfig": "apps/octra/jest.config.ts",
-        "tsConfig": "apps/octra/tsconfig.spec.json"
-      }
-    },
     "serve-static": {
+      "continuous": true,
       "executor": "@nx/web:file-server",
       "options": {
-        "buildTarget": "octra:build"
+        "buildTarget": "octra:build",
+        "staticFilePath": "dist/apps/octra/browser",
+        "spa": true
       }
     },
     "version": {

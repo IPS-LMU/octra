@@ -1084,9 +1084,9 @@ export class ApplicationEffects {
     // check if matomo is activated
     if (type === 'matomo') {
       if (
-        settings.octra.tracking.matomo !== undefined &&
-        settings.octra.tracking.matomo.host !== undefined &&
-        settings.octra.tracking.matomo.siteID !== undefined
+        settings.octra.tracking?.matomo !== undefined &&
+        settings.octra.tracking?.matomo.host !== undefined &&
+        settings.octra.tracking?.matomo.siteID !== undefined
       ) {
         const matomoSettings = settings.octra.tracking.matomo;
 
@@ -1109,9 +1109,7 @@ export class ApplicationEffects {
 
         document.body.appendChild(trackingCode);
       } else {
-        console.error(
-          `attributes for piwik tracking in appconfig.json are invalid.`,
-        );
+        console.error(`attributes for piwik tracking in appconfig.json are invalid.`);
       }
     } else {
       console.error(`tracking type ${type} is not supported.`);

@@ -100,9 +100,7 @@ export class ShortcutService {
   }
 
   disableAll() {
-    this.previouslyEnabled = this._groups
-      .filter((a) => a.enabled)
-      .map((a) => a.name);
+    this.previouslyEnabled = this._groups.filter((a) => a.enabled).map((a) => a.name);
     this._groups.forEach((group) => {
       group.enabled = false;
     });
@@ -130,18 +128,12 @@ export class ShortcutService {
   public overwriteCallback(
     groupName: string,
     itemName: string,
-    callback?: (
-      keyboardEvent: KeyboardEvent,
-      shortcut: Shortcut,
-      hotkeyEvent: HotkeysEvent,
-    ) => void,
+    callback?: (keyboardEvent: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => void,
   ) {
     const groupIndex = this._groups.findIndex((a) => a.name == groupName);
 
     if (groupIndex > -1) {
-      const itemIndex = this._groups[groupIndex].items.findIndex(
-        (a) => a.name === itemName,
-      );
+      const itemIndex = this._groups[groupIndex].items.findIndex((a) => a.name === itemName);
       if (itemIndex > -1) {
         this._groups[groupIndex].items[itemIndex].callback = callback;
       }

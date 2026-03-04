@@ -143,8 +143,8 @@
                     [height]="60"
                     [validationEnabled]="
                       (appStorage.useMode !== 'url' ||
-                        (routingService.staticQueryParams.functions_url && routingService.staticQueryParams.guidelines_url)) &&
-                      (appStorage.useMode! === 'demo' || settingsService.projectsettings?.octra?.validationEnabled)
+                        (routingService.staticQueryParams.functions_url !== undefined && routingService.staticQueryParams.guidelines_url !== undefined)) &&
+                      (appStorage.useMode! === 'demo' || settingsService.projectsettings?.octra?.validationEnabled === true)
                     "
                     [markers]="annotationStoreService.guidelines !== undefined ? annotationStoreService.guidelines.markers : undefined"
                     [easymode]="true"

@@ -114,8 +114,8 @@
   [markers]="annotationStoreService.guidelines?.markers!"
   [validationEnabled]="
     (appStorage.useMode !== 'url' ||
-      (routingService.staticQueryParams.functions_url &&
-        routingService.staticQueryParams.guidelines_url)) &&
+      (routingService.staticQueryParams.functions_url !== undefined &&
+        routingService.staticQueryParams.guidelines_url !== undefined)) &&
     (appStorage.useMode === 'demo' ||
       settingsService.projectsettings?.octra?.validationEnabled === true)
   "

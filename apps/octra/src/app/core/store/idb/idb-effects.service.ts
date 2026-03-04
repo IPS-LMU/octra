@@ -1,36 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
-import {
-  ASRContext,
-  IAnnotJSON,
-  OAnnotJSON,
-  OctraAnnotation,
-  OctraAnnotationSegment,
-} from '@octra/annotation';
+import { ASRContext, IAnnotJSON, OAnnotJSON, OctraAnnotation, OctraAnnotationSegment } from '@octra/annotation';
 import { ProjectDto, TaskDto } from '@octra/api-types';
 import { hasProperty } from '@octra/utilities';
 import { SessionStorageService } from 'ngx-webstorage';
-import {
-  catchError,
-  exhaustMap,
-  filter,
-  forkJoin,
-  from,
-  map,
-  mergeAll,
-  mergeMap,
-  Observable,
-  of,
-  Subject,
-  tap,
-  timer,
-  withLatestFrom,
-} from 'rxjs';
-import {
-  IIDBApplicationOptions,
-  IIDBModeOptions,
-} from '../../shared/octra-database';
+import { catchError, exhaustMap, filter, forkJoin, from, map, mergeAll, mergeMap, Observable, of, Subject, tap, timer, withLatestFrom } from 'rxjs';
+import { IIDBApplicationOptions, IIDBModeOptions } from '../../shared/octra-database';
 import { AudioService } from '../../shared/service';
 import { IDBService } from '../../shared/service/idb.service';
 import { RoutingService } from '../../shared/service/routing.service';
@@ -85,15 +61,7 @@ export class IDBEffects {
                   mode: LoginMode.URL,
                 }),
               );
-              return forkJoin<
-                [
-                  IIDBApplicationOptions,
-                  IIDBModeOptions,
-                  IIDBModeOptions,
-                  IIDBModeOptions,
-                  IIDBModeOptions,
-                ]
-              >([
+              return forkJoin<[IIDBApplicationOptions, IIDBModeOptions, IIDBModeOptions, IIDBModeOptions, IIDBModeOptions]>([
                 this.idbService.loadOptions([
                   'version',
                   'easyMode',
@@ -119,23 +87,15 @@ export class IDBEffects {
             mergeAll(),
           )
           .pipe(
-            map(
-              ([
+            map(([applicationOptions, localOptions, demoOptions, onlineOptions, urlOptions]) => {
+              return IDBActions.loadOptions.success({
                 applicationOptions,
                 localOptions,
-                demoOptions,
                 onlineOptions,
+                demoOptions,
                 urlOptions,
-              ]) => {
-                return IDBActions.loadOptions.success({
-                  applicationOptions,
-                  localOptions,
-                  onlineOptions,
-                  demoOptions,
-                  urlOptions,
-                });
-              },
-            ),
+              });
+            }),
             catchError((err: string) => {
               console.error(err);
 
@@ -163,10 +123,7 @@ export class IDBEffects {
         ]).pipe(
           map(([onlineModeLogs, localModeLogs, demoModeLogs, urlModeLogs]) => {
             if (this.sessStr.retrieve('last_page_path') !== '/help-tools') {
-              if (
-                state.application.mode === LoginMode.ONLINE &&
-                !this.routingService.staticQueryParams.audio_url
-              ) {
+              if (state.application.mode === LoginMode.ONLINE && !this.routingService.staticQueryParams.audio_url) {
                 this.store.dispatch(
                   LoginModeActions.loadProjectAndTaskInformation.do({
                     projectID: action.onlineOptions.project?.id,
@@ -181,9 +138,7 @@ export class IDBEffects {
                   LoginModeActions.loadProjectAndTaskInformation.do({
                     projectID: action.demoOptions?.project?.id ?? '1234',
                     taskID: action.demoOptions?.transcriptID ?? '38295',
-                    mode: this.routingService.staticQueryParams.audio_url
-                      ? undefined
-                      : state.application.mode!,
+                    mode: this.routingService.staticQueryParams.audio_url ? LoginMode.URL : state.application.mode!,
                     startup: true,
                   }),
                 );
@@ -214,48 +169,28 @@ export class IDBEffects {
           this.idbService.loadAnnotation(LoginMode.DEMO),
         ]).pipe(
           withLatestFrom(this.store),
-          map(
-            ([[onlineAnnotation, localAnnotation, demoAnnotation], state]) => {
-              const deserialize = (json: IAnnotJSON) => {
-                const annotation = OAnnotJSON.deserialize(json);
-                if (annotation) {
-                  const result = OctraAnnotation.deserialize(annotation);
-                  result.changeCurrentLevelIndex(0);
-                  return result;
-                }
-                return undefined;
-              };
+          map(([[onlineAnnotation, localAnnotation, demoAnnotation], state]) => {
+            const deserialize = (json: IAnnotJSON) => {
+              const annotation = OAnnotJSON.deserialize(json);
+              if (annotation) {
+                const result = OctraAnnotation.deserialize(annotation);
+                result.changeCurrentLevelIndex(0);
+                return result;
+              }
+              return undefined;
+            };
 
-              const oAnnotation =
-                deserialize(onlineAnnotation) ??
-                new OctraAnnotation<
-                  ASRContext,
-                  OctraAnnotationSegment<ASRContext>
-                >();
-              const lAnnotation =
-                deserialize(localAnnotation) ??
-                new OctraAnnotation<
-                  ASRContext,
-                  OctraAnnotationSegment<ASRContext>
-                >();
-              const dAnnotation =
-                deserialize(demoAnnotation) ??
-                new OctraAnnotation<
-                  ASRContext,
-                  OctraAnnotationSegment<ASRContext>
-                >();
+            const oAnnotation = deserialize(onlineAnnotation) ?? new OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>();
+            const lAnnotation = deserialize(localAnnotation) ?? new OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>();
+            const dAnnotation = deserialize(demoAnnotation) ?? new OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>();
 
-              return IDBActions.loadAnnotation.success({
-                online: oAnnotation,
-                local: lAnnotation,
-                demo: dAnnotation,
-                url: new OctraAnnotation<
-                  ASRContext,
-                  OctraAnnotationSegment<ASRContext>
-                >(), // IGNORE
-              });
-            },
-          ),
+            return IDBActions.loadAnnotation.success({
+              online: oAnnotation,
+              local: lAnnotation,
+              demo: dAnnotation,
+              url: new OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>(), // IGNORE
+            });
+          }),
           catchError((error) => {
             return of(
               IDBActions.loadAnnotation.fail({
@@ -350,11 +285,7 @@ export class IDBEffects {
 
   clearLogs$ = createEffect(() =>
     this.actions$.pipe(
-      filter(
-        (a) =>
-          a.type === AnnotationActions.clearLogs.do.type ||
-          a.type === LoginModeActions.clearOnlineSession.do.type,
-      ),
+      filter((a) => a.type === AnnotationActions.clearLogs.do.type || a.type === LoginModeActions.clearOnlineSession.do.type),
       exhaustMap((action) =>
         this.idbService.clearLoggingData((action as any).mode).pipe(
           map(() => IDBActions.clearLogs.success((action as any).mode)),
@@ -406,17 +337,12 @@ export class IDBEffects {
           action.type === LoginModeActions.endTranscription.do.type,
       ),
       exhaustMap((action) => {
-        if (
-          hasProperty(action, 'clearSession') &&
-          (action as any).clearSession
-        ) {
+        if (hasProperty(action, 'clearSession') && (action as any).clearSession) {
           return forkJoin<{
             annotation: Observable<void>;
             logs: Observable<void>;
           }>({
-            annotation: this.idbService.clearAnnotationData(
-              (action as any).mode,
-            ),
+            annotation: this.idbService.clearAnnotationData((action as any).mode),
             logs: this.idbService.clearLoggingData((action as any).mode),
           }).pipe(
             map(() => {
@@ -477,8 +403,7 @@ export class IDBEffects {
         const mode = (action as any).mode as LoginMode;
         const modeState = this.getModeStateFromString(appState, mode);
 
-        const clearSession =
-          (action as any).clearSession === true ? true : false;
+        const clearSession = (action as any).clearSession === true ? true : false;
         const project = (action as any).project as ProjectDto;
         const task = (action as any).task as TaskDto;
         const currentEditor = (action as any).currentEditor as string;
@@ -486,16 +411,9 @@ export class IDBEffects {
         if (modeState) {
           return this.idbService
             .saveModeOptions((action as any).mode, {
-              sessionfile:
-                modeState?.sessionFile &&
-                Object.keys(modeState.sessionFile).length > 0
-                  ? modeState.sessionFile.toAny()
-                  : null,
+              sessionfile: modeState?.sessionFile && Object.keys(modeState.sessionFile).length > 0 ? modeState.sessionFile.toAny() : null,
               importConverter: modeState.importConverter,
-              currentEditor:
-                mode === LoginMode.ONLINE && clearSession && currentEditor
-                  ? currentEditor
-                  : (modeState.currentEditor ?? null),
+              currentEditor: mode === LoginMode.ONLINE && clearSession && currentEditor ? currentEditor : (modeState.currentEditor ?? null),
               currentLevel: modeState.transcript?.selectedLevelIndex ?? null,
               logging: modeState.logging.enabled ?? null,
               project: modeState.currentSession?.loadFromServer
@@ -567,18 +485,16 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(UserActions.setUserProfile),
       exhaustMap((action) => {
-        return this.idbService
-          .saveOption('userProfile', { name: action.name, email: action.email })
-          .pipe(
-            map(() => IDBActions.saveUserProfile.success()),
-            catchError((error: Error) => {
-              return of(
-                IDBActions.saveUserProfile.fail({
-                  error: error.message,
-                }),
-              );
-            }),
-          );
+        return this.idbService.saveOption('userProfile', { name: action.name, email: action.email }).pipe(
+          map(() => IDBActions.saveUserProfile.success()),
+          catchError((error: Error) => {
+            return of(
+              IDBActions.saveUserProfile.fail({
+                error: error.message,
+              }),
+            );
+          }),
+        );
       }),
     ),
   );
@@ -641,18 +557,16 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(ApplicationActions.setHighlightingEnabled),
       exhaustMap((action) => {
-        return this.idbService
-          .saveOption('highlightingEnabled', action.highlightingEnabled)
-          .pipe(
-            map(() => IDBActions.saveHighlightingEnabled.success()),
-            catchError((error: Error) => {
-              return of(
-                IDBActions.saveHighlightingEnabled.fail({
-                  error: error.message,
-                }),
-              );
-            }),
-          );
+        return this.idbService.saveOption('highlightingEnabled', action.highlightingEnabled).pipe(
+          map(() => IDBActions.saveHighlightingEnabled.success()),
+          catchError((error: Error) => {
+            return of(
+              IDBActions.saveHighlightingEnabled.fail({
+                error: error.message,
+              }),
+            );
+          }),
+        );
       }),
     ),
   );
@@ -660,11 +574,7 @@ export class IDBEffects {
   saveLogin$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(
-          AuthenticationActions.loginLocal.success,
-          AuthenticationActions.loginDemo.success,
-          AuthenticationActions.loginOnline.success,
-        ),
+        ofType(AuthenticationActions.loginLocal.success, AuthenticationActions.loginDemo.success, AuthenticationActions.loginOnline.success),
         tap(async (action) => {
           this.sessStr.store('loggedIn', true);
           await this.idbService.saveOption('useMode', action.mode);
@@ -766,18 +676,16 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(AnnotationActions.setCurrentEditor.do),
       exhaustMap((action) => {
-        return this.idbService
-          .saveOption('interface', action.currentEditor)
-          .pipe(
-            map(() => IDBActions.saveCurrentEditor.success()),
-            catchError((error: Error) => {
-              return of(
-                IDBActions.saveCurrentEditor.fail({
-                  error: error.message,
-                }),
-              );
-            }),
-          );
+        return this.idbService.saveOption('interface', action.currentEditor).pipe(
+          map(() => IDBActions.saveCurrentEditor.success()),
+          catchError((error: Error) => {
+            return of(
+              IDBActions.saveCurrentEditor.fail({
+                error: error.message,
+              }),
+            );
+          }),
+        );
       }),
     ),
   );
@@ -787,24 +695,19 @@ export class IDBEffects {
       ofType(AnnotationActions.saveLogs.do, AnnotationActions.addLog.do),
       withLatestFrom(this.store),
       exhaustMap(([action, appState]: [Action, RootState]) => {
-        const modeState = this.getModeStateFromString(
-          appState,
-          (action as any).mode,
-        );
+        const modeState = this.getModeStateFromString(appState, (action as any).mode);
 
         if (modeState) {
-          return this.idbService
-            .saveLogs((action as any).mode, modeState.logging.logs)
-            .pipe(
-              map(() => IDBActions.saveLogs.success()),
-              catchError((error) => {
-                return of(
-                  IDBActions.saveLogs.fail({
-                    error,
-                  }),
-                );
-              }),
-            );
+          return this.idbService.saveLogs((action as any).mode, modeState.logging.logs).pipe(
+            map(() => IDBActions.saveLogs.success()),
+            catchError((error) => {
+              return of(
+                IDBActions.saveLogs.fail({
+                  error,
+                }),
+              );
+            }),
+          );
         } else {
           return of(
             IDBActions.saveLogs.fail({
@@ -963,9 +866,7 @@ export class IDBEffects {
     this.actions$.pipe(
       ofType(LoginModeActions.changeImportOptions.do),
       exhaustMap((action) =>
-        this.idbService
-          .saveImportOptions(action.mode, action.importOptions)
-          .pipe(map(() => IDBActions.saveImportOptions.success())),
+        this.idbService.saveImportOptions(action.mode, action.importOptions!).pipe(map(() => IDBActions.saveImportOptions.success())),
       ),
     ),
   );

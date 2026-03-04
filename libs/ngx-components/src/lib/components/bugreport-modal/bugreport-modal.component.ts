@@ -260,7 +260,7 @@ export class BugreportModalComponent extends SubscriberComponent implements Afte
       } else {
         alert('No compatible image found in clipboard.');
       }
-    } catch (e) {
+    } catch (e: any) {
       alert(e.message);
     }
   }

@@ -36,7 +36,7 @@ export class ProjectRequestModalComponent extends SubscriberComponent {
 
   constructor() {
     super();
-    if (this.api.appProperties.support?.admin_email) {
+    if (this.api.appProperties?.support?.admin_email) {
       this.supportEmailURL = this.sanitizer.bypassSecurityTrustResourceUrl(
         `mailto:${this.api.appProperties.support?.admin_email}`,
       );

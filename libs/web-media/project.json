@@ -11,7 +11,8 @@
       "options": {
         "outputPath": "dist/libs/web-media",
         "tsConfig": "libs/web-media/tsconfig.lib.json"
-      }
+      },
+      "dependsOn": ["media:build", "utilities:build"]
     },
     "lint": {
       "executor": "@nx/eslint:lint",

@@ -8,7 +8,7 @@
         #providerSelection
         class="d-inline-block"
         [ngModel]="fields.provider.selected"
-        [asrProviders]="languageSettings.services"
+        [asrProviders]="languageSettings?.services"
         (ngModelChange)="setProvider($event)"
         [i18n]="asrTranslations"
         [required]="true"

@@ -1,17 +1,10 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, HostListener, inject, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, inject, OnInit, Output, ViewChild } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { contains, hasProperty } from '@octra/utilities';
 import { TranscrEditorComponent } from '../../core/component';
 
 import { NgStyle } from '@angular/common';
-import {
-  AnnotationLevelType,
-  ASRContext,
-  ASRQueueItemType,
-  getSegmentBySamplePosition,
-  OctraAnnotation,
-  OctraAnnotationSegment,
-} from '@octra/annotation';
+import { AnnotationLevelType, ASRQueueItemType, getSegmentBySamplePosition, OctraAnnotationSegment } from '@octra/annotation';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
 import {
   AudioViewerComponent,
@@ -56,7 +49,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   private shortcutService = inject(ShortcutService);
   private navbarService = inject(NavbarService);
 
-  static meta: SupportedOctraEditorMetaData = {
+  static override meta: SupportedOctraEditorMetaData = {
     name: '2D-Editor',
     supportedLevelTypes: [AnnotationLevelType.SEGMENT],
     translate: 'interfaces.2D editor',
@@ -98,9 +91,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   private shortcuts!: ShortcutGroup;
   private authWindow?: Window;
 
-  onAudioPlayPause = ($event: KeyboardEvent, shortcut: Shortcut, hotkeyEvent: HotkeysEvent) => {
+  onAudioPlayPause = ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
     this.triggerUIAction({
-      shortcut: hotkeyEvent.shortcut,
+      shortcut: hotkeyEvent?.shortcut ?? '',
       shortcutName: shortcut.name,
       value: shortcut.name,
       type: 'audio',
@@ -117,9 +110,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
   };
 
-  onAudioStop = ($event: KeyboardEvent, shortcut: Shortcut, hotkeyEvent: HotkeysEvent) => {
+  onAudioStop = ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
     this.triggerUIAction({
-      shortcut: hotkeyEvent.shortcut,
+      shortcut: hotkeyEvent?.shortcut ?? '',
       shortcutName: shortcut.name,
       value: shortcut.name,
       type: 'audio',
@@ -130,9 +123,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     });
   };
 
-  onStepBackward = ($event: KeyboardEvent, shortcut: Shortcut, hotkeyEvent: HotkeysEvent) => {
+  onStepBackward = ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
     this.triggerUIAction({
-      shortcut: hotkeyEvent.shortcut,
+      shortcut: hotkeyEvent?.shortcut ?? '',
       shortcutName: shortcut.name,
       value: shortcut.name,
       type: 'audio',
@@ -143,9 +136,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     });
   };
 
-  onStepBackwardTime = ($event: KeyboardEvent, shortcut: Shortcut, hotkeyEvent: HotkeysEvent) => {
+  onStepBackwardTime = ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
     this.triggerUIAction({
-      shortcut: hotkeyEvent.shortcut,
+      shortcut: hotkeyEvent?.shortcut ?? '',
       shortcutName: shortcut.name,
       value: shortcut.name,
       type: 'audio',
@@ -156,13 +149,13 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     });
   };
 
-  onZoomInOut = ($event: KeyboardEvent, shortcut: Shortcut, hotkeyEvent: HotkeysEvent) => {
+  onZoomInOut = ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
     if (this.shortcutsEnabled) {
       if (this.appStorage.showMagnifier) {
-        if (hotkeyEvent.key === '.' || hotkeyEvent.key === ',') {
+        if (hotkeyEvent?.key === '.' || hotkeyEvent?.key === ',') {
           if (hotkeyEvent.key === '.') {
             this.factor = Math.min(20, this.factor + 1);
-          } else if (hotkeyEvent.key === ',') {
+          } else if (hotkeyEvent?.key === ',') {
             if (this.factor > 3) {
               this.factor = Math.max(1, this.factor - 1);
             }
@@ -477,7 +470,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
 
     this.subscribe(this.annotationStoreService.importOptions$, {
       next: (importOptions) => {
-        if (importOptions && Object.keys(importOptions).includes('SRT') && importOptions.SRT) {
+        if (importOptions && Object.keys(importOptions).includes('SRT') && importOptions['SRT']) {
           this.viewer.settings.speakerPattern = importOptions['SRT']['speakerIdentifierPattern'];
         }
       },
@@ -509,8 +502,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   }
 
   async onSegmentEntered(selected: { levelID: number; itemID: number }) {
-    const selectedLevel = this.annotationStoreService.transcript.levels.find((a) => a.id === selected.levelID);
-    const itemIndex = selectedLevel.items.findIndex((a) => a.id === selected.itemID);
+    const selectedLevel = this.annotationStoreService.transcript?.levels.find((a) => a.id === selected.levelID);
+    let itemIndex = selectedLevel?.items.findIndex((a) => a.id === selected.itemID);
+    itemIndex = itemIndex || itemIndex === 0 ? itemIndex : -1;
 
     if (selectedLevel && selectedLevel.items && itemIndex > -1) {
       const segment = selectedLevel.items[itemIndex];

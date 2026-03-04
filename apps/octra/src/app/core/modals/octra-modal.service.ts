@@ -168,7 +168,7 @@ export class OctraModalService implements OnDestroy {
     );
     this.subscrManager.add(
       ref.componentInstance.profileChange.subscribe({
-        next: ({ email, name }) => {
+        next: ({ email, name }: any) => {
           this.store.dispatch(UserActions.setUserProfile({ email, name }));
         },
       }),
@@ -176,7 +176,7 @@ export class OctraModalService implements OnDestroy {
 
     this.subscrManager.add(
       ref.componentInstance.send.subscribe({
-        next: ({ name, email, message, sendProtocol, screenshots }) => {
+        next: ({ name, email, message, sendProtocol, screenshots }: any) => {
           console.log('Sending bug report...');
           ref.componentInstance.sendStatus = 'sending';
           ref.componentInstance.waitForSendResponse(

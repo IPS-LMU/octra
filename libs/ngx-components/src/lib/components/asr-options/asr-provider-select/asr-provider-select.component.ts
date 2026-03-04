@@ -21,12 +21,7 @@ import {
   ValidationErrors,
   Validator,
 } from '@angular/forms';
-import {
-  NgbDropdown,
-  NgbDropdownMenu,
-  NgbDropdownToggle,
-  NgbPopover,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 import { ASROptionsTranslations, ServiceProvider } from '../types';
 
@@ -40,14 +35,7 @@ const defaultI18n: ASROptionsTranslations = {
   selector: 'octra-asr-provider-select',
   templateUrl: './asr-provider-select.component.html',
   styleUrls: ['./asr-provider-select.component.scss'],
-  imports: [
-    NgbDropdown,
-    FormsModule,
-    NgbDropdownMenu,
-    NgbDropdownToggle,
-    NgbPopover,
-    NgStyle,
-  ],
+  imports: [NgbDropdown, FormsModule, NgbDropdownMenu, NgbDropdownToggle, NgbPopover, NgStyle],
   providers: [
     {
       provide: NG_VALIDATORS,
@@ -62,10 +50,7 @@ const defaultI18n: ASROptionsTranslations = {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OctraProviderSelectComponent
-  extends SubscriberComponent
-  implements OnChanges, ControlValueAccessor, Validator
-{
+export class OctraProviderSelectComponent extends SubscriberComponent implements OnChanges, ControlValueAccessor, Validator {
   @Output() ocbFocus = new EventEmitter<void>();
   @Input() name = '';
   @Input() id = 'providerDropdown';
@@ -90,7 +75,7 @@ export class OctraProviderSelectComponent
 
   @Input() asrProviders?: ServiceProvider[];
   @Input() required = false;
-  @Input() placeholder = "ASR Provider";
+  @Input() placeholder = 'ASR Provider';
   protected autoClose = true;
 
   @ViewChild('providerInput', { static: true }) input?: NgModel;
@@ -98,7 +83,7 @@ export class OctraProviderSelectComponent
 
   private value?: ServiceProvider | null;
 
-  get internValue(): ServiceProvider | undefined {
+  get internValue(): ServiceProvider | undefined | null {
     return this.value;
   }
 
@@ -120,9 +105,7 @@ export class OctraProviderSelectComponent
     super();
   }
 
-  validate(
-    control: AbstractControl<OctraProviderSelectComponent>,
-  ): ValidationErrors | null {
+  validate(control: AbstractControl<OctraProviderSelectComponent>): ValidationErrors | null {
     if (this.required && !this.value) {
       return {
         mustBeSet: true,
@@ -168,29 +151,26 @@ export class OctraProviderSelectComponent
       this.filtered =
         this.asrProviders?.filter(
           (a) =>
+            !this.langItem ||
             !this.langItem.providersOnly ||
             this.langItem.providersOnly.length === 0 ||
             this.langItem.providersOnly.includes(a.provider),
         ) ?? [];
     } else {
-      this.filtered = this.asrProviders;
+      this.filtered = this.asrProviders ?? [];
     }
 
     if (!value) {
       this.options = {
         ...this.options,
-        selectedServiceProvider: this.asrProviders.find(
-          (a) => a.provider === value,
-        ),
+        selectedServiceProvider: this.asrProviders?.find((a) => a.provider === value),
       };
       if (emit) {
         this.optionsChange.emit(this.options);
       }
     } else {
       this.filtered = this.filtered.filter(
-        (a) =>
-          a.basName?.toLowerCase().includes(value.toLowerCase()) ||
-          a.provider.toLowerCase().includes(value.toLowerCase()),
+        (a) => a.basName?.toLowerCase().includes(value.toLowerCase()) || a.provider.toLowerCase().includes(value.toLowerCase()),
       );
     }
 
@@ -202,9 +182,7 @@ export class OctraProviderSelectComponent
     dropdown?.close();
 
     if (provider) {
-      const langItem = this.asrProviders.find(
-        (a) => a.basName === provider.basName,
-      );
+      const langItem = this.asrProviders?.find((a) => a.basName === provider?.basName);
       if (!langItem) {
         provider = undefined;
       }
@@ -229,8 +207,7 @@ export class OctraProviderSelectComponent
     if (provider) {
       const ohService = provider;
       if (ohService.usedQuota && ohService.quotaPerMonth) {
-        const remainingQuota =
-          (ohService.quotaPerMonth - ohService.usedQuota) / 60;
+        const remainingQuota = (ohService.quotaPerMonth - ohService.usedQuota) / 60;
         let label = '';
         if (remainingQuota > 60) {
           label = `${Math.round(remainingQuota / 60)} hours`;
@@ -249,13 +226,8 @@ export class OctraProviderSelectComponent
   onInputKeyup(event: KeyboardEvent, value?: string, dropdown?: NgbDropdown) {
     this.filterProviders(value, dropdown);
 
-    if (
-      event.key === 'Enter' ||
-      event.which === 13 ||
-      event.keyCode === 13 ||
-      event.code === 'Enter'
-    ) {
-      const provider = this.asrProviders.find((a) => a.provider === value);
+    if (event.key === 'Enter' || event.which === 13 || event.keyCode === 13 || event.code === 'Enter') {
+      const provider = this.asrProviders?.find((a) => a.provider === value);
       this.selectProvider(provider, dropdown);
     } else {
       this.selectProvider(undefined);
@@ -300,15 +272,9 @@ export class OctraProviderSelectComponent
   }
 
   onProviderDropdownOpenChange(opened: boolean) {
-    if (
-      !opened &&
-      (!this.value ||
-        !this.asrProviders.find(
-          (a) => a.provider.toLowerCase() === this.value.provider.toLowerCase(),
-        ))
-    ) {
+    if (!opened && (!this.value || !this.asrProviders?.find((a) => a.provider.toLowerCase() === this.value!.provider.toLowerCase()))) {
       this.internValue = undefined;
-      this.filtered = this.asrProviders;
+      this.filtered = this.asrProviders ?? [];
       this.cd.markForCheck();
       this.cd.detectChanges();
     }

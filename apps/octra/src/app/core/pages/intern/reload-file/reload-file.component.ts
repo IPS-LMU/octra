@@ -43,7 +43,7 @@ export class ReloadFileComponent {
   newTranscription = () => {
     this.audioService.registerAudioManager(this.dropzone.audioManager!);
     this.authStoreService.loginLocal(
-      this.dropzone.files.map((a) => a.file.file),
+      this.dropzone.files.map((a) => a.file.file!),
       this.dropzone.oannotation,
       true,
     );
@@ -52,7 +52,7 @@ export class ReloadFileComponent {
   onOfflineSubmit = () => {
     this.audioService.registerAudioManager(this.dropzone.audioManager!);
     this.authStoreService.loginLocal(
-      this.dropzone.files.map((a) => a.file.file),
+      this.dropzone.files.map((a) => a.file.file!),
       this.dropzone.oannotation,
       false,
     );

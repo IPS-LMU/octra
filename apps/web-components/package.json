@@ -1,0 +1,21 @@
+{
+  "name": "@octra/web-components",
+  "description": "This library offers Octra components as web-components.",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": false,
+  "author": {
+    "name": "Julian Poemp"
+  },
+  "bugs": {
+    "url": "https://github.com/IPS-LMU/octra/issues"
+  },
+  "homepage": "https://github.com/IPS-LMU/octra",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/IPS-LMU/octra"
+  },
+  "type": "module",
+  "main": "./web-components.js",
+  "dependencies": {}
+}

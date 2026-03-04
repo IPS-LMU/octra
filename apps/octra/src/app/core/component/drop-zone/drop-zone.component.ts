@@ -46,7 +46,7 @@ export class DropZoneComponent implements OnInit {
   onDragOver($event: DragEvent) {
     $event.stopPropagation();
     $event.preventDefault();
-    $event.dataTransfer.dropEffect = 'copy';
+    $event.dataTransfer!.dropEffect = 'copy';
   }
 
   onFileDrop($event: DragEvent) {
@@ -54,7 +54,7 @@ export class DropZoneComponent implements OnInit {
     $event.preventDefault();
 
     if (this.fileAPIsupported) {
-      this._files = this.filterFiles($event.dataTransfer.files);
+      this._files = this.filterFiles($event.dataTransfer!.files);
       this.afterdrop.emit(Array.from(this._files));
     }
   }

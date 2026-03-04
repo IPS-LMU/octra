@@ -26,7 +26,7 @@ export class RoutingService {
 
   public removeStaticParam(name: string) {
     if (Object.keys(this._staticQueryParams).includes(name)) {
-      this.staticQueryParams[name] = undefined;
+      (this.staticQueryParams as any)[name] = undefined;
     }
   }
 

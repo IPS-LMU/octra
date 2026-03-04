@@ -1800,7 +1800,7 @@ export class TranscrEditorComponent
   };
 
   private onRedoUndo = (
-    keyboardEvent: KeyboardEvent,
+    keyboardEvent: KeyboardEvent | undefined,
     shortcutInfo: Shortcut,
   ) => {
     if (shortcutInfo.name === 'undo') {
@@ -1812,15 +1812,15 @@ export class TranscrEditorComponent
   };
 
   private onMarkerInsert = (
-    $event: KeyboardEvent,
+    $event: KeyboardEvent | undefined,
     shortcutInfo: Shortcut,
-    hotkeyEvent: HotkeysEvent,
+    hotkeyEvent?: HotkeysEvent,
   ) => {
     if (this.markers) {
       for (const marker of this.markers) {
         for (const key of Object.keys(marker.shortcut)) {
           if (
-            marker.shortcut[key]?.replace(/\s/g, '') === hotkeyEvent.shortcut
+            marker.shortcut[key]?.replace(/\s/g, '') === hotkeyEvent?.shortcut
           ) {
             this.insertMarker(marker.code, marker.icon);
             this.markerInsert.emit(marker.name);

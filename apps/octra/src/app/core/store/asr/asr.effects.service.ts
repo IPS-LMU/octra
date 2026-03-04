@@ -63,7 +63,7 @@ export class AsrEffects {
         }
 
         const asrSettings =
-          state.application.appConfiguration?.octra.plugins!.asr!;
+          state?.application?.appConfiguration?.octra.plugins?.asr;
 
         if (!asrSettings) {
           return of(
@@ -260,7 +260,7 @@ export class AsrEffects {
           cutter.cutAudioFileFromChannelData(
             this.audio.audioManager.resource.info,
             `OCTRA_ASRqueueItem_${action.item.id}.wav`,
-            audioManager.channel,
+            audioManager.channel!,
             {
               number: 1,
               sampleStart: Math.ceil(

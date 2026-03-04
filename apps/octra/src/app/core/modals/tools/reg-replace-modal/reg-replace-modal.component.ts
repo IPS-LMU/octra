@@ -110,7 +110,7 @@ export class RegReplaceModalComponent extends OctraModal implements OnDestroy, O
     const pattern = this.state.patternType === 'text' ? escapeRegex(this.state.patternText) : this.state.patternText;
     const regex = new RegExp(pattern, 'g');
     const selectedLevels = Object.keys(this.state.levels).filter((a) => this.state.levels[a] === true);
-    const transcript = this.annotationStoreService.transcript.clone();
+    const transcript = this.annotationStoreService.transcript!.clone();
 
     if (selectedLevels. length > 0 && this.state.patternText !== '') {
       if (preview) {
@@ -128,7 +128,7 @@ export class RegReplaceModalComponent extends OctraModal implements OnDestroy, O
             for (const item of level.items) {
               const transcriptLabel = item.getFirstLabelWithoutName('Speaker');
               const replacements = [];
-              let html: string | undefined;
+              let html = "";
 
               if (transcriptLabel?.value) {
                 const transcript = transcriptLabel.value;
@@ -151,12 +151,12 @@ export class RegReplaceModalComponent extends OctraModal implements OnDestroy, O
                   const replacement = replacements[i];
                   const start = `<div class="reg-replace-marker">`;
                   const end = `</div>`;
-                  html = insertString(html, replacement.start + replacement.length, end);
+                  html = insertString(html!, replacement.start + replacement.length, end);
                   html = html.slice(0, replacement.start) + (escapeHtml(replacement.text) || '&nbsp;') + html.slice(replacement.start + replacement.length);
                   html = insertString(html, replacement.start, start);
                 }
 
-                result.matches.push({
+                result!.matches.push({
                   startUnix: item.type === 'segment' ? (item as OctraAnnotationSegment).time.unix : undefined,
                   unitID: item.id,
                   replacements,
@@ -166,7 +166,7 @@ export class RegReplaceModalComponent extends OctraModal implements OnDestroy, O
               }
             }
 
-            if (result.matches.length === 0) {
+            if (result!.matches.length === 0) {
               this.state.results.splice(this.state.results.length - 1, 1);
             }
           }
@@ -205,7 +205,7 @@ export class RegReplaceModalComponent extends OctraModal implements OnDestroy, O
   }
 
   ngOnInit() {
-    this.annotationStoreService.transcript.levels.forEach((a) => {
+    this.annotationStoreService.transcript!.levels.forEach((a) => {
       this.state.levels[a.name] = true;
     });
   }

@@ -69,7 +69,7 @@ export class UserInteractionsService {
   public addElementFromEvent(
     type: string,
     event: any,
-    timestamp: number,
+    timestamp: number | undefined,
     playpos: SampleUnit | undefined,
     textSelection: { start?: number; end?: number } | undefined,
     audioSelection:
@@ -88,6 +88,9 @@ export class UserInteractionsService {
     targetName?: string,
   ) {
     if (!this._enabled) {
+      return;
+    }
+    if (!timestamp) {
       return;
     }
 

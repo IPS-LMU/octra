@@ -97,7 +97,7 @@ export class CombinePhrasesModalComponent
 
   isSomethingBlocked(): boolean {
     return (
-      this.annotationStoreService.currentLevel &&
+      this.annotationStoreService.currentLevel !== undefined &&
       this.annotationStoreService.currentLevel instanceof
         OctraAnnotationSegmentLevel &&
       this.annotationStoreService.currentLevel.items.find((a) => {

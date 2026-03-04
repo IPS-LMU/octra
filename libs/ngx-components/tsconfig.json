@@ -8,9 +8,9 @@
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "emitDecoratorMetadata": false,
     "module": "preserve",
-    "moduleResolution": "bundler",
-    "lib": ["dom", "es2022"]
+    "moduleResolution": "bundler"
   },
   "files": [],
   "include": [],

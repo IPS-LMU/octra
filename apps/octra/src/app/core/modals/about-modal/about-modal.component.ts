@@ -55,7 +55,7 @@ export class AboutModalComponent extends OctraModal implements OnDestroy {
     this.activeModal = activeModal;
 
     this.legalsExist =
-      this.api.appProperties?.legals.imprint_url !== undefined &&
+      this.api.appProperties?.legals?.imprint_url !== undefined &&
       this.api.appProperties?.legals.privacy_url !== undefined &&
       this.api.appProperties?.legals.tos_url !== undefined;
 

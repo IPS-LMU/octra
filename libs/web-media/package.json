@@ -21,8 +21,9 @@
     "@octra/media": "^1.0.0",
     "@octra/utilities": "^2.0.0"
   },
-  "type": "commonjs",
+  "type": "module",
   "main": "./index.js",
   "module": "./index.mjs",
-  "typings": "./index.d.ts"
+  "types": "./index.d.ts",
+  "dependencies": {}
 }

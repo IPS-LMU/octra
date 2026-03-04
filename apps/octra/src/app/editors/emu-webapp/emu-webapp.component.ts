@@ -27,7 +27,7 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
   actions$ = inject(Actions);
   shortcutService = inject(ShortcutService);
 
-  static meta: SupportedOctraEditorMetaData = {
+  static override meta: SupportedOctraEditorMetaData = {
     name: 'EMU',
     supportedLevelTypes: [AnnotationLevelType.SEGMENT, AnnotationLevelType.ITEM, AnnotationLevelType.EVENT],
     editor: EmuWebAppEditorComponent,
@@ -103,46 +103,48 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
     this.updateEmuWebAppOptions();
 
     try {
-      const iframeDocument = this.iframe.nativeElement!.contentWindow.document;
-      iframeDocument.addEventListener('keydown', (e) => {
-        if (e.altKey) {
-          if (!e.shiftKey) {
-            if (e.code === 'Digit8') {
-              // ALT + 8
-              this.shortcutService.triggerGeneralShortcuts.emit({
-                shortcut: 'ALT + 8',
-              });
-            } else if (e.code === 'Digit9') {
-              // ALT + 9
-              this.shortcutService.triggerGeneralShortcuts.emit({
-                shortcut: 'ALT + 9',
-              });
-            } else if (e.code === 'Digit0') {
-              // ALT + 0
-              this.shortcutService.triggerGeneralShortcuts.emit({
-                shortcut: 'ALT + 0',
-              });
+      const iframeDocument = this.iframe?.nativeElement?.contentWindow?.document;
+      if(iframeDocument) {
+        iframeDocument.addEventListener('keydown', (e) => {
+          if (e.altKey) {
+            if (!e.shiftKey) {
+              if (e.code === 'Digit8') {
+                // ALT + 8
+                this.shortcutService.triggerGeneralShortcuts.emit({
+                  shortcut: 'ALT + 8',
+                });
+              } else if (e.code === 'Digit9') {
+                // ALT + 9
+                this.shortcutService.triggerGeneralShortcuts.emit({
+                  shortcut: 'ALT + 9',
+                });
+              } else if (e.code === 'Digit0') {
+                // ALT + 0
+                this.shortcutService.triggerGeneralShortcuts.emit({
+                  shortcut: 'ALT + 0',
+                });
+              }
+            } else {
+              if (e.code === 'Digit1') {
+                // SHIFT + ALT + 1
+                this.shortcutService.triggerGeneralShortcuts.emit({
+                  shortcut: 'SHIFT + ALT + 1',
+                });
+              } else if (e.code === 'Digit2') {
+                this.shortcutService.triggerGeneralShortcuts.emit({
+                  shortcut: 'SHIFT + ALT + 1',
+                });
+              } else if (e.code === 'Digit3') {
+                this.shortcutService.triggerGeneralShortcuts.emit({
+                  shortcut: 'SHIFT + ALT + 3',
+                });
+              }
             }
-          } else {
-            if (e.code === 'Digit1') {
-              // SHIFT + ALT + 1
-              this.shortcutService.triggerGeneralShortcuts.emit({
-                shortcut: 'SHIFT + ALT + 1',
-              });
-            } else if (e.code === 'Digit2') {
-              this.shortcutService.triggerGeneralShortcuts.emit({
-                shortcut: 'SHIFT + ALT + 1',
-              });
-            } else if (e.code === 'Digit3') {
-              this.shortcutService.triggerGeneralShortcuts.emit({
-                shortcut: 'SHIFT + ALT + 3',
-              });
-            }
+            e.preventDefault();
+            e.stopPropagation();
           }
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      });
+        });
+      }
     } catch (e) {
       console.warn("Shortcuts for OCTRA can't be triggered while using Emu-webApp because origins are not the same.");
     }
@@ -165,7 +167,7 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
           let audioArrayBuffer: ArrayBuffer | undefined;
           if (resource.info.type.includes('wav')) {
             audioArrayBuffer = resource.arraybuffer;
-          } else {
+          } else if (this.audio.audioManager.channel) {
             const audioCutter = new AudioCutter(resource.info);
             const buffer = (
               await audioCutter.cutAudioFileFromChannelData(resource.info, resource.info.name, this.audio.audioManager.channel, {
@@ -177,18 +179,20 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
             audioArrayBuffer = buffer.buffer as ArrayBuffer;
           }
 
-          const command: EmuWebAppInMessageEventData = {
-            type: 'command',
-            command: 'load',
-            params,
-            audioArrayBuffer,
-            annotation: JSON.parse(
-              new AnnotJSONConverter().export(
-                this.annotationStoreService.transcript.serialize(resource.info.fullname, resource.info.sampleRate, resource.info.duration),
-              ).file!.content,
-            ),
-          };
-          this.iframe.nativeElement.contentWindow.postMessage(command, '*');
+          if (this.iframe && audioArrayBuffer && this.annotationStoreService.transcript && this.iframe.nativeElement.contentWindow) {
+            const command: EmuWebAppInMessageEventData = {
+              type: 'command',
+              command: 'load',
+              params,
+              audioArrayBuffer,
+              annotation: JSON.parse(
+                new AnnotJSONConverter().export(
+                  this.annotationStoreService.transcript.serialize(resource.info.fullname, resource.info.sampleRate, resource.info.duration),
+                ).file!.content,
+              ),
+            };
+            this.iframe.nativeElement.contentWindow.postMessage(command, '*');
+          }
 
           this.initialized.emit();
         },
@@ -217,7 +221,7 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
 
     if (url === event.origin) {
       const data = event.data as EmuWebAppOutMessageEventData;
-      if (data.data?.annotation && data.trigger === 'autoSave') {
+      if (data.data?.annotation && data.trigger === 'autoSave' && this.annotationStoreService?.transcript?.selectedLevelIndex) {
         const anno = OctraAnnotation.deserialize(data.data.annotation);
         anno.changeCurrentLevelIndex(this.annotationStoreService.transcript.selectedLevelIndex);
         this.annotationStoreService.overwriteTranscript(anno);

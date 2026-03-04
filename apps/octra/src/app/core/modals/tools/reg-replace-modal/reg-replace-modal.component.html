@@ -87,7 +87,7 @@
             <tr class="align-middle">
               <td class="fit">{{ 'g.levels' | transloco }}:</td>
               <td>
-                @for (level of annotationStoreService.transcript.levels; track level.id) {
+                @for (level of annotationStoreService.transcript!.levels; track level.id) {
                   <div class="me-1 form-check border bg-white rounded d-inline-block py-1 px-2">
                     <input
                       type="checkbox"

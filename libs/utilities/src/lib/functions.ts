@@ -427,7 +427,7 @@ export async function wait(seconds: number): Promise<void> {
  * @param url
  * @param params
  */
-export function appendURLQueryParams(url: string, params: Record<string, string | number | boolean>) {
+export function appendURLQueryParams(url: string, params: Record<string, string | number | boolean | undefined | null>) {
   let startingLetter = '?';
   if (/[^/]*\?([^/]*)$/g.exec(url)) {
     startingLetter = '&';

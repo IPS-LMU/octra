@@ -39,7 +39,7 @@ export class SupportedFilesModalComponent extends OctraModal {
 
     this.converters = AppInfo.converters.map((a) => {
       (a as any)._applications = (a as any)._applications.filter(
-        (a) => a.application.name !== 'Octra',
+        (a: any) => a.application.name !== 'Octra',
       );
       return a;
     });

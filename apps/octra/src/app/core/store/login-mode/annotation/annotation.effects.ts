@@ -447,7 +447,7 @@ export class AnnotationEffects {
           if (a.freeTask && state.onlineMode.currentSession.currentProject && state.onlineMode.currentSession.task) {
             return this.apiService.freeTask(state.onlineMode.currentSession.currentProject.id, state.onlineMode.currentSession.task.id).pipe(
               map((result) => {
-                if (a.redirectToProjects) {
+                if (a.redirectToProjects && state.application.mode) {
                   return AnnotationActions.redirectToProjects.do({
                     mode: state.application.mode,
                   });
@@ -479,7 +479,7 @@ export class AnnotationEffects {
           } else {
             return this.saveTaskToServer(state, TaskStatus.paused).pipe(
               map(() => {
-                if (a.redirectToProjects) {
+                if (a.redirectToProjects && state.application.mode) {
                   this.store.dispatch(ApplicationActions.waitForEffects.do());
                   return AnnotationActions.redirectToProjects.do({
                     mode: state.application.mode,
@@ -650,11 +650,12 @@ export class AnnotationEffects {
       ofType(AnnotationActions.openSegment.do),
       withLatestFrom(this.store),
       exhaustMap(([action, state]) => {
-        const level = getModeState(state).transcript.levels.find((a) => a.id === action.levelID);
+        const currentMode = getModeState(state)!;
+        const level = currentMode.transcript.levels.find((a) => a.id === action.levelID);
         const item = level?.items.find((a) => a.id === action.itemID);
 
         if (level && item) {
-          if(level.id !== getModeState(state).transcript.currentLevel.id) {
+          if (level.id !== currentMode.transcript.currentLevel?.id) {
             this.uiService.addElementFromEvent(
               'level',
               { value: 'changed' },
@@ -663,11 +664,11 @@ export class AnnotationEffects {
               undefined,
               undefined,
               undefined,
-              getModeState(state)?.transcript?.levels[level.id]?.name,
+              currentMode.transcript?.levels[level.id]?.name,
             );
           }
 
-          return of(AnnotationActions.openSegment.success({ mode: state.application.mode, itemID: action.itemID, levelID: action.levelID }));
+          return of(AnnotationActions.openSegment.success({ mode: state.application.mode!, itemID: action.itemID, levelID: action.levelID }));
         }
 
         return of(
@@ -1058,7 +1059,7 @@ export class AnnotationEffects {
                     inputs: [
                       {
                         id: Date.now().toString(),
-                        filename: state.localMode.sessionFile?.name,
+                        filename: state.localMode.sessionFile?.name ?? 'Unknown',
                         fileType: state.localMode.sessionFile?.type,
                         chain_position: 0,
                         type: 'input',
@@ -1096,11 +1097,12 @@ export class AnnotationEffects {
                 urlInfo.transcript.url = this.routingService.staticQueryParams.transcript
                   ? decodeURIComponent(this.routingService.staticQueryParams.transcript)
                   : undefined;
+                const urls = urlInfo as any;
 
                 for (const key of Object.keys(urlInfo)) {
-                  if (urlInfo[key].url) {
+                  if (urls[key].url) {
                     let mediaType: string | undefined = key === 'audio' ? this.routingService.staticQueryParams.audio_type : undefined;
-                    const decodedURL = decodeURIComponent(urlInfo[key].url);
+                    const decodedURL = decodeURIComponent(urls[key].url);
 
                     if (decodedURL.includes('?')) {
                       const regex = /mediatype=([^&]+)/g;
@@ -1115,16 +1117,16 @@ export class AnnotationEffects {
                       extension = nameFromURL.extension;
                     } else {
                       if (mediaType) {
-                        extension = MimeTypeMapper.mapTypeToExtension(mediaType);
+                        extension = MimeTypeMapper.mapTypeToExtension(mediaType) ?? '';
                       }
                     }
 
                     if (!mediaType) {
-                      mediaType = mime.getType(extension);
+                      mediaType = mime.getType(extension) ?? '';
                     }
 
-                    urlInfo[key].url = decodedURL;
-                    urlInfo[key].fileInfo = FileInfo.fromURL(
+                    urls[key].url = decodedURL;
+                    urls[key].fileInfo = FileInfo.fromURL(
                       decodedURL,
                       mediaType,
                       key === 'audio' && this.routingService.staticQueryParams.audio_name
@@ -1153,22 +1155,22 @@ export class AnnotationEffects {
                       const inputs: TaskInputOutputDto[] = [
                         {
                           id: Date.now().toString(),
-                          filename: urlInfo.audio.fileInfo.fullname,
-                          fileType: urlInfo.audio.fileInfo.type,
+                          filename: urls.audio.fileInfo.fullname,
+                          fileType: urls.audio.fileInfo.type,
                           chain_position: 0,
                           type: 'input',
                           url: urlInfo.audio.url,
                           creator_type: TaskInputOutputCreatorType.user,
                           content: undefined,
-                          content_type: undefined,
+                          content_type: '',
                         },
                       ];
 
                       if (urlInfo.transcript.url) {
                         inputs.push({
                           id: Date.now().toString(),
-                          filename: urlInfo.transcript.fileInfo.fullname,
-                          fileType: urlInfo.transcript.fileInfo.type,
+                          filename: urls.transcript.fileInfo.fullname,
+                          fileType: urls.transcript.fileInfo.type,
                           chain_position: 0,
                           type: 'input',
                           url: urlInfo.transcript.url,
@@ -1276,7 +1278,7 @@ export class AnnotationEffects {
                   duration = lastSegment.time.unix - startPos;
                   if (!isSilence(lastSegment) || duration < minSilenceLength) {
                     transcript = transcript!.removeItemByIndex(i - 1, '', true, (transcript: string) => {
-                      return tidyUpAnnotation(transcript, modeState.guidelines.selected.json);
+                      return tidyUpAnnotation(transcript, modeState?.guidelines?.selected?.json);
                     });
                     currentLevel = transcript.currentLevel as any;
                     i--;
@@ -1415,7 +1417,7 @@ export class AnnotationEffects {
             this.audio.audioManager.resource.info.duration,
           );
           const converter = new AnnotJSONConverter();
-          const result = converter.export(annotation);
+          const result = converter.export(annotation!);
           window.parent.postMessage(
             {
               data: {
@@ -1451,9 +1453,9 @@ export class AnnotationEffects {
               actionAfterFail: LoginModeActions.endTranscription.do({
                 clearSession: true,
                 mode: LoginMode.ONLINE,
-                project: state.onlineMode.currentSession.currentProject,
-                task: state.onlineMode.currentSession.task,
-                currentEditor: state.onlineMode.currentEditor,
+                project: state.onlineMode.currentSession.currentProject!,
+                task: state.onlineMode.currentSession.task!,
+                currentEditor: state.onlineMode.currentEditor!,
                 keepPreviousInformation: false,
               }),
             }),
@@ -1498,7 +1500,7 @@ export class AnnotationEffects {
       ofType(AnnotationActions.resumeTaskManually.do),
       withLatestFrom(this.store),
       exhaustMap(([action, state]) => {
-        const mode = getModeState(state);
+        const mode = getModeState(state)!;
 
         if (action.task && action.project) {
           // user selected one combination of project task
@@ -1518,8 +1520,8 @@ export class AnnotationEffects {
             project: Observable<ProjectDto>;
             task: Observable<TaskDto>;
           }>({
-            project: project ? of(project) : this.apiService.getProject(mode.previousSession.project.id),
-            task: this.apiService.getTask(project?.id ?? mode.previousSession.project.id, taskID),
+            project: project ? of(project) : this.apiService.getProject(mode.previousSession!.project.id),
+            task: this.apiService.getTask(project?.id ?? mode.previousSession!.project.id, taskID!),
           }).pipe(
             map((result) => {
               if (result.project && result.task) {
@@ -1529,7 +1531,7 @@ export class AnnotationEffects {
                   mode: action.mode,
                 });
               } else {
-                AnnotationActions.resumeTaskManually.fail({
+                return AnnotationActions.resumeTaskManually.fail({
                   mode: action.mode,
                   error: 'Missing project and/or task id',
                 });
@@ -1834,7 +1836,7 @@ export class AnnotationEffects {
                 return isValidAnnotation(
                   io,
                   this.audio.audioManager.resource.getOAudioFile(),
-                  modeState.importOptions?.SRT, // TODO improve import selection
+                  modeState.importOptions!['SRT'], // TODO improve import selection
                 );
               })
             : undefined;
@@ -1844,7 +1846,7 @@ export class AnnotationEffects {
             this.store.dispatch(
               LoginModeActions.setImportConverter.do({
                 mode: rootState.application.mode,
-                importConverter: importResult?.converter,
+                importConverter: importResult!.converter!,
               }),
             );
             newAnnotation = OctraAnnotation.deserialize(importResult?.annotjson);
@@ -2075,12 +2077,12 @@ export class AnnotationEffects {
     );
   }
 
-  sendToParentWindwo$ = createEffect(() =>
+  sendToParentWindow$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnotationActions.sendAnnotationToParentWindow.do),
       withLatestFrom(this.store),
-      exhaustMap(([action, state]) => {
-        const modeState = getModeState(state);
+      exhaustMap(([action, state]: [any, RootState]) => {
+        const modeState = getModeState(state)!;
         const aType = this.routingService.staticQueryParams.annotationExportType;
         let converter: Converter | undefined = undefined;
 
@@ -2097,7 +2099,11 @@ export class AnnotationEffects {
               },
               '*',
             );
-            return;
+            return of(
+              AnnotationActions.sendAnnotationToParentWindow.fail({
+                error: `Annotation conversion failed: No Converter found.`,
+              }),
+            );
           }
         }
 
@@ -2145,9 +2151,10 @@ export class AnnotationEffects {
       ofType(AnnotationActions.closeAllModals.do),
       exhaustMap(() => {
         for (const key of Object.keys(this.modals)) {
-          if (this.modals[key]) {
-            this.modals[key].close();
-            this.modals[key] = undefined;
+          const modals = this.modals as any;
+          if (modals[key]) {
+            modals[key].close();
+            modals[key] = undefined;
           }
         }
         return of(AnnotationActions.closeAllModals.success());

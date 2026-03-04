@@ -1,12 +1,15 @@
 const fs = require('fs-extra');
+const { execSync } = require('child_process');
 const concat = require('concat');
 
 const build = async () => {
   const files = [
     'tmp/web-components/main.js',
-    'tmp/web-components/polyfills.js',
-    'tmp/web-components/runtime.js',
+    'tmp/web-components/polyfills.js'
   ];
+
+  execSync('mv tmp/web-components/browser/* tmp/web-components/');
+  execSync('rm -rf tmp/web-components/browser');
 
   await fs.ensureDir('dist/libs/web-components');
   await concat(files, 'dist/libs/web-components/web-components.js');

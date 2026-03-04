@@ -44,7 +44,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   appStorage = inject(AppStorageService);
   routingService = inject(RoutingService);
 
-  static meta: SupportedOctraEditorMetaData = {
+  static override meta: SupportedOctraEditorMetaData = {
     name: 'Linear Editor',
     supportedLevelTypes: [AnnotationLevelType.SEGMENT],
     editor: LinearEditorComponent,
@@ -93,15 +93,20 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
 
   private mousestate = 'initiliazied';
 
-  private onAudioPlayPause = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent, shortcutGroup: ShortcutGroup) => {
-    const currentAudioChunk = shortcutGroup.name === 'signaldisplay_top_audio' ? this.audioChunkTop : this.audioChunkDown;
-    const controlName = shortcutGroup.name.replace('_audio', '');
+  private onAudioPlayPause = (
+    keyboardEvent: KeyboardEvent | undefined,
+    shortcut: Shortcut,
+    hotKeyEvent?: HotkeysEvent,
+    shortcutGroup?: ShortcutGroup,
+  ) => {
+    const currentAudioChunk = shortcutGroup?.name === 'signaldisplay_top_audio' ? this.audioChunkTop : this.audioChunkDown;
+    const controlName = shortcutGroup?.name.replace('_audio', '');
 
     if (currentAudioChunk) {
       this.selectedAudioChunk = currentAudioChunk;
       this.triggerUIActionAfterShortcut(
         {
-          shortcut: hotKeyEvent.shortcut,
+          shortcut: hotKeyEvent?.shortcut,
           value: shortcut.name,
         },
         controlName,
@@ -119,15 +124,15 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     }
   };
 
-  private onAudioStop = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent, shortcutGroup: ShortcutGroup) => {
-    const currentAudioChunk = shortcutGroup.name === 'signaldisplay_top_audio' ? this.audioChunkTop : this.audioChunkDown;
-    const controlName = shortcutGroup.name.replace('_audio', '');
+  private onAudioStop = (keyboardEvent: KeyboardEvent | undefined, shortcut: Shortcut, hotKeyEvent?: HotkeysEvent, shortcutGroup?: ShortcutGroup) => {
+    const currentAudioChunk = shortcutGroup?.name === 'signaldisplay_top_audio' ? this.audioChunkTop : this.audioChunkDown;
+    const controlName = shortcutGroup?.name.replace('_audio', '');
 
     if (currentAudioChunk) {
       this.selectedAudioChunk = currentAudioChunk;
       this.triggerUIActionAfterShortcut(
         {
-          shortcut: hotKeyEvent.shortcut,
+          shortcut: hotKeyEvent?.shortcut,
           value: shortcut.name,
         },
         controlName,
@@ -139,15 +144,20 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     }
   };
 
-  private onStepBackward = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent, shortcutGroup: ShortcutGroup) => {
-    const currentAudioChunk = shortcutGroup.name === 'signaldisplay_top_audio' ? this.audioChunkTop : this.audioChunkDown;
-    const controlName = shortcutGroup.name.replace('_audio', '');
+  private onStepBackward = (
+    keyboardEvent: KeyboardEvent | undefined,
+    shortcut: Shortcut,
+    hotKeyEvent?: HotkeysEvent,
+    shortcutGroup?: ShortcutGroup,
+  ) => {
+    const currentAudioChunk = shortcutGroup?.name === 'signaldisplay_top_audio' ? this.audioChunkTop : this.audioChunkDown;
+    const controlName = shortcutGroup?.name.replace('_audio', '');
 
     if (currentAudioChunk) {
       this.selectedAudioChunk = currentAudioChunk;
       this.triggerUIActionAfterShortcut(
         {
-          shortcut: hotKeyEvent.shortcut,
+          shortcut: hotKeyEvent?.shortcut,
           value: shortcut.name,
         },
         controlName,
@@ -159,15 +169,20 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     }
   };
 
-  private onStepBackwardTime = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent, shortcutGroup: ShortcutGroup) => {
-    const currentAudioChunk = shortcutGroup.name === 'signaldisplay_top_audio' ? this.audioChunkTop : this.audioChunkDown;
-    const controlName = shortcutGroup.name.replace('_audio', '');
+  private onStepBackwardTime = (
+    keyboardEvent: KeyboardEvent | undefined,
+    shortcut: Shortcut,
+    hotKeyEvent?: HotkeysEvent,
+    shortcutGroup?: ShortcutGroup,
+  ) => {
+    const currentAudioChunk = shortcutGroup?.name === 'signaldisplay_top_audio' ? this.audioChunkTop : this.audioChunkDown;
+    const controlName = shortcutGroup?.name.replace('_audio', '');
 
     if (currentAudioChunk) {
       this.selectedAudioChunk = currentAudioChunk;
       this.triggerUIActionAfterShortcut(
         {
-          shortcut: hotKeyEvent.shortcut,
+          shortcut: hotKeyEvent?.shortcut,
           value: shortcut.name,
         },
         controlName,
@@ -609,7 +624,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     }
   }
 
-  private triggerUIActionAfterShortcut($event: any, control: string, timestamp: number) {
+  private triggerUIActionAfterShortcut($event: any, control?: string, timestamp?: number) {
     const component: AudioViewerComponent = control === 'signaldisplay_top' ? this.signalDisplayTop : this.signalDisplayDown;
     if (this.appStorage.logging) {
       if (

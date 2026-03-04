@@ -2118,6 +2118,7 @@ export class AudioViewerService {
                   this.settings.boundaries.enabled &&
                   !this.settings.boundaries.readonly &&
                   this._focused &&
+                  this.currentLevel &&
                   this.currentLevel?.items &&
                   this.currentLevel.items.length > 0 &&
                   this.audioManager !== undefined
@@ -2205,16 +2206,18 @@ export class AudioViewerService {
                   const segment = this.currentLevel.items[segInde];
                   this.selectSegment(segInde)
                     .then(({ posY1, posY2 }) => {
-                      this._focused = false;
-                      this.drawWholeSelection();
-                      this.stage?.draw();
+                      if(this.currentLevel) {
+                        this._focused = false;
+                        this.drawWholeSelection();
+                        this.stage?.draw();
 
-                      this.segmententer.emit({
-                        itemID: segment.id,
-                        levelID: this.currentLevel.id,
-                        index: segInde,
-                        pos: { Y1: posY1, Y2: posY2 },
-                      });
+                        this.segmententer.emit({
+                          itemID: segment.id,
+                          levelID: this.currentLevel.id,
+                          index: segInde,
+                          pos: { Y1: posY1, Y2: posY2 },
+                        });
+                      }
                     })
                     .catch(() => {
                       this.alert.emit({

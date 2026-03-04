@@ -16,7 +16,7 @@ export class ConsoleLoggingServiceOptions {
 }
 
 export class ConsoleChangeEvent {
-  console: (ConsoleEntry | ConsoleGroupEntry)[];
+  console!: (ConsoleEntry | ConsoleGroupEntry)[];
 
   constructor(partial?: Partial<ConsoleChangeEvent>) {
     Object.assign(this, partial);
@@ -48,7 +48,7 @@ export interface ConsoleGroupEntry {
 export class ConsoleLoggingService {
   public readonly consoleChange = new Subject<ConsoleChangeEvent>();
 
-  private options: ConsoleLoggingServiceOptions;
+  private options!: ConsoleLoggingServiceOptions;
   private startedGroup?: ConsoleGroupEntry;
   private _console: (ConsoleEntry | ConsoleGroupEntry)[] = [];
   private initialized = false;

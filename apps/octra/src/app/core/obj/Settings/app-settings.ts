@@ -1,10 +1,10 @@
 export class AppSettings {
-  version: string;
+  version!: string;
   api?: {
     url: string;
     appToken: string;
   };
-  octra: {
+  octra!: {
     database: {
       name: string;
     };
@@ -56,7 +56,7 @@ export class AppSettings {
     Object.assign(this, {
       ...partial,
       octra: {
-        ...partial.octra,
+        ...partial!.octra,
         allowed_browsers: [
           {
             name: 'Chrome',

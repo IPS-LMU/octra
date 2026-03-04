@@ -99,18 +99,18 @@ export const reducer = createReducer(
       : undefined,
   })),
   on(ASRActions.stopItemProcessing.success, (state: ASRState) => {
-    const runningItems = state.queue.items.filter(
+    const runningItems = state.queue?.items.filter(
       (item) => item.status === ASRProcessStatus.STARTED,
-    );
+    ) ?? [];
 
     return {
       ...state,
       queue: {
-        ...state.queue,
+        ...state.queue!,
         status:
           runningItems.length === 0
             ? ASRProcessStatus.STOPPED
-            : state.queue.status,
+            : state.queue!.status!,
       },
     };
   }),

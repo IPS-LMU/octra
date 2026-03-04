@@ -19,7 +19,8 @@
         },
         "development": {}
       },
-      "defaultConfiguration": "production"
+      "defaultConfiguration": "production",
+      "dependsOn": ["utilities:build"]
     },
     "lint": {
       "executor": "@nx/eslint:lint"

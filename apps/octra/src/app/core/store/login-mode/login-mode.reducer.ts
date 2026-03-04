@@ -80,7 +80,7 @@ export class LoginModeReducers {
             return {
               ...state,
               previousCurrentLevel: state.transcript.currentLevel
-                ? state.transcript.levels.findIndex((a) => a.id === state.transcript.currentLevel.id)
+                ? state.transcript.levels.findIndex((a) => a.id === state.transcript.currentLevel?.id)
                 : initialState.previousCurrentLevel,
               previousSession:
                 state.currentSession.currentProject && state.currentSession.task?.id

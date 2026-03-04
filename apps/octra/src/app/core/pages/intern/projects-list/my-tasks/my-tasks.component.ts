@@ -47,7 +47,7 @@ class PreparedTask extends TaskDto {
 
   private async readTranscriptFile() {
     const audioFile = findCompatibleFileFromIO(this, 'audio', (io) => {
-      if (io.fileType.includes('audio')) {
+      if (io.fileType?.includes('audio')) {
         return io;
       }
       return undefined;
@@ -59,14 +59,14 @@ class PreparedTask extends TaskDto {
     ) {
       this.audio = {
         name: audioFile.filename,
-        url: this.api.prepareFileURL(audioFile?.url),
-        type: audioFile.fileType,
+        url: this.api.prepareFileURL(audioFile.url!),
+        type: audioFile.fileType!,
       };
 
       const oAudioFile = new OAudiofile();
       oAudioFile.name = audioFile.filename;
-      oAudioFile.type = audioFile.fileType;
-      oAudioFile.size = audioFile.size;
+      oAudioFile.type = audioFile.fileType!;
+      oAudioFile.size = audioFile.size!;
       oAudioFile.duration = audioFile.metadata.duration.seconds;
       oAudioFile.sampleRate = audioFile.metadata.sampleRate;
 
@@ -83,7 +83,7 @@ class PreparedTask extends TaskDto {
       if (transcriptFile?.annotjson) {
         const textConverter = new TextConverter();
         this.transcript = textConverter.export(
-          OAnnotJSON.deserialize(transcriptFile.annotjson),
+          OAnnotJSON.deserialize(transcriptFile.annotjson)!,
           oAudioFile,
           0,
         )?.file?.content;
@@ -139,7 +139,7 @@ export class MyTasksComponent extends DefaultComponent implements OnChanges {
 
   listMyPausedTasks() {
     this.subscribe(
-      this.api.listMyProcessedTasks(this.project.id, {
+      this.api.listMyProcessedTasks(this.project!.id, {
         representation: 'interval',
         start: (this.pagination.currentPage - 1) * this.options.itemsPerPage,
         length: this.options.itemsPerPage,
@@ -161,7 +161,7 @@ export class MyTasksComponent extends DefaultComponent implements OnChanges {
   }
 
   freeTask(task: PreparedTask) {
-    this.subscribe(this.api.freeTask(this.project.id, task.id), {
+    this.subscribe(this.api.freeTask(this.project!.id, task.id), {
       next: (task) => {
         this.listMyPausedTasks();
         this.alertService.showAlert(
@@ -180,7 +180,7 @@ export class MyTasksComponent extends DefaultComponent implements OnChanges {
 
   continueTaskClick(task: PreparedTask) {
     this.continueTask.emit({
-      project: this.project,
+      project: this.project!,
       task: removeProperties(task, ['api']),
     });
   }

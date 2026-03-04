@@ -271,7 +271,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
   }
 
   public selectLevel(tiernum: number) {
-    const level = this.annotationStoreService.transcript.levels[tiernum];
+    const level = this.annotationStoreService.transcript!.levels[tiernum];
     if (this.isLevelTypeSupported(level.type)) {
       this.annotationStoreService.setLevelIndex(tiernum);
     }

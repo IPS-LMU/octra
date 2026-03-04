@@ -82,7 +82,7 @@ export abstract class OCTRAEditor extends DefaultComponent {
     });
   }
 
-  public abstract openSegment(item: { levelID: number; itemID: number });
+  public abstract openSegment(item: { levelID: number; itemID: number }): void;
 
   protected checkIfSmallAudioChunk(audioChunk: AudioChunk, currentLevel: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>) {
     const emptySegment = currentLevel.items.find((a) => {

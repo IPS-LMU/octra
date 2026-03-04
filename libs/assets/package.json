@@ -18,8 +18,7 @@
   "devDependencies": {
     "@types/json-schema": ">0.0.0"
   },
-  "type": "commonjs",
+  "type": "module",
   "main": "./index.js",
-  "module": "./index.mjs",
-  "typings": "./index.d.ts"
+  "types": "./index.d.ts"
 }

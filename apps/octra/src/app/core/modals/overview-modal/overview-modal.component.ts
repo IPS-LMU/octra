@@ -47,7 +47,7 @@ export class OverviewModalComponent extends OctraModal implements OnInit, OnDest
   }
 
   public get sendValidTranscriptOnly(): boolean {
-    return this.settingsService.projectsettings.octra?.sendValidatedTranscriptionOnly;
+    return this.settingsService.projectsettings?.octra?.sendValidatedTranscriptionOnly ?? false;
   }
 
   public shownSegments: {

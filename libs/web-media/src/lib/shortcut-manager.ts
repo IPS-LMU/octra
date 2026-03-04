@@ -34,8 +34,8 @@ export interface Shortcut {
   title: string;
   label?: string;
   callback?: (
-    keyboardEvent?: KeyboardEvent,
-    shortcut?: Shortcut,
+    keyboardEvent: KeyboardEvent | undefined,
+    shortcut: Shortcut,
     hotkeyEvent?: HotkeysEvent,
     shortcutGroup?: ShortcutGroup,
   ) => void;

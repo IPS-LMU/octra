@@ -91,7 +91,7 @@ export class AsrStoreService {
       next: (queue) => {
         this.queue = queue;
         console.log("statistics");
-        console.log(queue.statistics);
+        console.log(queue?.statistics);
       }
     }));
   }

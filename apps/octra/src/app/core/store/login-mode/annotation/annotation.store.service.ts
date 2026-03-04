@@ -217,7 +217,7 @@ export class AnnotationStoreService {
   breakMarker$ = this.store.select((state: RootState) => getModeState(state)?.guidelines?.selected?.json?.markers?.find((a) => a.type === 'break'));
 
   importOptions$ = new BehaviorSubject<Record<string, any> | undefined>(undefined);
-  importConverter$ = new BehaviorSubject<string>(undefined);
+  importConverter$ = new BehaviorSubject<string | undefined>(undefined);
 
   public set comment(value: string | undefined) {
     this.changeComment(value ?? '');
@@ -892,7 +892,7 @@ export class AnnotationStoreService {
   overwriteTidyUpAnnotation() {
     const tidyUp = (window as any).tidyUpAnnotation;
 
-    (window as any).tidyUpAnnotation = (transcript, guidelines) => {
+    (window as any).tidyUpAnnotation = (transcript: any, guidelines: any) => {
       transcript = tidyUp(transcript, guidelines);
 
       // make sure there is only one speaker label for each unit if exists

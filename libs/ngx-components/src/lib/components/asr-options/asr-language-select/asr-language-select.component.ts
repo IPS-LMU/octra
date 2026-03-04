@@ -36,13 +36,7 @@ const defaultI18n: ASROptionsTranslations = {
   selector: 'octra-asr-language-select',
   templateUrl: './asr-language-select.component.html',
   styleUrls: ['./asr-language-select.component.scss'],
-  imports: [
-    NgbDropdown,
-    FormsModule,
-    NgbDropdownMenu,
-    NgbDropdownItem,
-    NgbDropdownToggle,
-  ],
+  imports: [NgbDropdown, FormsModule, NgbDropdownMenu, NgbDropdownItem, NgbDropdownToggle],
   providers: [
     {
       provide: NG_VALIDATORS,
@@ -56,26 +50,25 @@ const defaultI18n: ASROptionsTranslations = {
     },
   ],
 })
-export class OctraASRLanguageSelectComponent
-  extends SubscriberComponent
-  implements OnChanges, ControlValueAccessor, Validator
-{
+export class OctraASRLanguageSelectComponent extends SubscriberComponent implements OnChanges, ControlValueAccessor, Validator {
   @Input() languageSettings?: {
     services: ServiceProvider[];
-  };
+  } | null;
   @Input() id = 'languageDropdownMenu';
-  @Input() languages?: {
-    value: string;
-    providersOnly?: string[];
-    description: string;
-  }[];
+  @Input() languages?:
+    | {
+        value: string;
+        providersOnly?: string[];
+        description: string;
+      }[]
+    | null;
   @Input() i18n: ASROptionsTranslations = defaultI18n;
   @Input() options?: {
     accessCode?: string;
     selectedMausLanguage?: string;
     selectedASRLanguage?: string;
     selectedServiceProvider?: ServiceProvider;
-  };
+  } | null;
   @Output() optionsChange = new EventEmitter<{
     accessCode?: string;
     selectedMausLanguage?: string;
@@ -93,7 +86,7 @@ export class OctraASRLanguageSelectComponent
 
   private value?: string | null;
 
-  get internValue(): string | undefined {
+  get internValue(): string | undefined | null {
     return this.value;
   }
 
@@ -116,9 +109,7 @@ export class OctraASRLanguageSelectComponent
     super();
   }
 
-  validate(
-    control: AbstractControl<OctraASRLanguageSelectComponent>,
-  ): ValidationErrors | null {
+  validate(control: AbstractControl<OctraASRLanguageSelectComponent>): ValidationErrors | null {
     if (this.required && !this.value) {
       return {
         mustBeSet: true,
@@ -143,12 +134,12 @@ export class OctraASRLanguageSelectComponent
 
     setTimeout(() => {
       if (this.value) {
-        const language = this.languages.find((a) => a.value === this.value);
+        const language = this.languages?.find((a) => a.value === this.value);
         if (!language || !this.isLanguageSupportedByProvider(language)) {
           this.value = undefined;
         }
+        this.filterLanguages(this.value);
       }
-      this.filterLanguages(this.value);
     }, 0);
 
     const i18n = changes['i18n']?.currentValue;
@@ -160,36 +151,25 @@ export class OctraASRLanguageSelectComponent
     }
   }
 
-  private isLanguageSupportedByProvider(language: {
-    value: string;
-    providersOnly?: string[];
-    description: string;
-  }) {
+  private isLanguageSupportedByProvider(language: { value: string; providersOnly?: string[]; description: string }) {
     return (
       !this.options?.selectedServiceProvider ||
       !language.providersOnly ||
-      language.providersOnly.find(
-        (b) => b === this.options.selectedServiceProvider.provider,
-      ) !== undefined
+      language.providersOnly.find((b) => b === this.options?.selectedServiceProvider?.provider) !== undefined
     );
   }
 
-  filterLanguages(value?: string, dropdown?: NgbDropdown, emit?: boolean) {
+  filterLanguages(value?: string | null, dropdown?: NgbDropdown, emit?: boolean) {
     if (value) {
-      this.filtered = this.languages.filter(
-        (a) =>
-          (a.description?.toLowerCase().includes(value.toLowerCase()) ||
-            a.value?.toLowerCase().includes(value.toLowerCase())) &&
-          this.isLanguageSupportedByProvider(a),
-      );
+      this.filtered =
+        this.languages?.filter(
+          (a) =>
+            (a.description?.toLowerCase().includes(value.toLowerCase()) || a.value?.toLowerCase().includes(value.toLowerCase())) &&
+            this.isLanguageSupportedByProvider(a),
+        ) ?? [];
       dropdown?.open();
 
-      if (
-        this.languages.find(
-          (a) => a.value.toLowerCase() === value.toLowerCase(),
-        ) ||
-        value === ''
-      ) {
+      if (this.languages?.find((a) => a.value.toLowerCase() === value.toLowerCase()) || value === '') {
         this.options = {
           ...this.options,
           selectedASRLanguage: value ?? undefined,
@@ -199,16 +179,14 @@ export class OctraASRLanguageSelectComponent
         }
       }
     } else {
-      this.filtered = this.languages.filter((a) =>
-        this.isLanguageSupportedByProvider(a),
-      );
+      this.filtered = this.languages?.filter((a) => this.isLanguageSupportedByProvider(a)) ?? [];
     }
   }
 
   selectLanguage(language?: string, dropdown?: NgbDropdown) {
     dropdown?.close();
     if (language) {
-      const langItem = this.languages.find((a) => a.value === language);
+      const langItem = this.languages?.find((a) => a.value === language);
       if (!langItem) {
         language = '';
       }
@@ -219,29 +197,16 @@ export class OctraASRLanguageSelectComponent
   }
 
   onLanguageDropdownOpenChange(opened: boolean) {
-    if (
-      !opened &&
-      (!this.value ||
-        !this.languages.find(
-          (a) => a.value.toLowerCase() === this.value.toLowerCase(),
-        ))
-    ) {
+    if (!opened && (!this.value || !this.languages?.find((a) => a.value.toLowerCase() === this.value?.toLowerCase()))) {
       this.internValue = undefined;
-      this.filtered = this.languages.filter((a) =>
-        this.isLanguageSupportedByProvider(a),
-      );
+      this.filtered = this.languages?.filter((a) => this.isLanguageSupportedByProvider(a)) ?? [];
     }
   }
 
   onInputKeyup(event: KeyboardEvent, value: string, dropdown?: NgbDropdown) {
     this.filterLanguages(value, dropdown);
 
-    if (
-      event.key === 'Enter' ||
-      event.which === 13 ||
-      event.keyCode === 13 ||
-      event.code === 'Enter'
-    ) {
+    if (event.key === 'Enter' || event.which === 13 || event.keyCode === 13 || event.code === 'Enter') {
       this.selectLanguage(value, dropdown);
     } else if (value === '') {
       this.selectLanguage(undefined);

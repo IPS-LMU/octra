@@ -24,13 +24,7 @@ import {
   templateUrl: './octra-dropzone.component.html',
   styleUrls: ['./octra-dropzone.component.scss'],
   providers: [OctraDropzoneService],
-  imports: [
-    DropZoneComponent_1,
-    NgbPopover,
-    NgStyle,
-    OctraUtilitiesModule,
-    TranslocoPipe,
-  ],
+  imports: [DropZoneComponent_1, NgbPopover, NgStyle, OctraUtilitiesModule, TranslocoPipe],
 })
 export class OctraDropzoneComponent extends DefaultComponent {
   protected octraDropzoneService = inject(OctraDropzoneService);
@@ -57,11 +51,11 @@ export class OctraDropzoneComponent extends DefaultComponent {
     return this.octraDropzoneService.files;
   }
 
-  get oaudiofile(): OAudiofile {
+  get oaudiofile(): OAudiofile | undefined {
     return this.octraDropzoneService.oaudiofile;
   }
 
-  public get audioManager(): AudioManager {
+  public get audioManager(): AudioManager | undefined {
     return this.octraDropzoneService.audioManager;
   }
 
@@ -82,20 +76,13 @@ export class OctraDropzoneComponent extends DefaultComponent {
 
   getDropzoneFileString(file: { name: string; size: number }) {
     const fsize: FileSize = getFileSize(file.size);
-    return `${file.name} (${Math.round(fsize.size * 100) / 100} ${
-      fsize.label
-    })`;
+    return `${file.name} (${Math.round(fsize.size * 100) / 100} ${fsize.label})`;
   }
 
   showSupported() {
-    this.modService
-      .openModal(
-        SupportedFilesModalComponent,
-        SupportedFilesModalComponent.options,
-      )
-      .catch((error) => {
-        console.error(error);
-      });
+    this.modService.openModal(SupportedFilesModalComponent, SupportedFilesModalComponent.options).catch((error) => {
+      console.error(error);
+    });
   }
 
   onDeleteEntry($event: MouseEvent, fileProgressID: number) {

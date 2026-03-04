@@ -31,7 +31,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   appStorage = inject(AppStorageService);
   routingService = inject(RoutingService);
 
-  static meta: SupportedOctraEditorMetaData = {
+  static override meta: SupportedOctraEditorMetaData = {
     name: 'Dictaphone Editor',
     supportedLevelTypes: [AnnotationLevelType.SEGMENT],
     translate: 'interfaces.simple editor',
@@ -61,10 +61,10 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   private oldRaw = '';
   boundaryselected = false;
 
-  onAudioPlayerPlay = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent) => {
+  onAudioPlayerPlay = (keyboardEvent: KeyboardEvent | undefined, shortcut?: Shortcut, hotKeyEvent?: HotkeysEvent) => {
     this.triggerUIAction(keyboardEvent, {
-      shortcut: shortcut.name,
-      value: hotKeyEvent.shortcut,
+      shortcut: shortcut?.name,
+      value: hotKeyEvent?.shortcut,
     });
 
     if (this.audiochunk.isPlaying) {
@@ -78,10 +78,10 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     }
   };
 
-  onAudioStop = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent) => {
+  onAudioStop = (keyboardEvent: KeyboardEvent | undefined, shortcut?: Shortcut, hotKeyEvent?: HotkeysEvent) => {
     this.triggerUIAction(keyboardEvent, {
-      shortcut: shortcut.name,
-      value: hotKeyEvent.shortcut,
+      shortcut: shortcut?.name,
+      value: hotKeyEvent?.shortcut,
     });
 
     this.audiochunk.stopPlayback().catch((error: any) => {
@@ -89,10 +89,10 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     });
   };
 
-  onStepBackward = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent) => {
+  onStepBackward = (keyboardEvent: KeyboardEvent | undefined, shortcut?: Shortcut, hotKeyEvent?: HotkeysEvent) => {
     this.triggerUIAction(keyboardEvent, {
-      shortcut: shortcut.name,
-      value: hotKeyEvent.shortcut,
+      shortcut: shortcut?.name,
+      value: hotKeyEvent?.shortcut,
     });
 
     this.audiochunk.stepBackward().catch((error: any) => {
@@ -100,10 +100,10 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     });
   };
 
-  onStepBackwardTime = (keyboardEvent: KeyboardEvent, shortcut: Shortcut, hotKeyEvent: HotkeysEvent) => {
+  onStepBackwardTime = (keyboardEvent: KeyboardEvent | undefined, shortcut?: Shortcut, hotKeyEvent?: HotkeysEvent) => {
     this.triggerUIAction(keyboardEvent, {
-      shortcut: shortcut.name,
-      value: hotKeyEvent.shortcut,
+      shortcut: shortcut?.name,
+      value: hotKeyEvent?.shortcut,
     });
 
     this.audiochunk.stepBackwardTime(0.5).catch((error: any) => {
@@ -256,7 +256,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     }
   }
 
-  private triggerUIAction = (keyboardEvent: Event, shortcutObj: any) => {
+  private triggerUIAction = (keyboardEvent: Event | undefined, shortcutObj: any) => {
     shortcutObj.value = `audio:${shortcutObj.value}`;
     this.uiService.addElementFromEvent(
       'shortcut',
@@ -275,7 +275,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
 
     if (i > -1) {
       this.boundaryselected = true;
-      const start = i > 0 ? (this.annotationStoreService.currentLevel?.items[i - 1]! as any).time.samples : 0;
+      const start = i > 0 ? (this.annotationStoreService.currentLevel!.items[i - 1]! as any).time.samples : 0;
 
       new Promise<void>((resolve) => {
         if (this.audiochunk.isPlaying) {

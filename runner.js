@@ -18,7 +18,7 @@ async function buildLibrary(libraryName) {
       recursive: true,
     });
   }
-  await run(`nx build ${libraryName} --skip-nx-cache`);
+  await run(`nx build ${libraryName}`);
   await fs.copyFile(
     `libs/${libraryName}/LICENSE.txt`,
     `dist/libs/${libraryName}/LICENSE.txt`

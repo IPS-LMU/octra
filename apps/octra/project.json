@@ -24,7 +24,11 @@
           "apps/octra/src/ocb_info.json",
           "apps/octra/src/manifest.json"
         ],
-        "styles": ["node_modules/video.js/dist/video-js.min.css", "node_modules/jodit/es2021/jodit.min.css", "apps/octra/src/styles.scss"],
+        "styles": [
+          "node_modules/video.js/dist/video-js.min.css",
+          "node_modules/jodit/es2021/jodit.min.css",
+          "apps/octra/src/styles.scss"
+        ],
         "allowedCommonJsDependencies": [
           "jodit-angular",
           "ajv",

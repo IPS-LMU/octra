@@ -4,6 +4,7 @@
   "license": "MIT",
   "author": "Julian Pömp, Christoph Draxler; Institut für Phonetik und Sprachverarbeitung, LMU München",
   "scripts": {
+    "postinstall": "echo \"Apply fix for bootstrap-icons: Copy bootstrap-icons to assets...\" && rm -rf apps/octra/src/assets/bootstrap-icons && cp -rf node_modules/bootstrap-icons/ apps/octra/src/assets/bootstrap-icons",
     "start": "npm run start:octra",
     "start:octra": "nx serve octra --no-tui",
     "start:json-sets-demo": "nx serve json-sets-demo --no-tui",

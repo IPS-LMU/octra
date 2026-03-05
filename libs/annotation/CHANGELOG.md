@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.3.6](https://github.com/IPS-LMU/octra/compare/annotation-1.3.5...annotation-1.3.6) (2026-03-05)
+
+
+### Bug Fixes
+
+* **octra:** SRTConverter creates infinite loop trying to combine segments with same speakers ([86a11d4](https://github.com/IPS-LMU/octra/commit/86a11d46a9d8c672573ec0f3ed79f9435e92ff53))
+
+
+
 ## [1.3.5](https://github.com/IPS-LMU/octra/compare/annotation-1.3.4...annotation-1.3.5) (2026-01-28)
 
 

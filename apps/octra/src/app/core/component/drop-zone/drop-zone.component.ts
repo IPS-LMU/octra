@@ -1,8 +1,11 @@
 import { NgStyle } from '@angular/common';
 import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
+  inject,
   Input,
   OnInit,
   Output,
@@ -15,16 +18,15 @@ import { SessionFile } from '../../obj/SessionFile';
   templateUrl: './drop-zone.component.html',
   styleUrls: ['./drop-zone.component.scss'],
   imports: [NgStyle],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DropZoneComponent implements OnInit {
-  @Input()
-  innerhtml = '';
   @Input() height = 'auto';
   @Output() public afterdrop: EventEmitter<File[]> = new EventEmitter<File[]>();
   @ViewChild('fileinput', { static: true }) fileinput!: ElementRef;
   private fileAPIsupported = false;
-
   private _files?: File[];
+  private cd = inject(ChangeDetectorRef);
 
   get files(): File[] | undefined {
     return this._files;
@@ -47,6 +49,7 @@ export class DropZoneComponent implements OnInit {
     $event.stopPropagation();
     $event.preventDefault();
     $event.dataTransfer!.dropEffect = 'copy';
+    this.cd.markForCheck();
   }
 
   onFileDrop($event: DragEvent) {
@@ -56,16 +59,19 @@ export class DropZoneComponent implements OnInit {
     if (this.fileAPIsupported) {
       this._files = this.filterFiles($event.dataTransfer!.files);
       this.afterdrop.emit(Array.from(this._files));
+      this.cd.markForCheck();
     }
   }
 
   onClick() {
     this.fileinput.nativeElement.click();
+    this.cd.markForCheck();
   }
 
   onFileChange($event: any) {
     this._files = this.filterFiles($event.target.files);
     this.afterdrop.emit(this._files);
+    this.cd.markForCheck();
   }
 
   private filterFiles(files: FileList): File[] {

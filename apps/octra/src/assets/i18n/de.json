@@ -35,7 +35,7 @@
     "password reset success": "Wenn ein Benutzerkonto mit deiner E-Mail Adresse existiert, erhältst Du eine E-Mail für die Passwort-Zurücksetzung. Prüfe auch bitte auch deinen Spam/Junk Ordner. Please have a look on your spam/junk folder, too.",
     "signin": "Bitte anmelden",
     "signin credentials": "Mit Zugangsdaten anmelden",
-    "signin university": "Über Universitätsnetzwerk anmelden",
+    "signin university": "Über Universitätsnetzwerk anmelden / registrieren",
     "window closed": "Dieses Fenster wird in {{seconds}} Sekunden automatisch geschlossen.",
     "you are authenticated": "Du bist authentifiziert!"
   },

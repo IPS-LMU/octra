@@ -7,7 +7,7 @@
 </div>
 <octra-drop-zone #dropzone (afterdrop)="afterDrop()" [height]="height">
   <table [hidden]="files.length === 0" class="dropzone-table position-relative">
-    @for (fileProgress of files; track fileProgress) {
+    @for (fileProgress of files; track fileProgress.id) {
       <tr>
         <td class="text-center">
           @if (fileProgress.status === 'invalid') {

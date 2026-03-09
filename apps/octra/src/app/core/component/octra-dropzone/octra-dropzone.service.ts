@@ -277,6 +277,7 @@ export class OctraDropzoneService {
 
   private async checkForValidFiles(showOptionsModal = true) {
     for (const fileProgress of this._files) {
+      console.log(fileProgress);
       if (fileProgress.status !== 'progress') {
         const isAudioFile = AudioManager.isValidAudioFileName(fileProgress.file.fullname, AppInfo.audioformats);
         if (!isAudioFile && !(fileProgress.file.type.includes('image') || fileProgress.file.type.includes('video'))) {

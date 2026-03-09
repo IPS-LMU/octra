@@ -1836,7 +1836,7 @@ export class AnnotationEffects {
                 return isValidAnnotation(
                   io,
                   this.audio.audioManager.resource.getOAudioFile(),
-                  modeState.importOptions!['SRT'], // TODO improve import selection
+                  modeState.importOptions ? modeState.importOptions!['SRT'] : undefined
                 );
               })
             : undefined;

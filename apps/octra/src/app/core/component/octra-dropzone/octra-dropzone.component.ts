@@ -1,5 +1,5 @@
 import { NgStyle } from '@angular/common';
-import { Component, inject, Input, Output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { OAnnotJSON } from '@octra/annotation';
@@ -14,10 +14,7 @@ import { FileProgress } from '../../obj/objects';
 import { DefaultComponent } from '../default.component';
 import { DropZoneComponent } from '../drop-zone';
 import { DropZoneComponent as DropZoneComponent_1 } from '../drop-zone/drop-zone.component';
-import {
-  DropzoneStatistics,
-  OctraDropzoneService,
-} from './octra-dropzone.service';
+import { DropzoneStatistics, OctraDropzoneService } from './octra-dropzone.service';
 
 @Component({
   selector: 'octra-dropzone',
@@ -25,10 +22,12 @@ import {
   styleUrls: ['./octra-dropzone.component.scss'],
   providers: [OctraDropzoneService],
   imports: [DropZoneComponent_1, NgbPopover, NgStyle, OctraUtilitiesModule, TranslocoPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OctraDropzoneComponent extends DefaultComponent {
+export class OctraDropzoneComponent extends DefaultComponent implements OnInit {
   protected octraDropzoneService = inject(OctraDropzoneService);
   private modService = inject(OctraModalService);
+  private cd = inject(ChangeDetectorRef);
 
   @ViewChild('dropzone', { static: true }) dropzone!: DropZoneComponent;
   @Input() height = '250px';
@@ -92,6 +91,14 @@ export class OctraDropzoneComponent extends DefaultComponent {
 
       this.octraDropzoneService.remove(fileProgressID);
     }
+  }
+
+  ngOnInit() {
+    this.subscribe(this.octraDropzoneService.filesChange, {
+      next: () => {
+        this.cd.markForCheck();
+      },
+    });
   }
 
   override ngOnDestroy() {

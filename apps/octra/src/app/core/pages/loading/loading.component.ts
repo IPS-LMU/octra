@@ -1,5 +1,5 @@
 import { NgStyle } from '@angular/common';
-import { Component, inject, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
 import { navigateTo } from '@octra/ngx-utilities';
@@ -14,6 +14,7 @@ import { ApplicationStoreService } from '../../store/application/application-sto
   selector: 'octra-loading',
   templateUrl: './loading.component.html',
   styleUrls: ['./loading.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgStyle],
 })
 export class LoadingComponent extends DefaultComponent implements OnInit {
@@ -23,6 +24,7 @@ export class LoadingComponent extends DefaultComponent implements OnInit {
   appStoreService = inject(ApplicationStoreService);
   audio = inject(AudioService);
   private router = inject(Router);
+  private cd = inject(ChangeDetectorRef);
 
   @Output() loaded = false;
   public text = '';
@@ -44,11 +46,13 @@ export class LoadingComponent extends DefaultComponent implements OnInit {
       .selectTranslate('g.please wait')
       .subscribe((translation) => {
         this.text = translation + '... ';
+        this.cd.markForCheck();
       });
 
     this.subscribe(this.appStoreService.loading$, {
       next: (loading) => {
         this.loading = loading;
+        this.cd.markForCheck();
       },
     });
   }

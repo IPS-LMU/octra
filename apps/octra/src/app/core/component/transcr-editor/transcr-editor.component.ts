@@ -1626,7 +1626,6 @@ export class TranscrEditorComponent
           target.offsetTop - height + this.toolbar.offsetHeight,
         );
         this.cd.markForCheck();
-        this.cd.detectChanges();
       }
     } else {
       console.error(`errorcode is undefined!`);

@@ -1,6 +1,6 @@
 import { AsyncPipe, NgClass, NgStyle } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbAccordionModule, NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, ofType } from '@ngrx/effects';
@@ -46,6 +46,7 @@ class PreparedProjectDto extends ProjectDto {
   selector: 'octra-projects-list',
   templateUrl: './projects-list.component.html',
   styleUrls: ['./projects-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [AsyncPipe, TranslocoPipe, LuxonShortDateTimePipe, NgbPagination, NgStyle, NgbAccordionModule, NgClass, MyTasksComponent],
 })
 export class ProjectsListComponent extends DefaultComponent implements OnInit {
@@ -57,6 +58,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   private store = inject<Store<RootState>>(Store);
   private actions$ = inject(Actions);
   private settings = inject(SettingsService);
+  private cd = inject(ChangeDetectorRef);
 
   projects?: ProjectListDto;
   shownProjects?: PreparedProjectDto[];
@@ -95,10 +97,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     });
     this.subscribe(authStoreService.sameUserWithOpenTask$, {
       next: (result) => {
-        this.sameUserWithOpenTask = {
-          projectID: result!.projectID!,
-          taskID: result!.taskID!,
-        };
+        this.sameUserWithOpenTask = result;
         if (result?.projectID) {
           this.subscribe(this.api.getProject(result.projectID), {
             next: (result) => {
@@ -160,6 +159,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
             const ref = this.modalService.openModalRef<ErrorModalComponent>(ErrorModalComponent, ErrorModalComponent.options);
             ref.componentInstance.text = error.message;
           }
+          this.cd.markForCheck();
         },
       },
     );
@@ -171,6 +171,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
       page,
       collectionSize: this.projects!.list.length,
     };
+    this.cd.markForCheck();
   }
 
   onStartNewTaskClick(project: ProjectDto) {

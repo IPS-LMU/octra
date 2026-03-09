@@ -103,15 +103,7 @@ export class BugreportModalComponent extends SubscriberComponent implements Afte
     screenshots: any[];
   }>();
 
-  _i18n: BugReportTranslations = defaultTranslations;
-
-  get i18n() {
-    return this._i18n;
-  }
-
-  set i18n(value: BugReportTranslations) {
-    this._i18n = value;
-  }
+  i18n: BugReportTranslations = defaultTranslations;
 
   public get isvalid(): boolean {
     return this.sendProObj || this.bgdescr !== '';

@@ -16,6 +16,7 @@ import { ErrorModalComponent } from './error-modal/error-modal.component';
 import { FeedbackNoticeModalComponent } from './feedback-notice-modal/feedback-notice-modal.component';
 import { NgbModalWrapper } from './ng-modal-wrapper';
 import { ReAuthenticationModalComponent } from './re-authentication-modal/re-authentication-modal.component';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable()
 export class OctraModalService implements OnDestroy {
@@ -23,6 +24,7 @@ export class OctraModalService implements OnDestroy {
   private bugService = inject(BugReportService);
   private appStorage = inject(AppStorageService);
   private store = inject<Store<RootState>>(Store);
+  private transloco = inject(TranslocoService);
 
   onModalAction = new EventEmitter<{
     name: string;
@@ -48,7 +50,7 @@ export class OctraModalService implements OnDestroy {
   public openModalRef<T>(
     modal: any,
     config: NgbModalOptions,
-    data?: any,
+    data?: Partial<T>,
   ): NgbModalWrapper<T> {
     const ref = this.modalService.open(modal, {
       ...config,
@@ -147,25 +149,34 @@ export class OctraModalService implements OnDestroy {
 
   openBugreportModal() {
     this.bugService.getPackage();
-    const ref = this.openModalRef<BugreportModalComponent>(
-      BugreportModalComponent,
-      BugreportModalComponent.options,
-      {
-        pkgText: this.bugService.pkgText,
-        showSenderFields:
-          this.appStorage.useMode !== LoginMode.ONLINE ||
-          !this.appStorage.loggedIn,
-        _profile: {
-          ...((this.appStorage.useMode !== LoginMode.ONLINE ||
-          !this.appStorage.loggedIn
-            ? this.appStorage.snapshot.user
-            : {
-                email: this.appStorage.snapshot.authentication?.me?.email,
-                name: `${this.appStorage.snapshot.authentication?.me?.first_name} ${this.appStorage.snapshot.authentication?.me?.last_name}`,
-              }) ?? {}),
-        },
+    const ref = this.openModalRef<BugreportModalComponent>(BugreportModalComponent, BugreportModalComponent.options, {
+      pkgText: this.bugService.pkgText,
+      showSenderFields: this.appStorage.useMode !== LoginMode.ONLINE || !this.appStorage.loggedIn,
+      _profile: {
+        ...((this.appStorage.useMode !== LoginMode.ONLINE || !this.appStorage.loggedIn
+          ? this.appStorage.snapshot.user
+          : {
+              email: this.appStorage.snapshot.authentication?.me?.email,
+              name: `${this.appStorage.snapshot.authentication?.me?.first_name} ${this.appStorage.snapshot.authentication?.me?.last_name}`,
+            }) ?? {}),
       },
-    );
+      i18n: {
+        abort: this.transloco.translate('g.abort'),
+        description: this.transloco.translate('g.description'),
+        addProtocol: this.transloco.translate('bug report.add protocol'),
+        introduction: this.transloco.translate('bug report.description'),
+        error: this.transloco.translate('bug report.error'),
+        eMail: this.transloco.translate('g.e-mail'),
+        giveFeedback: this.transloco.translate('bug report.give feedback'),
+        sending: this.transloco.translate('bug report.sending'),
+        bugReportSent: this.transloco.translate('bug report.sent'),
+        name: this.transloco.translate('g.name'),
+        protocol: this.transloco.translate('g.protocol'),
+        screenshots: this.transloco.translate('g.screenshots'),
+        sendFeedback: this.transloco.translate('g.send now')
+      },
+    });
+
     this.subscrManager.add(
       ref.componentInstance.profileChange.subscribe({
         next: ({ email, name }: any) => {
@@ -179,15 +190,7 @@ export class OctraModalService implements OnDestroy {
         next: ({ name, email, message, sendProtocol, screenshots }: any) => {
           console.log('Sending bug report...');
           ref.componentInstance.sendStatus = 'sending';
-          ref.componentInstance.waitForSendResponse(
-            this.bugService.sendReport(
-              name,
-              email,
-              message,
-              sendProtocol,
-              screenshots,
-            ),
-          );
+          ref.componentInstance.waitForSendResponse(this.bugService.sendReport(name, email, message, sendProtocol, screenshots));
         },
       }),
     );

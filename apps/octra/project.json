@@ -43,7 +43,7 @@
         "scripts": ["apps/octra/src/assets/js/modernizr.js", "node_modules/hammerjs/hammer.min.js"],
         "extractLicenses": true,
         "serviceWorker": "apps/octra/ngsw-config.json",
-        "polyfills": ["zone.js", "@angular/localize/init"]
+        "polyfills": ["@angular/localize/init"]
       },
       "configurations": {
         "production": {

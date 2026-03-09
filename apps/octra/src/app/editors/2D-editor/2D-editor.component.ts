@@ -520,7 +520,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           this.viewer.disableShortcuts();
 
           this.window?.close();
-          this.window = this.modalService.openModalRef(TranscrWindowComponent, TranscrWindowComponent.options, {
+          this.window = this.modalService.openModalRef<TranscrWindowComponent>(TranscrWindowComponent, TranscrWindowComponent.options, {
             audiochunk: this.audioChunkWindow,
             easyMode: this.appStorage.easyMode,
             segmentIndex: this.selectedIndex,

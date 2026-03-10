@@ -461,10 +461,9 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.editorSettings.markers = this.annotationStoreService.guidelines?.markers ?? [];
     this.editorSettings.disabledKeys.push('SHIFT + SPACE');
 
-    this.subscribe(this.annotationStoreService.currentLevel$, ($event) => {
+    this.subscribe(this.annotationStoreService.currentLevelIndex$, ($event) => {
       if (!this.saving) {
-        this.subscribe(timer(1000), () => {
-          this.saving = true;
+        this.subscribe(timer(0), () => {
           this.onLevelChange();
         });
       }
@@ -549,6 +548,11 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   onLevelChange() {
+    this.saving = true;
+    this.signalDisplayTop?.redraw();
+    this.signalDisplayDown?.redraw();
+    this.cd.markForCheck();
+    this.cd.detectChanges();
     this.saving = false;
   }
 

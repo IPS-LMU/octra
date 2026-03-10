@@ -728,7 +728,8 @@ export class TranscrEditorComponent
       obj['segments'].currentValue !== undefined &&
       !obj['segments'].firstChange
     ) {
-      this.setSegments(obj['segments'] as any);
+      this.setSegments(obj['segments'].currentValue);
+      this.cd.markForCheck();
     }
 
     if (renew) {
@@ -1448,6 +1449,7 @@ export class TranscrEditorComponent
           next: async () => {
             await this.validate();
             await this.initPopover();
+            this.cd.markForCheck();
           },
         },
         'initialization',

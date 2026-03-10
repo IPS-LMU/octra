@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ComponentRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ComponentRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { hasProperty, joinURL } from '@octra/utilities';
@@ -46,6 +46,7 @@ import { AnnotationStoreService } from '../../../store/login-mode/annotation/ann
   selector: 'octra-transcription',
   templateUrl: './transcription.component.html',
   styleUrls: ['./transcription.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgClass, FastbarComponent, LoadeditorDirective, FormsModule, AsyncPipe, TranslocoPipe],
 })
 export class TranscriptionComponent extends DefaultComponent implements OnInit, OnDestroy {
@@ -83,8 +84,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
   modalGuidelines?: NgbModalRef;
   inactivityModal?: NgbModalRef;
 
-  @ViewChild(LoadeditorDirective, { static: true })
-  appLoadeditor!: LoadeditorDirective;
+  @ViewChild(LoadeditorDirective, { static: true }) appLoadeditor!: LoadeditorDirective;
 
   public sendError = '';
   public saving = '';
@@ -416,14 +416,16 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
 
     this.subscribe(this.actions.pipe(ofType(AnnotationActions.overviewModal.send)), {
       next: () => {
-        this.onSendNowClick();
         this.cd.markForCheck();
+        this.cd.detectChanges();
+        this.onSendNowClick();
       },
     });
 
     this.subscribe(this.actions.pipe(ofType(AnnotationActions.overviewModal.close)), {
       next: () => {
         this.cd.markForCheck();
+        this.cd.detectChanges();
       },
     });
 
@@ -580,6 +582,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     return new Promise<void>((resolve, reject) => {
       this.subscriptionManager.removeByTag('unsupported level');
       this.editorloaded = false;
+      this.cd.markForCheck();
       this.cd.detectChanges();
       let comp: any;
 
@@ -607,12 +610,22 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
             if (this.isLevelSupportedByEditor(comp)) {
               this._currentEditor = viewContainerRef.createComponent<OCTRAEditor>(comp);
 
-              const id = this.subscribe(this._currentEditor.instance.initialized, () => {
-                this.editorloaded = true;
-                this.subscriptionManager.removeById(id);
-                this.cd.detectChanges();
+              this.cd.markForCheck();
+              this.cd.detectChanges();
 
-                resolve();
+              const id = this.subscribe(this._currentEditor.instance.initialized, {
+                next: () => {
+                  this.editorloaded = true;
+                  this.subscriptionManager.removeById(id);
+
+                  this.cd.markForCheck();
+                  this.cd.detectChanges();
+
+                  resolve();
+                },
+                error: (a) => {
+                  console.error(a);
+                }
               });
               if (hasProperty(this.currentEditor.instance as any, 'openModal')) {
                 this.subscribe((this.currentEditor.instance as any).openModal, () => {
@@ -644,6 +657,8 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
                   next: async (anno) => {
                     if (currentLevelindex !== anno?.selectedLevelIndex) {
                       await this.changeEditor(this.interface!, false);
+                      this.cd.markForCheck();
+                      this.cd.detectChanges();
                     }
                   },
                 },
@@ -651,6 +666,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
               );
             }
 
+            this.cd.markForCheck();
             this.cd.detectChanges();
           });
         } else {
@@ -712,8 +728,9 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     if ((!validTranscript && showOverview) || (validTranscriptOnly && !validTranscript)) {
       this.annotationStoreService.openOverviewModal();
     } else {
-      this.onSendNowClick();
       this.cd.markForCheck();
+      this.cd.detectChanges();
+      this.onSendNowClick();
     }
   }
 

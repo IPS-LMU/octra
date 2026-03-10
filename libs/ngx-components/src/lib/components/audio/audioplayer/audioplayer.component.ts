@@ -1,7 +1,10 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ElementRef,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -21,12 +24,15 @@ import KonvaEventObject = Konva.KonvaEventObject;
 @Component({
   selector: 'octra-audioplayer',
   templateUrl: './audioplayer.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./audioplayer.component.css'],
   imports: [TimespanPipe],
 })
 export class AudioplayerComponent
   implements OnInit, AfterViewInit, OnChanges, OnDestroy
 {
+  private cd = inject(ChangeDetectorRef);
+
   @Input() audioChunk: AudioChunk | undefined;
   @ViewChild('konvaContainer', { static: true }) konvaContainer:
     | ElementRef
@@ -157,6 +163,7 @@ export class AudioplayerComponent
         },
       );
     }
+    this.cd.markForCheck();
   }
 
   ngAfterViewInit(): void {
@@ -407,11 +414,13 @@ export class AudioplayerComponent
         this.onPlaybackEnded();
         break;
     }
+    this.cd.markForCheck();
   };
 
   private doPlayHeadAnimation = () => {
     if (this.canvasElements?.playHead !== undefined) {
       this.canvasElements.playHead.x(this.getPlayHeadX);
+      this.cd.markForCheck();
     }
   };
 
@@ -498,6 +507,7 @@ export class AudioplayerComponent
           this._settings.playHead.width / 2,
       );
       this.audioChunk.startpos = this.audioChunk.absolutePlayposition;
+      this.cd.markForCheck();
     }
   };
 }

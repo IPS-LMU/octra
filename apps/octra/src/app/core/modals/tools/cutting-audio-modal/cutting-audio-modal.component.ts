@@ -1,18 +1,7 @@
 import { DecimalPipe, NgStyle } from '@angular/common';
-import {
-  Component,
-  ElementRef,
-  inject,
-  OnDestroy,
-  ViewChild,
-  ViewEncapsulation,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  DomSanitizer,
-  SafeResourceUrl,
-  SafeUrl,
-} from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { OctraAnnotationSegmentLevel } from '@octra/annotation';
@@ -21,15 +10,8 @@ import { AudioCutter, IntArray } from '@octra/web-media';
 import { strToU8, zip, zipSync } from 'fflate';
 import { interval } from 'rxjs';
 import { AppInfo } from '../../../../app.info';
-import {
-  JSONConverter,
-  TextTableConverter,
-} from '../../../obj/tools/audio-cutting/cutting-format';
-import {
-  AlertService,
-  AudioService,
-  SettingsService,
-} from '../../../shared/service';
+import { JSONConverter, TextTableConverter } from '../../../obj/tools/audio-cutting/cutting-format';
+import { AlertService, AudioService, SettingsService } from '../../../shared/service';
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 import { NamingDragAndDropComponent } from '../../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import { ErrorModalComponent } from '../../error-modal/error-modal.component';
@@ -40,20 +22,11 @@ import { OctraModal } from '../../types';
   selector: 'octra-cutting-audio-modal',
   templateUrl: './cutting-audio-modal.component.html',
   styleUrls: ['./cutting-audio-modal.component.scss'],
-  imports: [
-    FormsModule,
-    TranslocoPipe,
-    OctraUtilitiesModule,
-    DecimalPipe,
-    NamingDragAndDropComponent,
-    NgStyle,
-  ],
+  imports: [FormsModule, TranslocoPipe, OctraUtilitiesModule, DecimalPipe, NamingDragAndDropComponent, NgStyle],
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CuttingAudioModalComponent
-  extends OctraModal
-  implements OnDestroy
-{
+export class CuttingAudioModalComponent extends OctraModal implements OnDestroy {
   annotationStoreService = inject(AnnotationStoreService);
   audio = inject(AudioService);
   transloco = inject(TranslocoService);
@@ -62,6 +35,7 @@ export class CuttingAudioModalComponent
   protected sanitizer = inject(DomSanitizer);
   protected modalsService = inject(OctraModalService);
   protected override activeModal: NgbActiveModal;
+  private cd = inject(ChangeDetectorRef);
 
   public static options: NgbModalOptions = {
     keyboard: false,
@@ -187,28 +161,15 @@ export class CuttingAudioModalComponent
     if (!this.annotationStoreService.transcript?.currentLevel) {
       return;
     }
-    if (
-      this.annotationStoreService.transcript.currentLevel instanceof
-      OctraAnnotationSegmentLevel
-    ) {
-      for (
-        let i = 0;
-        i < this.annotationStoreService.transcript.currentLevel.items.length;
-        i++
-      ) {
-        const segment =
-          this.annotationStoreService.transcript.currentLevel.items[i]!;
+    if (this.annotationStoreService.transcript.currentLevel instanceof OctraAnnotationSegmentLevel) {
+      for (let i = 0; i < this.annotationStoreService.transcript.currentLevel.items.length; i++) {
+        const segment = this.annotationStoreService.transcript.currentLevel.items[i]!;
 
         let sampleDur = segment.time.samples - startSample;
 
-        if (
-          startSample + sampleDur >
-          this.audio.audiomanagers[0].resource.info.duration.samples
-        ) {
+        if (startSample + sampleDur > this.audio.audiomanagers[0].resource.info.duration.samples) {
           console.error(`invalid sampleDur!!`);
-          sampleDur =
-            this.audio.audiomanagers[0].resource.info.duration.samples -
-            startSample;
+          sampleDur = this.audio.audiomanagers[0].resource.info.duration.samples - startSample;
         }
 
         cutList.push({
@@ -239,205 +200,143 @@ export class CuttingAudioModalComponent
     let totalSize = 0;
     let cuttingStarted = 0;
 
-    this.state.subscriptionIDs[1] = this.subscribe(
-      this.state.cutter.onaudiocut,
-      {
-        next: (status: {
-          finishedSegments: number;
-          fileName: string;
-          intArray: IntArray;
-        }) => {
-          this.state.progress = Math.round(
-            (status.finishedSegments / overallTasks) * 100,
+    this.state.subscriptionIDs[1] = this.subscribe(this.state.cutter.onaudiocut, {
+      next: (status: { finishedSegments: number; fileName: string; intArray: IntArray }) => {
+        this.state.progress = Math.round((status.finishedSegments / overallTasks) * 100);
+        if (this.state.archiveStructure === undefined) {
+          this.state.archiveStructure = {};
+        }
+        this.state.archiveStructure[status.fileName + '.wav'] = status.intArray;
+        totalSize += status.intArray.byteLength / 2;
+
+        if (this.state.cuttingSpeed < 0) {
+          const now = Date.now();
+          this.state.cuttingSpeed = (now - cuttingStarted) / 1000 / status.intArray.length;
+
+          const rest = this.audio.audioManager.resource.arraybuffer!.byteLength - totalSize;
+          this.state.cuttingTimeLeft = this.state.cuttingSpeed * rest;
+
+          const zippingSpeed = this.state.zippingSpeed;
+          this.state.timeLeft = Math.ceil(
+            (this.state.cuttingTimeLeft + this.audio.audioManager.resource.arraybuffer!.byteLength * zippingSpeed + 10) * 1000,
           );
-          if (this.state.archiveStructure === undefined) {
-            this.state.archiveStructure = {};
-          }
-          this.state.archiveStructure[status.fileName + '.wav'] =
-            status.intArray;
-          totalSize += status.intArray.byteLength / 2;
 
-          if (this.state.cuttingSpeed < 0) {
-            const now = Date.now();
-            this.state.cuttingSpeed =
-              (now - cuttingStarted) / 1000 / status.intArray.length;
+          this.state.subscriptionIDs[2] = this.subscribe(interval(1000), () => {
+            this.state.timeLeft -= 1000;
+            this.cd.markForCheck();
+          });
+        }
 
-            const rest =
-              this.audio.audioManager.resource.arraybuffer!.byteLength -
-              totalSize;
-            this.state.cuttingTimeLeft = this.state.cuttingSpeed * rest;
+        if (status.finishedSegments === cutList.length) {
+          // all segments cutted
+          let finished = cutList.length;
+          let lastCheck = -1;
 
-            const zippingSpeed = this.state.zippingSpeed;
-            this.state.timeLeft = Math.ceil(
-              (this.state.cuttingTimeLeft +
-                this.audio.audioManager.resource.arraybuffer!.byteLength *
-                  zippingSpeed +
-                10) *
-                1000,
+          if (this.state.exportFormats[0].selected) {
+            // add TextTable
+            const converter = new TextTableConverter();
+            const content = converter.exportList(
+              cutList,
+              this.audio.audioManager.resource.info,
+              this.audio.audioManager.resource.info.fullname,
+              this.namingConvention.namingConvention,
             );
 
-            this.state.subscriptionIDs[2] = this.subscribe(
-              interval(1000),
-              () => {
-                this.state.timeLeft -= 1000;
-              },
-            );
+            this.state.archiveStructure[this.audio.audioManager.resource.info.name + '_meta.txt'] = strToU8(content);
+            finished++;
           }
 
-          if (status.finishedSegments === cutList.length) {
-            // all segments cutted
-            let finished = cutList.length;
-            let lastCheck = -1;
+          if (this.state.exportFormats[1].selected) {
+            // add JSON
+            const converter = new JSONConverter();
+            const content = converter.exportList(
+              cutList,
+              this.audio.audioManager.resource.info,
+              this.audio.audioManager.resource.info.fullname,
+              this.namingConvention.namingConvention,
+            );
 
-            if (this.state.exportFormats[0].selected) {
-              // add TextTable
-              const converter = new TextTableConverter();
-              const content = converter.exportList(
-                cutList,
-                this.audio.audioManager.resource.info,
-                this.audio.audioManager.resource.info.fullname,
-                this.namingConvention.namingConvention,
-              );
+            this.state.archiveStructure[this.audio.audioManager.resource.info.name + '_meta.json'] = strToU8(JSON.stringify(content, undefined, 2));
+            finished++;
+          }
 
-              this.state.archiveStructure[
-                this.audio.audioManager.resource.info.name + '_meta.txt'
-              ] = strToU8(content);
-              finished++;
-            }
-
-            if (this.state.exportFormats[1].selected) {
-              // add JSON
-              const converter = new JSONConverter();
-              const content = converter.exportList(
-                cutList,
-                this.audio.audioManager.resource.info,
-                this.audio.audioManager.resource.info.fullname,
-                this.namingConvention.namingConvention,
-              );
-
-              this.state.archiveStructure[
-                this.audio.audioManager.resource.info.name + '_meta.json'
-              ] = strToU8(JSON.stringify(content, undefined, 2));
-              finished++;
-            }
-
-            let sizeProcessed = 0;
-            const startZipping = Date.now();
-            zip(this.state.archiveStructure, { level: 9 }, (error, data) => {
-              if (!error) {
-                if (sizeProcessed === 0) {
-                  // first process
-                  if (this.state.subscriptionIDs[2] > -1) {
-                    this.subscriptionManager.removeById(
-                      this.state.subscriptionIDs[2],
-                    );
-                    this.state.subscriptionIDs[2] = -1;
-                  }
-                  this.state.cuttingSpeed = -1;
-                  this.state.zippingSpeed = -1;
+          let sizeProcessed = 0;
+          const startZipping = Date.now();
+          zip(this.state.archiveStructure, { level: 9 }, (error, data) => {
+            if (!error) {
+              if (sizeProcessed === 0) {
+                // first process
+                if (this.state.subscriptionIDs[2] > -1) {
+                  this.subscriptionManager.removeById(this.state.subscriptionIDs[2]);
+                  this.state.subscriptionIDs[2] = -1;
                 }
-
-                sizeProcessed += data.length;
-                const overAllProgress = sizeProcessed / totalSize;
-                // data is a Uint8Array because that's the type asked in generateInternalStream
-                // metadata contains for example currentFile and percent, see the generateInternalStream doc.
-                this.state.progress = Number(
-                  (((finished + overAllProgress) / overallTasks) * 100).toFixed(
-                    2,
-                  ),
-                );
-                if (Date.now() - lastCheck >= 1000) {
-                  if (sizeProcessed > 1024 * 1024 * 2) {
-                    this.state.timeLeft =
-                      ((Date.now() - startZipping) / sizeProcessed) *
-                      (totalSize - sizeProcessed);
-                  }
-
-                  lastCheck = Date.now();
-                }
-
-                this.state.status = 'finished';
-                this.state.progress = 100;
-                this.state.progressbarType = 'success';
-
-                if (this.state.result.url !== undefined) {
-                  window.URL.revokeObjectURL(this.state.result.url.toString());
-                }
-
-                try {
-                  this.state.result.url =
-                    this.sanitizer.bypassSecurityTrustResourceUrl(
-                      URL.createObjectURL(
-                        new File(
-                          [data] as any,
-                          this.audio.audioManager.resource.info.name + '.zip',
-                        ),
-                      ),
-                    );
-                  this.state.result.filename =
-                    this.audio.audioManager.resource.info.name + '.zip';
-                } catch (e) {
-                  this.modalsService.openModal(
-                    ErrorModalComponent,
-                    ErrorModalComponent.options,
-                    {
-                      text: (e as any).message ?? e,
-                    },
-                  );
-                }
-              } else {
-                console.error(`cutting error`);
-                console.error(error);
+                this.state.cuttingSpeed = -1;
+                this.state.zippingSpeed = -1;
               }
-            });
 
-            /*
-            this.state.clientStreamHelper.accumulate().then((data) => {
+              sizeProcessed += data.length;
+              const overAllProgress = sizeProcessed / totalSize;
+              // data is a Uint8Array because that's the type asked in generateInternalStream
+              // metadata contains for example currentFile and percent, see the generateInternalStream doc.
+              this.state.progress = Number((((finished + overAllProgress) / overallTasks) * 100).toFixed(2));
+              if (Date.now() - lastCheck >= 1000) {
+                if (sizeProcessed > 1024 * 1024 * 2) {
+                  this.state.timeLeft = ((Date.now() - startZipping) / sizeProcessed) * (totalSize - sizeProcessed);
+                }
+
+                lastCheck = Date.now();
+              }
+
               this.state.status = 'finished';
               this.state.progress = 100;
               this.state.progressbarType = 'success';
 
               if (this.state.result.url !== undefined) {
-                window.URL.revokeObjectURL(this.state.result.url);
+                window.URL.revokeObjectURL(this.state.result.url.toString());
               }
 
-              this.state.result.url = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(data));
-              this.state.result.filename = this.audio.audioManager.ressource.info.name + '.zip';
-              // finished
-            });
-
-            this.state.clientStreamHelper.resume();
-
-             */
-          }
-        },
-        error: (err: any) => {
-          if (this.state.subscriptionIDs[2] > -1) {
-            this.subscriptionManager.removeById(this.state.subscriptionIDs[2]);
-            this.state.subscriptionIDs[2] = -1;
-          }
-          this.state.cuttingSpeed = -1;
-          this.state.zippingSpeed = -1;
-
-          console.error(`other error`);
-          console.error(err);
-        },
+              try {
+                this.state.result.url = this.sanitizer.bypassSecurityTrustResourceUrl(
+                  URL.createObjectURL(new File([data] as any, this.audio.audioManager.resource.info.name + '.zip')),
+                );
+                this.state.result.filename = this.audio.audioManager.resource.info.name + '.zip';
+                this.cd.markForCheck();
+              } catch (e) {
+                this.modalsService.openModal(ErrorModalComponent, ErrorModalComponent.options, {
+                  text: (e as any).message ?? e,
+                });
+              }
+            } else {
+              console.error(`cutting error`);
+              console.error(error);
+            }
+          });
+        }
+        this.cd.markForCheck();
       },
-    );
+      error: (err: any) => {
+        if (this.state.subscriptionIDs[2] > -1) {
+          this.subscriptionManager.removeById(this.state.subscriptionIDs[2]);
+          this.state.subscriptionIDs[2] = -1;
+        }
+        this.state.cuttingSpeed = -1;
+        this.state.zippingSpeed = -1;
+
+        console.error(`other error`);
+        console.error(err);
+      },
+    });
 
     this.state.status = 'running';
     this.state.progressbarType = 'info';
+    this.cd.markForCheck();
 
     this.getDurationFactorForZipping()
       .then((zipFactor) => {
         this.state.zippingSpeed = zipFactor;
 
         cuttingStarted = Date.now();
-        this.state.cutter!.cutChannelDataSequentially(
-          this.namingConvention.namingConvention,
-          this.audio!.audioManager.channel!,
-          cutList,
-        );
+        this.state.cutter!.cutChannelDataSequentially(this.namingConvention.namingConvention, this.audio!.audioManager.channel!, cutList);
       })
       .catch((err) => {
         console.error(err);
@@ -468,6 +367,7 @@ export class CuttingAudioModalComponent
     if (this.state.cutter !== undefined) {
       this.state.cutter.stopAudioSplitting();
     }
+    this.cd.markForCheck();
   }
 
   private getDurationFactorForZipping(): Promise<number> {

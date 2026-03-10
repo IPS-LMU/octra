@@ -87,12 +87,14 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     this.subscribe(this.actions$.pipe(ofType(AnnotationActions.startAnnotation.fail, AnnotationActions.startAnnotation.success)), {
       next: () => {
         this.projectStarting = false;
+        this.cd.markForCheck();
       },
     });
     this.subscribe(authStoreService.me$, {
       next: (me) => {
         this.projectRoles = me?.projectRoles ?? [];
         this.istProjectAdmin = this.projectRoles.find((a) => a.role === 'project_admin') !== undefined;
+        this.cd.markForCheck();
       },
     });
     this.subscribe(authStoreService.sameUserWithOpenTask$, {
@@ -102,9 +104,11 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
           this.subscribe(this.api.getProject(result.projectID), {
             next: (result) => {
               this.previousProject = result;
+              this.cd.markForCheck();
             },
           });
         }
+        this.cd.markForCheck();
       },
     });
   }
@@ -113,6 +117,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     this.subscribe(this.actions$.pipe(ofType(AuthenticationActions.needReAuthentication.success.type)), {
       next: () => {
         this.loadProjects(1);
+        this.cd.markForCheck();
       },
     });
     this.loadProjects(1);

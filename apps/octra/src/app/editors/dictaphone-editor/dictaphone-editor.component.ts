@@ -1,4 +1,14 @@
-import { AfterViewInit, Component, EventEmitter, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { TranscrEditorComponent } from '../../core/component';
 
 import { AnnotationLevelType, ASRContext, OctraAnnotationSegment, OctraAnnotationSegmentLevel, OLabel } from '@octra/annotation';
@@ -6,6 +16,7 @@ import { SampleUnit } from '@octra/media';
 import { AudioplayerComponent, OctraComponentsModule } from '@octra/ngx-components';
 import { AudioChunk, AudioManager, Shortcut, ShortcutGroup } from '@octra/web-media';
 import { HotkeysEvent } from 'hotkeys-js';
+import { timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../core/component/audio-navigation';
 import { AudioNavigationComponent as AudioNavigationComponent_1 } from '../../core/component/audio-navigation/audio-navigation.component';
 import { TranscrEditorComponent as TranscrEditorComponent_1 } from '../../core/component/transcr-editor/transcr-editor.component';
@@ -20,6 +31,7 @@ import { OCTRAEditor, OctraEditorRequirements, SupportedOctraEditorMetaData } fr
   selector: 'octra-audioplayer-gui',
   templateUrl: './dictaphone-editor.component.html',
   styleUrls: ['./dictaphone-editor.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [AudioNavigationComponent_1, OctraComponentsModule, TranscrEditorComponent_1],
 })
 export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, OnDestroy, AfterViewInit, OctraEditorRequirements {
@@ -30,6 +42,7 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
   settingsService = inject(SettingsService);
   appStorage = inject(AppStorageService);
   routingService = inject(RoutingService);
+  cd = inject(ChangeDetectorRef);
 
   static override meta: SupportedOctraEditorMetaData = {
     name: 'Dictaphone Editor',
@@ -180,7 +193,20 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.shortcutService.unregisterShortcutGroup(this.shortcuts.name);
     this.shortcutService.registerShortcutGroup(this.shortcuts);
 
-    this.initialized.emit();
+    this.cd.markForCheck();
+    this.cd.detectChanges();
+    this.subscribe(timer(100), {
+      next: () => {
+        this.initialized.emit();
+      },
+    });
+    this.subscribe(this.annotationStoreService.currentLevelIndex$, {
+      next: () => {
+        this.loadEditor();
+        this.cd.markForCheck();
+        this.cd.detectChanges();
+      },
+    });
   }
 
   ngAfterViewInit() {

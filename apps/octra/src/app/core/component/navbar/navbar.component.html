@@ -12,7 +12,7 @@
         class="navbar-brand"
         >OCTRA 2
         @if (
-          appStorage.useMode !== undefined && appStorage.useMode !== undefined
+          appStorage.useMode !== undefined && appStorage.useMode !== null
         ) {
           ({{ appStorage.useMode }})
         }
@@ -130,7 +130,7 @@
           </ul>
         } @else {
           <ul class="navbar-nav me-auto">
-            @for (editor of editors; track editor) {
+            @for (editor of editors; track editor.meta.name) {
               @if (
                 appStorage.loggedIn &&
                 navbarServ.showInterfaces &&

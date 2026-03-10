@@ -1,4 +1,15 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Actions, ofType } from '@ngrx/effects';
 import { AnnotationLevelType, AnnotJSONConverter, OctraAnnotation } from '@octra/annotation';
@@ -17,6 +28,7 @@ import { OCTRAEditor, OctraEditorRequirements, SupportedOctraEditorMetaData } fr
   selector: 'octra-emu-webapp',
   templateUrl: './emu-webapp.component.html',
   styleUrls: ['./emu-webapp.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditorRequirements, AfterViewInit, OnInit {
   audio = inject(AudioService);
@@ -26,6 +38,7 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
   annotationStoreService = inject(AnnotationStoreService);
   actions$ = inject(Actions);
   shortcutService = inject(ShortcutService);
+  cd = inject(ChangeDetectorRef);
 
   static override meta: SupportedOctraEditorMetaData = {
     name: 'EMU',
@@ -53,13 +66,17 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
             listenForMessages: true,
           })}`,
         );
+        this.cd.detectChanges();
+        this.cd.markForCheck();
       } else {
         this.error = 'Missing EMU webApp URL';
         this.initialized.emit();
+        this.cd.detectChanges();
       }
     } else {
       this.error = 'The EMU-webApp editor only supports audio files with a size smaller or equal 50 MB.';
       this.initialized.emit();
+      this.cd.detectChanges();
     }
   }
 
@@ -106,6 +123,8 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
       const iframeDocument = this.iframe?.nativeElement?.contentWindow?.document;
       if(iframeDocument) {
         iframeDocument.addEventListener('keydown', (e) => {
+          this.cd.markForCheck();
+
           if (e.altKey) {
             if (!e.shiftKey) {
               if (e.code === 'Digit8') {
@@ -195,6 +214,8 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
           }
 
           this.initialized.emit();
+          this.cd.detectChanges();
+          this.cd.markForCheck();
         },
       },
       'init emu',
@@ -221,10 +242,11 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
 
     if (url === event.origin) {
       const data = event.data as EmuWebAppOutMessageEventData;
-      if (data.data?.annotation && data.trigger === 'autoSave' && this.annotationStoreService?.transcript?.selectedLevelIndex) {
+      if (data.data?.annotation && data.trigger === 'autoSave' && this.annotationStoreService?.transcript?.selectedLevelIndex !== undefined) {
         const anno = OctraAnnotation.deserialize(data.data.annotation);
         anno.changeCurrentLevelIndex(this.annotationStoreService.transcript.selectedLevelIndex);
         this.annotationStoreService.overwriteTranscript(anno);
+        this.cd.markForCheck();
       }
     }
   }

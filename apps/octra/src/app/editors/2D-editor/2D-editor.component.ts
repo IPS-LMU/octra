@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, inject, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, inject, OnInit, Output, ViewChild } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { contains, hasProperty } from '@octra/utilities';
 import { TranscrEditorComponent } from '../../core/component';
@@ -33,6 +33,7 @@ import { TranscrWindowComponent } from './transcr-window';
   selector: 'octra-overlay-gui',
   templateUrl: './2D-editor.component.html',
   styleUrls: ['./2D-editor.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [OctraComponentsModule, NgStyle, AudioNavigationComponent],
 })
 export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OctraEditorRequirements {
@@ -325,6 +326,11 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       enabled: true,
       items: this.audioShortcuts.items,
     });
+    this.subscribe(this.annotationStoreService.transcript$, {
+      next: () => {
+        this.cd.markForCheck();
+      },
+    });
     this.shortcutService.registerShortcutGroup(this.miniMagnifierShortcuts);
     this.shortcutService.registerShortcutGroup(this.windowShortcuts);
 
@@ -498,6 +504,8 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     const subscr = this.viewer.onInitialized.subscribe(() => {
       subscr.unsubscribe();
       this.initialized.emit();
+      this.cd.markForCheck();
+      this.cd.detectChanges();
     });
   }
 

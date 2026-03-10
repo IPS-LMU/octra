@@ -1,5 +1,5 @@
 import { AsyncPipe, NgClass, NgStyle, UpperCasePipe } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -18,6 +18,7 @@ import { AccountRole, ProjectDto } from '@octra/api-types';
 import { ConsoleEntry, ConsoleGroupEntry, ConsoleLoggingService, ConsoleType, OctraComponentsModule } from '@octra/ngx-components';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { TimespanPipe } from '@octra/ngx-utilities';
+import { merge } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { AppInfo } from '../../../app.info';
 import { editorComponents } from '../../../editors/components';
@@ -30,7 +31,6 @@ import { CombinePhrasesModalComponent } from '../../modals/tools/combine-phrases
 import { YesNoModalComponent } from '../../modals/yes-no-modal/yes-no-modal.component';
 import { AudioService, SettingsService, UserInteractionsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { BugReportService } from '../../shared/service/bug-report.service';
 import { LoginMode } from '../../store';
 import { ApplicationStoreService } from '../../store/application/application-store.service';
 import { ASRStateSettings } from '../../store/asr';
@@ -72,7 +72,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
   langService = inject(TranslocoService);
   modalService = inject(OctraModalService);
   settService = inject(SettingsService);
-  bugService = inject(BugReportService);
+  cd = inject(ChangeDetectorRef);
   consoleLoggingService = inject(ConsoleLoggingService);
   annotationStoreService = inject(AnnotationStoreService);
   authStoreService = inject(AuthenticationStoreService);
@@ -130,8 +130,8 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
     return this.navbarServ.uiService;
   }
 
-  public get editors() {
-    return editorComponents;
+  public get editors(): Array<any> {
+    return editorComponents as any[];
   }
 
   get annotJSONType() {
@@ -187,23 +187,33 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
     this.subscribe(this.navbarServ.openSettings, {
       next: () => {
         this.openEnd();
+        this.cd.markForCheck();
       },
     });
 
     this.subscribe(this.asrStoreService.asrOptions$, {
       next: (asrOptions) => {
         this.asrSettings = asrOptions;
+        this.cd.markForCheck();
+      },
+    });
+
+    this.subscribe(merge(this.annotationStoreService.currentLevel$, this.appStoreService.loggedIn$), {
+      next: () => {
+        this.cd.markForCheck();
       },
     });
   }
 
   setInterface(editor: typeof OCTRAEditor) {
     this.navbarServ.interfacechange.emit(editor);
+    this.cd.markForCheck();
   }
 
   changeLanguage(lang: string) {
     this.langService.setActiveLang(lang);
     this.appStorage.language = lang;
+    this.cd.markForCheck();
   }
 
   public interfaceActive(name: string) {
@@ -217,6 +227,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
     (this.appStorage as any)[option] = !(this.appStorage as any)[option];
     if (option === 'logging') {
       this.uiService.enabled = this.appStorage[option];
+      this.cd.markForCheck();
     }
   }
 
@@ -229,20 +240,24 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
         this.appStorage.enableUndoRedo();
         this.appStoreService.setShortcutsEnabled(true);
         window.location.hash = '';
+        this.cd.markForCheck();
       })
       .catch((err) => {
         this.appStorage.enableUndoRedo();
         this.appStoreService.setShortcutsEnabled(true);
         console.error(err);
       });
+    this.cd.markForCheck();
   }
 
   onLevelNameLeave(event: any, tiernum: number) {
     this.annotationStoreService.changeLevelName(tiernum, event.target.value);
+    this.cd.markForCheck();
   }
 
   onLevelAddClick() {
     this.annotationStoreService.addAnnotationLevel(AnnotationLevelType.SEGMENT);
+    this.cd.markForCheck();
   }
 
   onLevelRemoveClick(level: OctraAnnotationAnyLevel<OctraAnnotationSegment>) {
@@ -256,6 +271,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
         if (answer === 'yes') {
           this.appStorage.removeAnnotationLevel(level.id);
         }
+        this.cd.markForCheck();
       })
       .catch((error) => {
         console.error(error);
@@ -264,6 +280,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
 
   onLevelDuplicateClick(tiernum: number) {
     this.annotationStoreService.duplicateLevel(tiernum);
+    this.cd.markForCheck();
   }
 
   isLevelTypeSupported(type: AnnotationLevelType) {
@@ -274,11 +291,14 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
     const level = this.annotationStoreService.transcript!.levels[tiernum];
     if (this.isLevelTypeSupported(level.type)) {
       this.annotationStoreService.setLevelIndex(tiernum);
+      this.cd.markForCheck();
+      this.cd.detectChanges();
     }
   }
 
   public changeSecondsPerLine(seconds: number) {
     this.appStorage.secondsPerLine = seconds;
+    this.cd.markForCheck();
   }
 
   openExportModal() {
@@ -290,14 +310,17 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
 
   openCombinePhrases() {
     this.modalStatistics = this.modalService.openModalRef(CombinePhrasesModalComponent, CombinePhrasesModalComponent.options);
+    this.cd.markForCheck();
   }
 
   openStatisticsModal() {
     this.modalStatistics = this.modalService.openModalRef(StatisticsModalComponent, StatisticsModalComponent.options);
+    this.cd.markForCheck();
   }
 
   backToProjectsList() {
     this.logout(true);
+    this.cd.markForCheck();
   }
 
   logout(redirectToProjects = false) {
@@ -306,6 +329,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
     } else {
       this.appStorage.logout(true);
     }
+    this.cd.markForCheck();
   }
 
   getFreeAnnotationTasks(project: ProjectDto | undefined) {

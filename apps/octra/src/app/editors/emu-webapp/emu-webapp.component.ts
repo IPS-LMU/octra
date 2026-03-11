@@ -15,21 +15,20 @@ import { Actions, ofType } from '@ngrx/effects';
 import { AnnotationLevelType, AnnotJSONConverter, OctraAnnotation } from '@octra/annotation';
 import { stringifyQueryParams } from '@octra/utilities';
 import { AudioCutter } from '@octra/web-media';
-import { timer } from 'rxjs';
-import { EmuWebAppInMessageEventData, EmuWebAppOutMessageEventData } from '../../core/obj/emu-webapp.types';
+import { AppInfo } from '../../app.info';
+import { EmuWebAppOutMessageEventData, WindowMessageCommandLoad } from '../../core/obj/emu-webapp.types';
 import { AudioService, SettingsService } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
 import { ShortcutService } from '../../core/shared/service/shortcut.service';
 import { AnnotationActions } from '../../core/store/login-mode/annotation/annotation.actions';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
 import { OCTRAEditor, OctraEditorRequirements, SupportedOctraEditorMetaData } from '../octra-editor';
-import { AppInfo } from '../../app.info';
 
 @Component({
   selector: 'octra-emu-webapp',
   templateUrl: './emu-webapp.component.html',
   styleUrls: ['./emu-webapp.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditorRequirements, AfterViewInit, OnInit {
   audio = inject(AudioService);
@@ -122,7 +121,7 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
 
     try {
       const iframeDocument = this.iframe?.nativeElement?.contentWindow?.document;
-      if(iframeDocument) {
+      if (iframeDocument) {
         iframeDocument.addEventListener('keydown', (e) => {
           this.cd.markForCheck();
 
@@ -170,57 +169,67 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
     }
   }
 
-  updateEmuWebAppOptions() {
-    this.subscriptionManager.removeByTag('init emu');
-    this.subscribe(
-      timer(1000),
-      {
-        next: async () => {
-          const resource = this.audio.audioManager.resource;
-          const params = {
-            listenForMessages: true,
-            disableBundleListSidebar: true,
-            saveToWindowParent: false,
-            labelType: 'annotJSON',
-          };
+  async updateEmuWebAppOptions() {
+    const resource = this.audio.audioManager.resource;
+    const params = {
+      listenForMessages: true,
+      disableBundleListSidebar: true,
+      saveToWindowParent: false,
+      labelType: 'annotJSON',
+    };
 
-          let audioArrayBuffer: ArrayBuffer | undefined;
-          if (resource.info.type.includes('wav')) {
-            audioArrayBuffer = resource.arraybuffer;
-          } else if (this.audio.audioManager.channel) {
-            const audioCutter = new AudioCutter(resource.info);
-            const buffer = (
-              await audioCutter.cutAudioFileFromChannelData(resource.info, resource.info.name, this.audio.audioManager.channel, {
-                number: 1,
-                sampleStart: 0,
-                sampleDur: resource.info.duration.samples,
-              })
-            ).uint8Array;
-            audioArrayBuffer = buffer.buffer as ArrayBuffer;
-          }
+    let audioArrayBuffer: ArrayBuffer | undefined;
+    if (resource.info.type.includes('wav')) {
+      audioArrayBuffer = resource.arraybuffer;
+    } else if (this.audio.audioManager.channel) {
+      const audioCutter = new AudioCutter(resource.info);
+      const buffer = (
+        await audioCutter.cutAudioFileFromChannelData(resource.info, resource.info.name, this.audio.audioManager.channel, {
+          number: 1,
+          sampleStart: 0,
+          sampleDur: resource.info.duration.samples,
+        })
+      ).uint8Array;
+      audioArrayBuffer = buffer.buffer as ArrayBuffer;
+    }
 
-          if (this.iframe && audioArrayBuffer && this.annotationStoreService.transcript && this.iframe.nativeElement.contentWindow) {
-            const command: EmuWebAppInMessageEventData = {
-              type: 'command',
-              command: 'load',
-              params,
-              audioArrayBuffer,
-              annotation: JSON.parse(
-                new AnnotJSONConverter().export(
-                  this.annotationStoreService.transcript.serialize(resource.info.fullname, resource.info.sampleRate, resource.info.duration),
-                ).file!.content,
-              ),
-            };
-            this.iframe.nativeElement.contentWindow.postMessage(command, '*');
-          }
-
-          this.initialized.emit();
-          this.cd.detectChanges();
-          this.cd.markForCheck();
+    if (this.iframe && audioArrayBuffer && this.annotationStoreService.transcript && this.iframe.nativeElement.contentWindow) {
+      const command: WindowMessageCommandLoad = {
+        type: 'command',
+        command: 'load',
+        params: {
+          ...params,
+          audioArrayBuffer,
+          annotation: JSON.parse(
+            new AnnotJSONConverter().export(
+              this.annotationStoreService.transcript.serialize(resource.info.fullname, resource.info.sampleRate, resource.info.duration),
+            ).file!.content,
+          ),
+          styles: {
+            colorBlack: '#fafffa',
+            colorWhite: '#237053',
+            colorBlue: '#009eb3',
+            colorGrey: '#f3f1f1',
+            colorDarkGrey: '#b3d6d3',
+            fontSmallSize: '15px',
+            fontLargeSize: '18px',
+            colorTransparentYellow: 'rgba(255, 255, 22, 0.15)',
+            spectrogram: {
+              heatMapColorAnchors: [
+                [250, 255, 250],
+                [61, 189, 140],
+                [20, 62, 46],
+              ],
+            },
+          },
         },
-      },
-      'init emu',
-    );
+      };
+      this.iframe.nativeElement.contentWindow.postMessage(command, '*');
+    }
+
+    this.initialized.emit();
+    this.cd.detectChanges();
+    this.cd.markForCheck();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -238,17 +247,56 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
   }
 
   @HostListener('window:message', ['$event'])
-  windowMessageReceived(event: MessageEvent) {
+  async windowMessageReceived(event: MessageEvent) {
     const url = this.settingsService.appSettings.octra.plugins?.emuWebApp?.url.replace(/(^https?:\/\/[^/]+)(.*)/g, '$1');
 
     if (url === event.origin) {
       const data = event.data as EmuWebAppOutMessageEventData;
-      if (data.data?.annotation && data.trigger === 'autoSave' && this.annotationStoreService?.transcript?.selectedLevelIndex !== undefined) {
-        const anno = OctraAnnotation.deserialize(data.data.annotation);
-        anno.changeCurrentLevelIndex(this.annotationStoreService.transcript.selectedLevelIndex);
-        this.annotationStoreService.overwriteTranscript(anno);
-        this.cd.markForCheck();
+      if (data.trigger === 'autoSave') {
+        if (data.data?.annotation && data.trigger === 'autoSave' && this.annotationStoreService?.transcript?.selectedLevelIndex !== undefined) {
+          const anno = OctraAnnotation.deserialize(data.data.annotation);
+          anno.changeCurrentLevelIndex(this.annotationStoreService.transcript.selectedLevelIndex);
+          this.annotationStoreService.overwriteTranscript(anno);
+          this.cd.markForCheck();
+        }
+      } else if (data.trigger === 'listening') {
+        // EMU webApp is ready
+        const emuWebAppVersion = await this.postEmuWebAppCommandAsync<string>('get_version');
+        const matches = /([0-9]+)\.([0-9]+)\.([0-9]+)/g.exec(emuWebAppVersion);
+        const semver = matches ? [Number(matches[1]), Number(matches[2]), Number(matches[3])] : undefined;
+
+        if (emuWebAppVersion && semver && semver[0] === 1 && semver[1] === 5 && semver[2] >= 4) {
+          await this.updateEmuWebAppOptions();
+        } else {
+          this.error = `This version of OCTRA is not compatible with Emu-webApp ${emuWebAppVersion}.`;
+        }
       }
     }
+  }
+
+  private async postEmuWebAppCommandAsync<T>(command: string, data?: any) {
+    return new Promise<T>((resolve, reject) => {
+      const handler = (event) => {
+        if (event.data.type === 'response') {
+          if (event.data.command === command) {
+            window.removeEventListener('message', handler);
+            resolve(event.data.data);
+          }
+        }
+      };
+      window.addEventListener('message', handler);
+      this.postEmuWebAppCommand(command, data);
+    });
+  }
+
+  private postEmuWebAppCommand(command: string, data) {
+    this.iframe?.nativeElement.contentWindow.postMessage(
+      {
+        type: 'command',
+        command,
+        ...data,
+      },
+      '*',
+    );
   }
 }

@@ -329,9 +329,9 @@ export class AuthenticationEffects {
               this.sessionStorageService.clear();
               return AuthenticationActions.logout.success({
                 ...action,
-                project: modeState.currentSession?.currentProject!,
-                task: modeState.currentSession?.task!,
-                currentEditor: modeState.currentEditor!,
+                project: modeState?.currentSession?.currentProject,
+                task: modeState?.currentSession?.task,
+                currentEditor: modeState?.currentEditor,
               });
             }),
             catchError((err: HttpErrorResponse) => {
@@ -340,9 +340,9 @@ export class AuthenticationEffects {
               return of(
                 AuthenticationActions.logout.success({
                   ...action,
-                  project: modeState.currentSession!.currentProject!,
-                  task: modeState.currentSession!.task!,
-                  currentEditor: modeState.currentEditor!,
+                  project: modeState?.currentSession?.currentProject,
+                  task: modeState?.currentSession?.task,
+                  currentEditor: modeState?.currentEditor,
                 }),
               );
             }),
@@ -352,9 +352,9 @@ export class AuthenticationEffects {
         return of(
           AuthenticationActions.logout.success({
             ...action,
-            project: modeState!.currentSession!.currentProject!,
-            task: modeState!.currentSession!.task!,
-            currentEditor: modeState!.currentEditor!,
+            project: modeState?.currentSession?.currentProject,
+            task: modeState?.currentSession?.task,
+            currentEditor: modeState?.currentEditor,
           }),
         );
       }),

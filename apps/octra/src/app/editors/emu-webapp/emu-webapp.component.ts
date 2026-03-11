@@ -23,6 +23,7 @@ import { ShortcutService } from '../../core/shared/service/shortcut.service';
 import { AnnotationActions } from '../../core/store/login-mode/annotation/annotation.actions';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
 import { OCTRAEditor, OctraEditorRequirements, SupportedOctraEditorMetaData } from '../octra-editor';
+import { AppInfo } from '../../app.info';
 
 @Component({
   selector: 'octra-emu-webapp',
@@ -59,7 +60,7 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
   }
 
   ngAfterViewInit() {
-    if (this.audio.audioManager.resource.info.size <= 1024 * 1024 * 50) {
+    if (this.audio.audioManager.resource.info.size <= 1024 * 1024 * AppInfo.maxEMUAudioFileSize) {
       if (this.settingsService.appSettings.octra.plugins?.emuWebApp?.url) {
         this.iframeURL = this.sanitizer.bypassSecurityTrustResourceUrl(
           `${this.settingsService.appSettings.octra.plugins?.emuWebApp?.url}${stringifyQueryParams({

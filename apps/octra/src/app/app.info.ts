@@ -14,7 +14,8 @@ export class AppInfo {
   static readonly manualURL =
     'https://clarin.phonetik.uni-muenchen.de/apps/octra/manuals/octra/';
 
-  static readonly maxAudioFileSize = 3000;
+  static readonly maxAudioFileSize = 3000; // MB
+  static readonly maxEMUAudioFileSize = 50; // MB
 
   public static readonly queryParamsHandling: NavigationExtras = {
     queryParamsHandling: 'merge',

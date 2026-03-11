@@ -152,9 +152,9 @@ export class AuthenticationActions {
         clearSession: boolean;
         keepPreviousInformation?: boolean;
         mode?: LoginMode;
-        project: ProjectDto;
-        task: TaskDto;
-        currentEditor: string;
+        project?: ProjectDto;
+        task?: TaskDto;
+        currentEditor?: string;
       }>(),
     },
   });

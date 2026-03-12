@@ -13,7 +13,7 @@ import {
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Actions, ofType } from '@ngrx/effects';
 import { AnnotationLevelType, AnnotJSONConverter, OctraAnnotation } from '@octra/annotation';
-import { stringifyQueryParams } from '@octra/utilities';
+import { stringifyQueryParams, wait } from '@octra/utilities';
 import { AudioCutter } from '@octra/web-media';
 import { AppInfo } from '../../app.info';
 import { EmuWebAppOutMessageEventData, WindowMessageCommandLoad } from '../../core/obj/emu-webapp.types';
@@ -266,6 +266,7 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
         const semver = matches ? [Number(matches[1]), Number(matches[2]), Number(matches[3])] : undefined;
 
         if (emuWebAppVersion && semver && semver[0] === 1 && semver[1] === 5 && semver[2] >= 4) {
+          await wait(0.2);
           await this.updateEmuWebAppOptions();
         } else {
           this.error = `This version of OCTRA is not compatible with Emu-webApp ${emuWebAppVersion}.`;

@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { MultiThreadingService, OctraComponentsModule, VersionCheckerService, VersionNotificationComponent } from '@octra/ngx-components';
@@ -10,7 +10,6 @@ import { AppStorageService } from './core/shared/service/appstorage.service';
 import { LoginMode } from './core/store';
 import { ApplicationStoreService } from './core/store/application/application-store.service';
 import { AnnotationStoreService } from './core/store/login-mode/annotation/annotation.store.service';
-import { FileInfo } from '@octra/web-media';
 
 @Component({
   selector: 'octra-app',
@@ -25,11 +24,9 @@ import { FileInfo } from '@octra/web-media';
     VersionNotificationComponent,
     TranslocoPipe,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent
-  extends DefaultComponent
-  implements OnInit, OnDestroy
-{
+export class AppComponent extends DefaultComponent implements OnInit, OnDestroy {
   appStorage = inject(AppStorageService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -37,10 +34,9 @@ export class AppComponent
   private appStoreService = inject(ApplicationStoreService);
   private annotationStoreService = inject(AnnotationStoreService);
   protected versionChecker = inject(VersionCheckerService);
+  protected cd = inject(ChangeDetectorRef);
 
-  @ViewChild('navigation', { static: true }) navigation:
-    | NavigationComponent
-    | undefined;
+  @ViewChild('navigation', { static: true }) navigation: NavigationComponent | undefined;
 
   public get environment(): any {
     return environment;
@@ -57,26 +53,30 @@ export class AppComponent
       this.subscribe(this.router.events, {
         next: (event: any) => {
           if (event.snapshot) {
-            console.log(
-              `route from ${event.url} to guard: ${event.snapshot.url}, component: ${event.snapshot.component?.name}`,
-            );
+            console.log(`route from ${event.url} to guard: ${event.snapshot.url}, component: ${event.snapshot.component?.name}`);
           }
         },
       });
     }
+
+    this.subscribe(this.versionChecker.newVersion, {
+      next: () => {
+        this.cd.markForCheck();
+      },
+    });
   }
 
   ngOnInit() {
-    this.route.fragment.subscribe((fragment) => {
-      switch (fragment) {
-        case 'feedback':
-          this.navigation?.openBugReport();
-          break;
-      }
+    this.subscribe(this.route.fragment, {
+      next: (fragment) => {
+        switch (fragment) {
+          case 'feedback':
+            this.navigation?.openBugReport();
+            this.cd.markForCheck();
+            break;
+        }
+      },
     });
-
-    const test = new FileInfo("Bahnauskunft_.wav", "audio/wav", 2378);
-    const t = "";
   }
 
   override ngOnDestroy() {
@@ -84,11 +84,7 @@ export class AppComponent
     this.multiThreading.destroy();
     this.annotationStoreService.destroy();
     this.appStoreService.destroy();
-  }
-
-  queryParamsSet(): boolean {
-    const params = this.route.snapshot.queryParams;
-    return params['audio_url'] && params['embedded'];
+    this.versionChecker.destroy();
   }
 
   protected readonly LoginMode = LoginMode;

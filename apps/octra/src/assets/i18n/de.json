@@ -613,7 +613,7 @@
   "toasts": {
     "new update": {
       "header": "Neue Aktualisierung verfügbar",
-      "body": "Eine neue Aktualisierung für Octra ist verfügbar. Stelle sicher, dass keine automatischen Prozesse laufen (ASR, Word Alignment, Schneiden etc.). Lade dann Octra neu, um diese zu installieren."
+      "body": "Eine neue Aktualisierung für Octra ist verfügbar. Stelle sicher, dass keine automatischen Prozesse laufen (ASR, Word Alignment, Schneiden etc.). Lade dann Octra neu, um diese zu installieren. Dein Transkript bleibt erhalten."
     }
   }
 }

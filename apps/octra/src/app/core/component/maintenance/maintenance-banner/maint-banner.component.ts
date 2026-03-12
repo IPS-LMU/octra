@@ -1,29 +1,22 @@
 import { HttpClient } from '@angular/common/http';
-import {
-  Component,
-  ElementRef,
-  inject,
-  Input,
-  OnChanges,
-  Renderer2,
-  SimpleChanges,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, Input, OnChanges, Renderer2, SimpleChanges } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { hasProperty } from '@octra/utilities';
 import { DateTime } from 'luxon';
 import { MaintenanceAPI, MaintenanceNotification } from '../maintenance-api';
 
 @Component({
-  // tslint:disable-next-line:component-selector
   selector: 'octra-maint-banner',
   templateUrl: './maint-banner.component.html',
   styleUrls: ['./maint-banner.component.scss'],
   imports: [TranslocoPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MaintenanceBannerComponent implements OnChanges {
   private http = inject(HttpClient);
   private renderer = inject(Renderer2);
   private elementRef = inject(ElementRef);
+  private cd = inject(ChangeDetectorRef);
 
   @Input() serverURL!: string;
   @Input() language?: string;
@@ -32,19 +25,12 @@ export class MaintenanceBannerComponent implements OnChanges {
   parsedNotification?: MaintenanceNotification;
 
   ngOnChanges(changes: SimpleChanges) {
-    const isServerURL =
-      hasProperty(changes, 'serverURL') &&
-      changes['serverURL'].currentValue !== undefined;
+    const isServerURL = hasProperty(changes, 'serverURL') && changes['serverURL'].currentValue !== undefined;
 
-    const isLanguage =
-      hasProperty(changes, 'language') &&
-      changes['language'].currentValue !== undefined;
+    const isLanguage = hasProperty(changes, 'language') && changes['language'].currentValue !== undefined;
 
     if (isServerURL) {
-      const api = new MaintenanceAPI(
-        changes['serverURL'].currentValue,
-        this.http,
-      );
+      const api = new MaintenanceAPI(changes['serverURL'].currentValue, this.http);
       api
         .readMaintenanceNotifications(72)
         .then((notification) => {
@@ -77,12 +63,9 @@ export class MaintenanceBannerComponent implements OnChanges {
       this.parsedNotification = notification;
 
       if (this.language && this.serverURL) {
-        this.renderer.setStyle(
-          this.elementRef.nativeElement,
-          'display',
-          'inherit',
-        );
+        this.renderer.setStyle(this.elementRef.nativeElement, 'display', 'inherit');
       }
     }
+    this.cd.markForCheck();
   }
 }

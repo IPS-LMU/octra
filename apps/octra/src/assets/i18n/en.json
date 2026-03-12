@@ -613,7 +613,7 @@
   "toasts": {
     "new update": {
       "header": "New update available",
-      "body": "A new update for Octra is available. Make sure that no automatic processes are running (ASR, Word Alignment, Trimming etc.). Then reload Octra to install it."
+      "body": "A new update for Octra is available. Make sure that no automatic processes are running (ASR, Word Alignment, Trimming etc.). Then reload Octra to install it. Your transcript remains stored."
     }
   }
 }

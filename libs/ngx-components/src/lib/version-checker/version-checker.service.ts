@@ -1,4 +1,4 @@
-import { ApplicationRef, inject, Injectable } from '@angular/core';
+import { ApplicationRef, EventEmitter, inject, Injectable } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 import { interval } from 'rxjs';
@@ -18,6 +18,7 @@ export class VersionCheckerService extends SubscriberComponent {
 
   isNewVersionAvailable = false;
   private options = new VersionCheckerOptions();
+  newVersion = new EventEmitter<void>();
 
   init(options?: VersionCheckerOptions) {
     this.options = options ? new VersionCheckerOptions(options) : this.options;
@@ -47,15 +48,12 @@ export class VersionCheckerService extends SubscriberComponent {
             break;
           case 'VERSION_READY':
             console.log(`Current app version: ${evt.currentVersion.hash}`);
-            console.log(
-              `New app version ready for use: ${evt.latestVersion.hash}`,
-            );
+            console.log(`New app version ready for use: ${evt.latestVersion.hash}`);
             this.isNewVersionAvailable = true;
+            this.newVersion.emit();
             break;
           case 'VERSION_INSTALLATION_FAILED':
-            console.log(
-              `Failed to install app version '${evt.version.hash}': ${evt.error}`,
-            );
+            console.log(`Failed to install app version '${evt.version.hash}': ${evt.error}`);
             break;
         }
       },
@@ -65,5 +63,9 @@ export class VersionCheckerService extends SubscriberComponent {
   applyUpdate() {
     // Reload the page to update to the latest version after the new version is activated
     document.location.reload();
+  }
+
+  destroy() {
+    this.subscriptionManager.destroy();
   }
 }

@@ -4,7 +4,7 @@
   font-size: 0.8em;
 }
 
-.upload-screenshot {
+.octra-feedback-modal-upload-screenshot {
   width: 150px;
   height: 100px;
   border: 1px solid cornflowerblue;
@@ -21,17 +21,17 @@
   position: relative;
 }
 
-.upload-screenshot .bi {
+.octra-feedback-modal-upload-screenshot .bi {
   color: cornflowerblue;
   display: inline-block;
   font-size: 2rem;
 }
 
-.upload-screenshot .preview-image {
+.octra-feedback-modal-upload-screenshot .preview-image {
   height: 100%;
 }
 
-.upload-screenshot .cross.rounded-circle {
+.octra-feedback-modal-upload-screenshot .cross.rounded-circle {
   background-color: aliceblue;
   font-size: 0.8em;
   width: 22px;
@@ -46,6 +46,47 @@
   right: 0;
 }
 
-.modal-body {
+.octra-feedback-modal.modal-body {
   padding-bottom: 0;
+}
+
+@media (min-width: 1200px) {
+  .modal-xxl {
+    width: 90%;
+    max-width: 90%;
+  }
+}
+
+.octra-feedback-modal.protocol {
+  background-color: whitesmoke;
+  border-radius: 5px;
+  padding: 20px 10px;
+  border: 1px solid lightgray;
+  font-size: 0.8rem;
+}
+
+.octra-feedback-modal.table tbody tr td {
+  padding: 0 5px 3px 5px;
+}
+
+.table td.octra-feedback-modal.fit,
+.table th.octra-feedback-modal.fit {
+  white-space: nowrap;
+  width: 1%;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.octra-feedback-modal.protocol-header {
+  font-size: 0.825rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.octra-feedback-modal.list-group-item{
+  padding-top: 20px;
+}
+
+.octra-feedback-modal.red-icon{
+  color: darkred;
 }

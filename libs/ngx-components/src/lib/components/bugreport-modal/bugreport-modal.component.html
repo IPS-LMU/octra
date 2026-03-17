@@ -3,14 +3,9 @@
     <h5 class="modal-title" id="modal-title">
       {{ i18n.giveFeedback }}
     </h5>
-    <button
-      type="button"
-      class="btn-close"
-      aria-describedby="modal-title"
-      (click)="close()"
-    ></button>
+    <button type="button" class="btn-close" aria-describedby="modal-title" (click)="close()"></button>
   </div>
-  <div class="modal-body">
+  <div class="octra-feedback-modal modal-body">
     <p>
       {{ i18n.introduction }}
     </p>
@@ -57,9 +52,7 @@
                 [required]="true"
                 placeholder="email@example.com"
               />
-              <label for="inputEmail" class="form-label">{{
-                i18n.eMail
-              }}</label>
+              <label for="inputEmail" class="form-label">{{ i18n.eMail }}</label>
             </div>
           </div>
         </div>
@@ -73,12 +66,7 @@
               [options]="joditOptions"
               #editor
               class="w-100"
-              style="
-                display: flex !important;
-                flex-direction: column;
-                flex: auto;
-                height: 100% !important;
-              "
+              style="display: flex !important; flex-direction: column; flex: auto; height: 100% !important"
               aria-describedby="bgDescr"
               id="bgDescr"
               maxlength="1000"
@@ -94,20 +82,9 @@
           <div class="form-group" style="margin-bottom: 20px">
             <label>{{ i18n.screenshots }} (optional):</label><br />
             <div class="preview-images">
-              @for (
-                screenshot of screenshots;
-                track screenshot;
-                let i = $index
-              ) {
-                <div
-                  (click)="selectFileForUpload(uploadInput2)"
-                  class="upload-screenshot"
-                >
-                  <span
-                    (click)="removeScreenshot(i)"
-                    class="cross rounded-circle"
-                    >X</span
-                  >
+              @for (screenshot of screenshots; track screenshot; let i = $index) {
+                <div (click)="selectFileForUpload(uploadInput2)" class="octra-feedback-modal-upload-screenshot">
+                  <span (click)="removeScreenshot(i)" class="cross rounded-circle">X</span>
                   <input
                     #uploadInput2
                     (change)="onFileChange($event)"
@@ -122,22 +99,22 @@
                 </div>
               }
               @if (screenshots.length < 4) {
-                <div [ngbPopover]="'Add screenshot from your PC'" triggers="mouseenter:mouseleave" placement="bottom"
+                <div
+                  [ngbPopover]="'Add screenshot from your PC'"
+                  triggers="mouseenter:mouseleave"
+                  placement="bottom"
                   (click)="selectFileForUpload(uploadInput)"
-                  class="upload-screenshot align-items-center justify-content-center"
+                  class="octra-feedback-modal-upload-screenshot align-items-center justify-content-center"
                 >
-                  <input
-                    #uploadInput
-                    (change)="onFileChange($event)"
-                    name="upload"
-                    style="display: none"
-                    type="file"
-                  />
+                  <input #uploadInput (change)="onFileChange($event)" name="upload" style="display: none" type="file" />
                   <i class="bi bi-plus-lg"></i> <i class="bi bi-laptop"></i>
                 </div>
-                <div [ngbPopover]="'Add screenshot from clipboard'" triggers="mouseenter:mouseleave" placement="bottom"
+                <div
+                  [ngbPopover]="'Add screenshot from clipboard'"
+                  triggers="mouseenter:mouseleave"
+                  placement="bottom"
                   (click)="addFromClipboard()"
-                  class="upload-screenshot align-items-center justify-content-center"
+                  class="octra-feedback-modal-upload-screenshot align-items-center justify-content-center"
                 >
                   <i class="bi bi-plus-lg"></i> <i class="bi bi-clipboard"></i>
                 </div>
@@ -153,31 +130,78 @@
           <div class="form-group" style="padding-top: 0; margin-bottom: 0">
             <div class="checkbox">
               <label>
-                <input
-                  #sendpro
-                  [(ngModel)]="sendProObj"
-                  checked
-                  name="sendpro"
-                  type="checkbox"
-                />
+                <input #sendpro [(ngModel)]="sendProObj" checked name="sendpro" type="checkbox" />
                 {{ i18n.addProtocol }}
               </label>
             </div>
           </div>
-          <div
-            [hidden]="!sendpro.checked"
-            class="form-group"
-            style="padding-top: 0; margin-top: 0"
-          >
+          <div [hidden]="!sendpro.checked" class="form-group" style="padding-top: 0; margin-top: 10px">
             <span>{{ i18n.protocol }}:</span>
-            <textarea
-              #bgProtocol
-              [innerHTML]="pkgText"
-              class="form-control"
-              disabled
-              id="bgProtocol"
-            >
-            </textarea>
+            <div class="octra-feedback-modal protocol mt-1">
+              <div class="octra-feedback-modal list-group">
+                <div class="octra-feedback-modal list-group-item">
+                  <div class="octra-feedback-modal protocol-header">User Device information:</div>
+                  <table class="octra-feedback-modal table table-sm table-borderless">
+                    <tbody>
+                      <tr>
+                        <td class="octra-feedback-modal protocol-label fit">Operating System:</td>
+                        <td>{{ pkg.dto.technicalInformation.os.name }} {{ pkg.dto.technicalInformation.os.version }}</td>
+                      </tr>
+                      <tr>
+                        <td class="octra-feedback-modal protocol-label fit">Web-Browser:</td>
+                        <td>{{ pkg.dto.technicalInformation.browser.name }} {{ pkg.dto.technicalInformation.browser.version }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="octra-feedback-modal list-group-item">
+                  <div class="octra-feedback-modal protocol-header">Tool Related Information:</div>
+                  <table class="octra-feedback-modal table table-sm table-borderless">
+                    <tbody>
+                      <tr>
+                        <td class="octra-feedback-modal protocol-label fit">Tool URL:</td>
+                        <td>{{ pkg.protocolObj.tool.url }}</td>
+                      </tr>
+                      <tr>
+                        <td class="octra-feedback-modal protocol-label fit">Tool Version:</td>
+                        <td>{{ pkg.protocolObj.tool.version }}</td>
+                      </tr>
+                      @if (pkg.protocolObj.tool.customAttributes) {
+                        @for (entry of pkg.protocolObj.tool.customAttributes | keyvalue; track entry.key) {
+                          <tr>
+                            <td class="octra-feedback-modal protocol-label fit">{{ entry.key }}:</td>
+                            <td>{{ entry.value }}</td>
+                          </tr>
+                        }
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="octra-feedback-modal list-group-item">
+                <table class="table table-sm table-striped table-bordered">
+                  <thead>
+                    <tr>
+                      <th class="text-end">#</th>
+                      <th class="text-center">Type</th>
+                      <th class="text-center">Timestamp</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (entry of pkg.protocolObj.entries; track entry) {
+                      <ng-container
+                        [ngTemplateOutlet]="ConsoleEntryTemplate"
+                        [ngTemplateOutletContext]="{
+                          entry: entry,
+                          index: $index,
+                        }"
+                      ></ng-container>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -189,12 +213,7 @@
     </button>
     <button
       (click)="sendBugReport()"
-      [disabled]="
-        !form.valid ||
-        !isvalid ||
-        sendStatus === 'sending' ||
-        sendStatus === 'success'
-      "
+      [disabled]="!form.valid || !isvalid || sendStatus === 'sending' || sendStatus === 'success'"
       class="btn btn-primary"
       type="button"
     >
@@ -202,3 +221,46 @@
     </button>
   </div>
 </div>
+
+<ng-template #ConsoleEntryTemplate let-entry="entry" let-index="index">
+  <tr class="align-middle align-items-center">
+    <td
+      [ngClass]="{
+        'bg-danger text-white': entry.type === ConsoleType.ERROR,
+      }"
+      class="text-end octra-feedback-modal fit"
+    >
+      {{ index + 1 }}
+    </td>
+    <td
+      [ngClass]="{
+        'bg-danger text-white': entry.type === ConsoleType.ERROR,
+      }"
+      class="fit octra-feedback-modal fit text-center"
+    >
+      <i
+        class="bi text"
+        [ngClass]="{
+          'bi-x-circle-fill red-icon': entry.type === ConsoleType.ERROR,
+          'bi-pen-fill text-secondary': entry.type === ConsoleType.LOG,
+          'bi-exclamation-circle-fill text-info': entry.type === ConsoleType.INFO,
+          'bi-exclamation-triangle-fill text-warning': entry.type === ConsoleType.WARN,
+        }"
+      ></i>
+    </td>
+    <td
+      [ngClass]="{
+        'bg-danger text-white': entry.type === ConsoleType.ERROR,
+      }"
+      class="fit octra-feedback-modal fit text-center"
+    >
+      {{ entry.timestamp | date:'short' }} {{entry.timestamp | date:'z'}}
+    </td>
+    <td
+      [ngClass]="{
+        'bg-danger text-white': entry.type === ConsoleType.ERROR,
+      }"
+      [innerHTML]="entry.message"
+    ></td>
+  </tr>
+</ng-template>

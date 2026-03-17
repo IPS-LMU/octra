@@ -235,7 +235,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
     this.appStorage.disableUndoRedo();
     this.appStoreService.setShortcutsEnabled(false);
     this.modalService
-      .openBugreportModal()
+      .openBugreportModal(this.audio, this.annotationStoreService)
       .then(() => {
         this.appStorage.enableUndoRedo();
         this.appStoreService.setShortcutsEnabled(true);

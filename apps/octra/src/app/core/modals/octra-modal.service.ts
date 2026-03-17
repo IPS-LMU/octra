@@ -1,22 +1,21 @@
 import { EventEmitter, inject, Injectable, OnDestroy } from '@angular/core';
-import {
-  NgbModal,
-  NgbModalOptions,
-  NgbModalRef,
-} from '@ng-bootstrap/ng-bootstrap';
+import { TranslocoService } from '@jsverse/transloco';
+import { NgbModal, NgbModalOptions, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Action, Store } from '@ngrx/store';
 import { AccountLoginMethod } from '@octra/api-types';
-import { BugreportModalComponent } from '@octra/ngx-components';
-import { SubscriptionManager } from '@octra/utilities';
+import { BugreportModalComponent, BugReportService } from '@octra/ngx-components';
+import { getFileSize, removeEmptyProperties, SubscriptionManager } from '@octra/utilities';
+import { AppInfo } from '../../app.info';
+import { OctraBugReportTool } from '../obj/objects';
+import { AudioService } from '../shared/service';
 import { AppStorageService } from '../shared/service/appstorage.service';
-import { BugReportService } from '../shared/service/bug-report.service';
 import { LoginMode, RootState } from '../store';
+import { AnnotationStoreService } from '../store/login-mode/annotation/annotation.store.service';
 import { UserActions } from '../store/user/user.actions';
 import { ErrorModalComponent } from './error-modal/error-modal.component';
 import { FeedbackNoticeModalComponent } from './feedback-notice-modal/feedback-notice-modal.component';
 import { NgbModalWrapper } from './ng-modal-wrapper';
 import { ReAuthenticationModalComponent } from './re-authentication-modal/re-authentication-modal.component';
-import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable()
 export class OctraModalService implements OnDestroy {
@@ -47,11 +46,7 @@ export class OctraModalService implements OnDestroy {
     return modalRef.result as Promise<R>;
   }
 
-  public openModalRef<T>(
-    modal: any,
-    config: NgbModalOptions,
-    data?: Partial<T>,
-  ): NgbModalWrapper<T> {
+  public openModalRef<T>(modal: any, config: NgbModalOptions, data?: Partial<T>): NgbModalWrapper<T> {
     const ref = this.modalService.open(modal, {
       ...config,
     }) as NgbModalWrapper<T>;
@@ -80,15 +75,8 @@ export class OctraModalService implements OnDestroy {
     }
   }
 
-  public openReAuthenticationModal(
-    type: AccountLoginMethod,
-    forceLogout = false,
-    actionAfterSuccess?: Action,
-  ) {
-    const ref = this.openModalRef<ReAuthenticationModalComponent>(
-      ReAuthenticationModalComponent,
-      ReAuthenticationModalComponent.options,
-    );
+  public openReAuthenticationModal(type: AccountLoginMethod, forceLogout = false, actionAfterSuccess?: Action) {
+    const ref = this.openModalRef<ReAuthenticationModalComponent>(ReAuthenticationModalComponent, ReAuthenticationModalComponent.options);
     ref.componentInstance.type = type;
     ref.componentInstance.forceLogout = forceLogout;
     ref.componentInstance.actionAfterSuccess = actionAfterSuccess;
@@ -109,10 +97,7 @@ export class OctraModalService implements OnDestroy {
   }
 
   openErrorModal(text: string) {
-    const ref = this.openModalRef<ErrorModalComponent>(
-      ErrorModalComponent,
-      ErrorModalComponent.options,
-    );
+    const ref = this.openModalRef<ErrorModalComponent>(ErrorModalComponent, ErrorModalComponent.options);
     ref.componentInstance.text = text;
 
     this.onModalAction.emit({
@@ -129,10 +114,7 @@ export class OctraModalService implements OnDestroy {
   }
 
   openFeedbackNoticeModal() {
-    const ref = this.openModalRef<FeedbackNoticeModalComponent>(
-      FeedbackNoticeModalComponent,
-      FeedbackNoticeModalComponent.options,
-    );
+    const ref = this.openModalRef<FeedbackNoticeModalComponent>(FeedbackNoticeModalComponent, FeedbackNoticeModalComponent.options);
 
     this.onModalAction.emit({
       type: 'open',
@@ -147,9 +129,52 @@ export class OctraModalService implements OnDestroy {
     });
   }
 
-  openBugreportModal() {
-    this.bugService.getPackage();
+  openBugreportModal(audio: AudioService, annotationStoreService: AnnotationStoreService) {
+    let pkg = this.bugService.getPackage<OctraBugReportTool>(AppInfo.BUILD.version);
+    pkg.protocolObj.tool.customAttributes = {
+      Language: this.transloco.getActiveLang(),
+      'Signed in': this.appStorage.loggedIn,
+      'Use Mode': this.appStorage.useMode,
+      'Last Updated': AppInfo.BUILD.timestamp,
+      Project: undefined,
+      User: undefined,
+      'Audio File Size': undefined,
+      'Task ID': undefined,
+      'Audio File Duration': undefined,
+      'Audio Sampling Rate': undefined,
+      'Audio Bitrate': undefined,
+      'Audio Channels': undefined,
+      'Audio Type': undefined,
+      'Annotation Levels': undefined,
+      'Annotation Current Level': undefined,
+      'Annotation Number Of Segments': undefined,
+    };
+
+    if (this.appStorage.useMode === LoginMode.ONLINE) {
+      pkg.protocolObj.tool.customAttributes.Project = this.appStorage.onlineSession?.currentProject?.name;
+      pkg.protocolObj.tool.customAttributes.User = this.appStorage.snapshot.authentication.me?.username;
+      pkg.protocolObj.tool.customAttributes['Task ID'] = this.appStorage.onlineSession?.task?.id;
+    }
+
+    if (annotationStoreService.transcript) {
+      if (audio.audioManager?.resource?.size) {
+        const file = getFileSize(audio.audioManager.resource.size);
+        pkg.protocolObj.tool.customAttributes['Audio File Size'] = file.size + ' ' + file.label;
+        pkg.protocolObj.tool.customAttributes['Audio File Duration'] = audio.audioManager.resource.info.duration.seconds;
+        pkg.protocolObj.tool.customAttributes['Audio Sampling Rate'] = audio.audioManager.resource.info.sampleRate;
+        pkg.protocolObj.tool.customAttributes['Audio Bitrate'] = audio.audioManager.resource.info.bitrate;
+        pkg.protocolObj.tool.customAttributes['Audio Channels'] = audio.audioManager.resource.info.channels;
+        pkg.protocolObj.tool.customAttributes['Audio Type'] = audio.audioManager.resource.extension;
+      }
+      pkg.protocolObj.tool.customAttributes['Annotation Levels'] = annotationStoreService.transcript.levels.length;
+      pkg.protocolObj.tool.customAttributes['Annotation Current Level'] = annotationStoreService.transcript.selectedLevelIndex;
+      pkg.protocolObj.tool.customAttributes['Annotation Number Of Segments'] = annotationStoreService.transcript.currentLevel?.items.length;
+    }
+
+    pkg = removeEmptyProperties(JSON.parse(JSON.stringify(pkg)));
+
     const ref = this.openModalRef<BugreportModalComponent>(BugreportModalComponent, BugreportModalComponent.options, {
+      pkg,
       pkgText: this.bugService.pkgText,
       showSenderFields: this.appStorage.useMode !== LoginMode.ONLINE || !this.appStorage.loggedIn,
       _profile: {
@@ -173,7 +198,7 @@ export class OctraModalService implements OnDestroy {
         name: this.transloco.translate('g.name'),
         protocol: this.transloco.translate('g.protocol'),
         screenshots: this.transloco.translate('g.screenshots'),
-        sendFeedback: this.transloco.translate('g.send now')
+        sendFeedback: this.transloco.translate('g.send now'),
       },
     });
 
@@ -190,7 +215,7 @@ export class OctraModalService implements OnDestroy {
         next: ({ name, email, message, sendProtocol, screenshots }: any) => {
           console.log('Sending bug report...');
           ref.componentInstance.sendStatus = 'sending';
-          ref.componentInstance.waitForSendResponse(this.bugService.sendReport(name, email, message, sendProtocol, screenshots));
+          ref.componentInstance.waitForSendResponse(this.bugService.sendReport(name, email, message, sendProtocol, screenshots, AppInfo.BUILD.version));
         },
       }),
     );

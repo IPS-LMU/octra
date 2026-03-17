@@ -1,3 +1,5 @@
+import { ConsoleEntry } from '../../console-logging.service';
+
 export interface BugReportTranslations {
   abort?: string;
   addProtocol?: string;
@@ -12,4 +14,15 @@ export interface BugReportTranslations {
   screenshots?: string;
   sendFeedback?: string;
   sending?: string;
+}
+
+export interface BugReportTool {
+  version: string;
+  url: string;
+  customAttributes?: Record<string, any>;
+}
+
+export interface BugReportProtocol<T extends BugReportTool> {
+  tool: T;
+  entries: ConsoleEntry[];
 }

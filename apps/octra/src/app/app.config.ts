@@ -32,7 +32,6 @@ import { PagesModule } from './core/pages/pages.module';
 import { TranscActivateGuard } from './core/shared/guard/transcr.activateguard';
 import { SettingsService } from './core/shared/service';
 import { AppStorageService } from './core/shared/service/appstorage.service';
-import { BugReportService } from './core/shared/service/bug-report.service';
 import { CompatibilityService } from './core/shared/service/compatibility.service';
 import { IDBService } from './core/shared/service/idb.service';
 import { APIEffects } from './core/store/api';
@@ -100,7 +99,6 @@ export const appConfig: ApplicationConfig = {
     IDBService,
     TranscActivateGuard,
     SettingsService,
-    BugReportService,
     CompatibilityService,
     MultiThreadingService,
     provideHttpClient(withInterceptorsFromDi()),

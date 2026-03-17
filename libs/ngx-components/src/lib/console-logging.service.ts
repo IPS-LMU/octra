@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { DateTime } from 'luxon';
 import { Subject } from 'rxjs';
 
 export class ConsoleLoggingServiceOptions {
@@ -30,15 +29,21 @@ export enum ConsoleType {
   ERROR,
 }
 
-export interface ConsoleEntry {
-  type: ConsoleType;
+export interface ConsoleBaseEntry {
   timestamp: string;
+  type?: ConsoleType;
+  message?: string;
+  label?: string;
+  entries?: ConsoleEntry[];
+}
+
+export interface ConsoleEntry extends ConsoleBaseEntry {
+  type: ConsoleType;
   message: string;
 }
 
-export interface ConsoleGroupEntry {
+export interface ConsoleGroupEntry extends ConsoleBaseEntry {
   label: string;
-  timestamp: string;
   entries: ConsoleEntry[];
 }
 
@@ -69,10 +74,7 @@ export class ConsoleLoggingService {
       if (this.options.ignore(...args)) {
         return;
       }
-      serv.addEntry(
-        ConsoleType.LOG,
-        this.censorMessage(args[0], this.options.confidentialList),
-      );
+      serv.addEntry(ConsoleType.LOG, this.censorMessage(args[0], this.options.confidentialList));
       oldLog.apply(console, args);
     };
 
@@ -89,20 +91,9 @@ export class ConsoleLoggingService {
       if (typeof error === 'string') {
         debug = error;
 
-        if (
-          error === 'ERROR' &&
-          context !== undefined &&
-          context.stack &&
-          context.message
-        ) {
-          debug = this.censorMessage(
-            context.message,
-            this.options.confidentialList,
-          );
-          stack = this.censorMessage(
-            context.stack,
-            this.options.confidentialList,
-          );
+        if (error === 'ERROR' && context !== undefined && context.stack && context.message) {
+          debug = this.censorMessage(context.message, this.options.confidentialList);
+          stack = this.censorMessage(context.stack, this.options.confidentialList);
         }
       } else {
         if (error instanceof Error) {
@@ -121,10 +112,7 @@ export class ConsoleLoggingService {
       }
 
       if (debug !== '') {
-        serv.addEntry(
-          ConsoleType.ERROR,
-          `${debug}${stack !== '' ? ' ' + stack : ''}`,
-        );
+        serv.addEntry(ConsoleType.ERROR, `${debug}${stack !== '' ? ' ' + stack : ''}`);
       }
 
       oldError.apply(console, args);
@@ -139,10 +127,7 @@ export class ConsoleLoggingService {
         return;
       }
 
-      serv.addEntry(
-        ConsoleType.WARN,
-        this.censorMessage(args[0], this.options.confidentialList),
-      );
+      serv.addEntry(ConsoleType.WARN, this.censorMessage(args[0], this.options.confidentialList));
       oldWarn.apply(console, args);
     };
 
@@ -172,7 +157,7 @@ export class ConsoleLoggingService {
   public addEntry(type: ConsoleType, message: any) {
     const consoleItem: ConsoleEntry = {
       type,
-      timestamp: DateTime.now().toISO(),
+      timestamp: new Date().toISOString(),
       message,
     };
 
@@ -180,10 +165,7 @@ export class ConsoleLoggingService {
       if (!this.startedGroup) {
         this._console = [...this._console, consoleItem];
         if (this._console.length > this.options.maxLogEntries) {
-          this._console.splice(
-            0,
-            this._console.length - this.options.maxLogEntries,
-          );
+          this._console.splice(0, this._console.length - this.options.maxLogEntries);
         }
         this.consoleChange.next(
           new ConsoleChangeEvent({
@@ -199,7 +181,7 @@ export class ConsoleLoggingService {
   public beginGroup(label: string) {
     this.startedGroup = {
       label,
-      timestamp: DateTime.now().toISO(),
+      timestamp: new Date().toDateString(),
       entries: [],
     };
   }
@@ -207,7 +189,7 @@ export class ConsoleLoggingService {
   public addToGroup(type: ConsoleType, message: any) {
     this.startedGroup?.entries.push({
       type,
-      timestamp: DateTime.now().toISO(),
+      timestamp: new Date().toISOString(),
       message,
     });
   }
@@ -217,10 +199,7 @@ export class ConsoleLoggingService {
       this._console = [...this._console, this.startedGroup];
       this.startedGroup = undefined;
       if (this._console.length > this.options.maxLogEntries) {
-        this._console.splice(
-          0,
-          this._console.length - this.options.maxLogEntries,
-        );
+        this._console.splice(0, this._console.length - this.options.maxLogEntries);
       }
       this.consoleChange.next(
         new ConsoleChangeEvent({
@@ -241,9 +220,7 @@ export class ConsoleLoggingService {
         [
           {
             type: ConsoleType.INFO,
-            timestamp: DateTime.now()
-              .setLocale('de')
-              .toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS),
+            timestamp: new Date().toISOString(),
             message: '--- AFTER RELOAD ---',
           },
         ],
@@ -252,10 +229,7 @@ export class ConsoleLoggingService {
     }
 
     if (this.initialized && this._console.length > this.options.maxLogEntries) {
-      this._console.splice(
-        0,
-        this._console.length - this.options.maxLogEntries,
-      );
+      this._console.splice(0, this._console.length - this.options.maxLogEntries);
     }
 
     this.consoleChange.next(
@@ -268,10 +242,7 @@ export class ConsoleLoggingService {
   private censorMessage<T>(obj: T, confidentialList?: string[]): T {
     if (confidentialList && confidentialList.length > 0) {
       if (typeof obj === 'string') {
-        const regex = new RegExp(
-          confidentialList.map((a) => `(?:${a})`).join('|'),
-          'g',
-        );
+        const regex = new RegExp(confidentialList.map((a) => `(?:${a})`).join('|'), 'g');
         const result = obj.replace(regex, '$1[CENSORED]$2');
         return result as T;
       } else {

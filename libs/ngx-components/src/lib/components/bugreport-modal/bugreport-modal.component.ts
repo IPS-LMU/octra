@@ -1,11 +1,23 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, inject, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  inject,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal, NgbModalOptions, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { FeedbackRequestPropertiesDto } from '@octra/api-types';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 import { downloadFile } from '@octra/web-media';
 import { JoditConfig, NgxJoditComponent } from 'ngx-jodit';
 import { Observable, Subject, timer } from 'rxjs';
-import { BugReportTranslations } from './types';
+import { BugReportProtocol, BugReportTranslations } from './types';
+import { DatePipe, KeyValuePipe, NgClass, NgTemplateOutlet } from '@angular/common';
+import { ConsoleType } from '../../console-logging.service';
 
 const defaultTranslations: BugReportTranslations = {
   giveFeedback: 'Give Feedback',
@@ -28,7 +40,9 @@ const defaultTranslations: BugReportTranslations = {
   standalone: true,
   templateUrl: './bugreport-modal.component.html',
   styleUrls: ['./bugreport-modal.component.scss'],
-  imports: [FormsModule, NgxJoditComponent, NgbPopover],
+  imports: [FormsModule, NgxJoditComponent, NgbPopover, KeyValuePipe, NgClass, NgTemplateOutlet, DatePipe],
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BugreportModalComponent extends SubscriberComponent implements AfterViewInit {
   private cd = inject(ChangeDetectorRef);
@@ -36,9 +50,11 @@ export class BugreportModalComponent extends SubscriberComponent implements Afte
 
   @ViewChild('editor') editor?: NgxJoditComponent;
   public static options: NgbModalOptions = {
-    size: 'xl',
+    size: 'xxl',
     keyboard: false,
+    fullscreen: 'xl',
     backdrop: true,
+    scrollable: true,
   };
 
   joditOptions: JoditConfig = {
@@ -91,6 +107,10 @@ export class BugreportModalComponent extends SubscriberComponent implements Afte
     name?: string;
   }> = new EventEmitter();
 
+  pkg!: {
+    dto: FeedbackRequestPropertiesDto;
+    protocolObj: BugReportProtocol<any>;
+  };
   pkgText = '';
 
   showSenderFields = true;
@@ -120,6 +140,7 @@ export class BugreportModalComponent extends SubscriberComponent implements Afte
   ngAfterViewInit() {
     setTimeout(() => {
       this.editor?.jodit?.focus();
+      this.cd.detectChanges();
     }, 0);
   }
 
@@ -144,6 +165,7 @@ export class BugreportModalComponent extends SubscriberComponent implements Afte
       sendProtocol: this.sendProObj,
       screenshots: this.screenshots,
     });
+    this.cd.markForCheck();
   }
 
   waitForSendResponse(obervable: Observable<void>) {
@@ -256,4 +278,6 @@ export class BugreportModalComponent extends SubscriberComponent implements Afte
       alert(e.message);
     }
   }
+
+  protected readonly ConsoleType = ConsoleType;
 }

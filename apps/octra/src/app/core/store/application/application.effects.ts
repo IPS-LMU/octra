@@ -33,7 +33,6 @@ import { AppSettings, ASRSettings } from '../../obj';
 import { AppConfigSchema } from '../../schemata/appconfig.schema';
 import { SettingsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
-import { BugReportService } from '../../shared/service/bug-report.service';
 import { ConfigurationService } from '../../shared/service/configuration.service';
 import { RoutingService } from '../../shared/service/routing.service';
 import { APIActions } from '../api';
@@ -58,9 +57,7 @@ export class ApplicationEffects {
   private store = inject<Store<RootState>>(Store);
   private http = inject(HttpClient);
   private configurationService = inject(ConfigurationService);
-  private bugService = inject(BugReportService);
   private appStorage = inject(AppStorageService);
-  private settingsService = inject(SettingsService);
   private routerService = inject(RoutingService);
   private modalService = inject(OctraModalService);
   private sessionStorage = inject(SessionStorageService);

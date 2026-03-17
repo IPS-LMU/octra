@@ -2,6 +2,21 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.7.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.6.1...ngx-components-1.7.0) (2026-03-17)
+
+
+### Bug Fixes
+
+* **octra:** issues with zoneless change detection ([b2008bc](https://github.com/IPS-LMU/octra/commit/b2008bc40cf78e49ab5286c1df8808c980b48abd))
+
+
+### Features
+
+* **ngx-components:** improved bugreport modal ([1daa102](https://github.com/IPS-LMU/octra/commit/1daa1023a49f0dda6ab0e8629d0ef47ed455b61c))
+* **ngx-components:** version checker with newVersion event for better change detection ([71528da](https://github.com/IPS-LMU/octra/commit/71528da2b3262a27377bcb52d02c9831579145c3))
+
+
+
 ## [1.6.1](https://github.com/IPS-LMU/octra/compare/ngx-components-1.6.0...ngx-components-1.6.1) (2026-03-04)
 
 

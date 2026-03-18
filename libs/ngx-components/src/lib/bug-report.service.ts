@@ -14,10 +14,8 @@ export class BugReportService {
   private consoleService = inject(ConsoleLoggingService);
   private api = inject(OctraAPIService);
 
-  pkgText = '';
-
   public getPackage<T extends BugReportTool>(
-    toolVersion: string,
+    tool: T,
   ): {
     dto: FeedbackRequestPropertiesDto;
     protocol?: File;
@@ -25,8 +23,9 @@ export class BugReportService {
   } {
     const protocol: { tool: { version: string; url: string }; entries: (ConsoleEntry | ConsoleGroupEntry)[] } = {
       tool: {
-        version: toolVersion,
-        url: window.location.href,
+        version: tool.version,
+        url: tool.url,
+        ...tool.customAttributes,
       },
       entries: this.consoleService.console,
     };
@@ -44,15 +43,6 @@ export class BugReportService {
         },
       },
     };
-
-    this.pkgText = JSON.stringify(
-      {
-        ...dto,
-        protocol,
-      },
-      null,
-      2,
-    );
 
     return {
       dto,
@@ -75,8 +65,15 @@ export class BugReportService {
     };
   }
 
-  sendReport(name: string, email: string, message: string, sendProtocol: boolean, screenshots: any[], toolVersion: string): Observable<any> {
-    const pkg = this.getPackage(toolVersion);
+  sendReport<T extends BugReportTool>(
+    name: string,
+    email: string,
+    message: string,
+    sendProtocol: boolean,
+    screenshots: any[],
+    tool: T,
+  ): Observable<any> {
+    const pkg = this.getPackage(tool);
     let body: FeedbackRequestPropertiesDto = {
       ...pkg.dto,
       message: message ?? '',

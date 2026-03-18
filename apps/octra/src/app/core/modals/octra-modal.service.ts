@@ -130,52 +130,55 @@ export class OctraModalService implements OnDestroy {
   }
 
   openBugreportModal(audio: AudioService, annotationStoreService: AnnotationStoreService) {
-    let pkg = this.bugService.getPackage<OctraBugReportTool>(AppInfo.BUILD.version);
-    pkg.protocolObj.tool.customAttributes = {
-      Language: this.transloco.getActiveLang(),
-      'Signed in': this.appStorage.loggedIn,
-      'Use Mode': this.appStorage.useMode,
-      'Last Updated': AppInfo.BUILD.timestamp,
-      Project: undefined,
-      User: undefined,
-      'Audio File Size': undefined,
-      'Task ID': undefined,
-      'Audio File Duration': undefined,
-      'Audio Sampling Rate': undefined,
-      'Audio Bitrate': undefined,
-      'Audio Channels': undefined,
-      'Audio Type': undefined,
-      'Annotation Levels': undefined,
-      'Annotation Current Level': undefined,
-      'Annotation Number Of Segments': undefined,
+    const tool: OctraBugReportTool = {
+      version: AppInfo.BUILD.version,
+      url: window.location.href,
+      customAttributes: {
+        Language: this.transloco.getActiveLang(),
+        'Signed in': this.appStorage.loggedIn,
+        'Use Mode': this.appStorage.useMode,
+        'Last Updated': AppInfo.BUILD.timestamp,
+        Project: undefined,
+        User: undefined,
+        'Audio File Size': undefined,
+        'Task ID': undefined,
+        'Audio File Duration': undefined,
+        'Audio Sampling Rate': undefined,
+        'Audio Bitrate': undefined,
+        'Audio Channels': undefined,
+        'Audio Type': undefined,
+        'Annotation Levels': undefined,
+        'Annotation Current Level': undefined,
+        'Annotation Number Of Segments': undefined,
+      },
     };
 
     if (this.appStorage.useMode === LoginMode.ONLINE) {
-      pkg.protocolObj.tool.customAttributes.Project = this.appStorage.onlineSession?.currentProject?.name;
-      pkg.protocolObj.tool.customAttributes.User = this.appStorage.snapshot.authentication.me?.username;
-      pkg.protocolObj.tool.customAttributes['Task ID'] = this.appStorage.onlineSession?.task?.id;
+      tool.customAttributes.Project = this.appStorage.onlineSession?.currentProject?.name;
+      tool.customAttributes.User = this.appStorage.snapshot.authentication.me?.username;
+      tool.customAttributes['Task ID'] = this.appStorage.onlineSession?.task?.id;
     }
 
     if (annotationStoreService.transcript) {
       if (audio.audioManager?.resource?.size) {
         const file = getFileSize(audio.audioManager.resource.size);
-        pkg.protocolObj.tool.customAttributes['Audio File Size'] = file.size + ' ' + file.label;
-        pkg.protocolObj.tool.customAttributes['Audio File Duration'] = audio.audioManager.resource.info.duration.seconds;
-        pkg.protocolObj.tool.customAttributes['Audio Sampling Rate'] = audio.audioManager.resource.info.sampleRate;
-        pkg.protocolObj.tool.customAttributes['Audio Bitrate'] = audio.audioManager.resource.info.bitrate;
-        pkg.protocolObj.tool.customAttributes['Audio Channels'] = audio.audioManager.resource.info.channels;
-        pkg.protocolObj.tool.customAttributes['Audio Type'] = audio.audioManager.resource.extension;
+        tool.customAttributes['Audio File Size'] = file.size + ' ' + file.label;
+        tool.customAttributes['Audio File Duration'] = audio.audioManager.resource.info.duration.seconds;
+        tool.customAttributes['Audio Sampling Rate'] = audio.audioManager.resource.info.sampleRate;
+        tool.customAttributes['Audio Bitrate'] = audio.audioManager.resource.info.bitrate;
+        tool.customAttributes['Audio Channels'] = audio.audioManager.resource.info.channels;
+        tool.customAttributes['Audio Type'] = audio.audioManager.resource.extension;
       }
-      pkg.protocolObj.tool.customAttributes['Annotation Levels'] = annotationStoreService.transcript.levels.length;
-      pkg.protocolObj.tool.customAttributes['Annotation Current Level'] = annotationStoreService.transcript.selectedLevelIndex;
-      pkg.protocolObj.tool.customAttributes['Annotation Number Of Segments'] = annotationStoreService.transcript.currentLevel?.items.length;
+      tool.customAttributes['Annotation Levels'] = annotationStoreService.transcript.levels.length;
+      tool.customAttributes['Annotation Current Level'] = annotationStoreService.transcript.selectedLevelIndex;
+      tool.customAttributes['Annotation Number Of Segments'] = annotationStoreService.transcript.currentLevel?.items.length;
     }
 
+    let pkg = this.bugService.getPackage<OctraBugReportTool>(tool);
     pkg = removeEmptyProperties(JSON.parse(JSON.stringify(pkg)));
 
     const ref = this.openModalRef<BugreportModalComponent>(BugreportModalComponent, BugreportModalComponent.options, {
       pkg,
-      pkgText: this.bugService.pkgText,
       showSenderFields: this.appStorage.useMode !== LoginMode.ONLINE || !this.appStorage.loggedIn,
       _profile: {
         ...((this.appStorage.useMode !== LoginMode.ONLINE || !this.appStorage.loggedIn
@@ -215,7 +218,7 @@ export class OctraModalService implements OnDestroy {
         next: ({ name, email, message, sendProtocol, screenshots }: any) => {
           console.log('Sending bug report...');
           ref.componentInstance.sendStatus = 'sending';
-          ref.componentInstance.waitForSendResponse(this.bugService.sendReport(name, email, message, sendProtocol, screenshots, AppInfo.BUILD.version));
+          ref.componentInstance.waitForSendResponse(this.bugService.sendReport(name, email, message, sendProtocol, screenshots, tool));
         },
       }),
     );

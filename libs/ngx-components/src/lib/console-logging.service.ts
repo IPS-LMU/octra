@@ -181,7 +181,7 @@ export class ConsoleLoggingService {
   public beginGroup(label: string) {
     this.startedGroup = {
       label,
-      timestamp: new Date().toDateString(),
+      timestamp: new Date().toISOString(),
       entries: [],
     };
   }

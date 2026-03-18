@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.7.1](https://github.com/IPS-LMU/octra/compare/ngx-components-1.7.0...ngx-components-1.7.1) (2026-03-18)
+
+
+### Bug Fixes
+
+* **ngx-components:** can't send tool properties as part of feedback ([04bc465](https://github.com/IPS-LMU/octra/commit/04bc46534770811db0538909e479a874957356a9))
+
+
+
 # [1.7.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.6.1...ngx-components-1.7.0) (2026-03-17)
 
 

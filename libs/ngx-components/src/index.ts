@@ -2,6 +2,7 @@ export * from './lib/components.module';
 export * from './lib/components/asr-options';
 export * from './lib/components/audio/audio-viewer';
 export * from './lib/components/audio/audioplayer';
+export * from './lib/components/audio/html-audioplayer';
 export * from './lib/components/bugreport-modal/bugreport-modal.component';
 export * from './lib/components/bugreport-modal/types';
 export * from './lib/components/form-generator/array-adder/toolconfig-array-adder.component';

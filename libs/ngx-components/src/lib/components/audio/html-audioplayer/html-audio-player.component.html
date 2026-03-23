@@ -1,0 +1,59 @@
+<audio
+  #audioElement
+  [preload]="preload"
+  [src]="url"
+  (timeupdate)="updateProgress()"
+  (progress)="updateBuffered()"
+  (loadeddata)="updateGUI()"
+></audio>
+
+<div class="octra-progress-container" (click)="progressBarClick($event)" #progressContainer>
+  <div class="octra-buffered" #buffered></div>
+  <div class="octra-progress" #progress></div>
+</div>
+
+<div class="time">
+  <span #currentTimeEl>0:00</span>
+  <span #currentDurEl>0:00</span>
+</div>
+<div class="btn-group w-100 mt-3">
+  <button class="octra-html-audio-button me-2" (click)="togglePlay()">
+    <i
+      class="bi"
+      [ngClass]="{
+        'bi-play-fill': state.status !== 'playing',
+        'bi-pause-fill': state.status === 'playing',
+      }"
+    ></i>
+  </button>
+  <button class="octra-html-audio-button" (click)="stop()">
+    <i class="bi bi-stop-fill"></i>
+  </button>
+  <div class="w-100"></div>
+  <div class="octra-html-audio-button slider d-flex me-2">
+    <div class="row g-0 w-100 d-flex align-items-center">
+      <div class="col-auto px-2">
+        <i class="bi bi-volume-down-fill"></i>
+      </div>
+      <div class="col">
+        <input type="range" min="0" max="1" step="0.01" value="1" (input)="volumeChange($event)" />
+      </div>
+      <div class="col-auto px-2">
+        <i class="bi bi-volume-up-fill"></i>
+      </div>
+    </div>
+  </div>
+  <div class="octra-html-audio-button slider d-flex">
+    <div class="row g-0 w-100 d-flex align-items-center">
+      <div class="col-auto px-2">
+        <i class="bi bi-speedometer"></i>
+      </div>
+      <div class="col">
+        <input type="range" min="0.25" max="3" step="0.25" value="1" (input)="speedChange($event)" />
+      </div>
+      <div class="col-auto px-2">
+        {{state.speed}}x
+      </div>
+    </div>
+  </div>
+</div>

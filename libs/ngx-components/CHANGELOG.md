@@ -2,6 +2,20 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.8.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.7.1...ngx-components-1.8.0) (2026-03-23)
+
+
+### Bug Fixes
+
+* **ngx-components:** invalid timestamp for groups in console logging service ([9f1c6e7](https://github.com/IPS-LMU/octra/commit/9f1c6e70c3748f84017a872246f3c80cb003e004))
+
+
+### Features
+
+* **ngx-components:** simple HTML Audio player with support for buffering ([984e9f9](https://github.com/IPS-LMU/octra/commit/984e9f9cbd5dd9725b8562742e0aa1d75e745ed0))
+
+
+
 ## [1.7.1](https://github.com/IPS-LMU/octra/compare/ngx-components-1.7.0...ngx-components-1.7.1) (2026-03-18)
 
 

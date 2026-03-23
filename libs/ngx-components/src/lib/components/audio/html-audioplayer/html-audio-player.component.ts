@@ -29,7 +29,7 @@ export class HtmlAudioPlayerComponent implements AfterViewInit, OnChanges, OnDes
 
   @Input() url?: string;
   @Input() type?: string;
-  @Input() preload?: 'metadata' | 'auto' | 'none' = "metadata"
+  @Input() preload?: 'metadata' | 'auto' | 'none' = 'metadata';
 
   protected state: {
     status: OctraHTMLAudioPlayerStatus;
@@ -78,11 +78,11 @@ export class HtmlAudioPlayerComponent implements AfterViewInit, OnChanges, OnDes
 
   ngOnDestroy() {}
 
-  protected togglePlay() {
+  protected async togglePlay() {
     if (this.state.status === 'playing') {
       this.pause();
     } else {
-      this.play();
+      await this.play();
     }
   }
 
@@ -108,9 +108,9 @@ export class HtmlAudioPlayerComponent implements AfterViewInit, OnChanges, OnDes
   }
 
   private formatTime(time: number) {
-    if (isNaN(time)) return '00:00:00.000';
+    if (isNaN(time)) return '00:00:00';
     const hours = Math.floor(time / 3600);
-    const minutes = Math.floor(time / 60)
+    const minutes = Math.floor((time / 60) % 60)
       .toString()
       .padStart(2, '0');
     const seconds = Math.floor(time % 60)
@@ -130,7 +130,7 @@ export class HtmlAudioPlayerComponent implements AfterViewInit, OnChanges, OnDes
     this.cd.markForCheck();
   }
 
-  async pause() {
+  pause() {
     this.audioElement?.pause();
     this.state.status = 'paused';
     this.cd.markForCheck();
@@ -141,6 +141,7 @@ export class HtmlAudioPlayerComponent implements AfterViewInit, OnChanges, OnDes
       this.audioElement.pause();
       this.audioElement.currentTime = 0;
       this.state.status = 'stopped';
+      this.cd.markForCheck();
     }
   }
 
@@ -154,6 +155,7 @@ export class HtmlAudioPlayerComponent implements AfterViewInit, OnChanges, OnDes
       const clickX = $event.offsetX;
       const duration = this.audioElement.duration;
       this.audioElement.currentTime = (clickX / width) * duration;
+      this.cd.markForCheck();
     }
   }
 
@@ -167,10 +169,9 @@ export class HtmlAudioPlayerComponent implements AfterViewInit, OnChanges, OnDes
   speedChange($event: Event) {
     if (this.audioElement) {
       this.audioElement.playbackRate = ($event.target as HTMLInputElement).valueAsNumber;
-      console.log(this.audioElement.playbackRate);
       this.state.speed = (this.audioElement.playbackRate * 100).toString();
       this.state.speed = this.state.speed.length < 3 ? `0.${this.state.speed}` : `${this.state.speed[0]}.${this.state.speed.slice(1)}`;
+      this.cd.markForCheck();
     }
-    this.cd.markForCheck();
   }
 }

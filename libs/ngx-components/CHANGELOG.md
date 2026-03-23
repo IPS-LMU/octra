@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.8.1](https://github.com/IPS-LMU/octra/compare/ngx-components-1.8.0...ngx-components-1.8.1) (2026-03-23)
+
+
+### Bug Fixes
+
+* **ngx-components:** invalid time format in html-audio player component ([7324225](https://github.com/IPS-LMU/octra/commit/73242250a124e1f1a2a0a6fd24e71cfd2e9b34a8))
+
+
+
 # [1.8.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.7.1...ngx-components-1.8.0) (2026-03-23)
 
 

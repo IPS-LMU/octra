@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.1.0](https://github.com/IPS-LMU/octra/compare/utilities-2.0.0...utilities-2.1.0) (2026-04-13)
+
+
+### Features
+
+* **utilities:** outputList() for SubscriptionManager ([24a4f1e](https://github.com/IPS-LMU/octra/commit/24a4f1e82a222cbd258499e76452b543a3973dc6))
+
+
+
 # [2.0.0](https://github.com/IPS-LMU/octra/compare/utilities-1.4.0...utilities-2.0.0) (2026-01-28)
 
 

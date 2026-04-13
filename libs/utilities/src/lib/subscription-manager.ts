@@ -96,4 +96,10 @@ export class SubscriptionManager<T> {
     }
     return removed;
   }
+
+  outputList() {
+    for (const subscr of this.subscriptions) {
+      console.log(`ID: ${subscr.id}; Tag: ${subscr.tag}`);
+    }
+  }
 }

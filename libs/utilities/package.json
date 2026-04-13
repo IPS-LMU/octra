@@ -18,11 +18,5 @@
   "type": "module",
   "main": "./index.js",
   "module": "./index.mjs",
-  "typings": "./index.d.ts",
-  "dependencies": {},
-  "exports": {
-    ".": {
-      "default": "./src/index.ts"
-    }
-  }
+  "typings": "./index.d.ts"
 }

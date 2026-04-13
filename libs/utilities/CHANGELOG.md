@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.1.1](https://github.com/IPS-LMU/octra/compare/utilities-2.1.0...utilities-2.1.1) (2026-04-13)
+
+
+### Bug Fixes
+
+* **utilities:** can't import library ([72752ca](https://github.com/IPS-LMU/octra/commit/72752ca8bd9ed4f27c65bbeaea0c6e558ec2d07a))
+
+
+
 # [2.1.0](https://github.com/IPS-LMU/octra/compare/utilities-2.0.0...utilities-2.1.0) (2026-04-13)
 
 

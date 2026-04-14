@@ -479,6 +479,10 @@ export class AudioViewerService {
       }
     }
 
+    if (this.currentLevel && oldAnnotation && this.currentLevel.id !== oldAnnotation.currentLevel.id) {
+      this.refresh();
+    }
+
     this.bringToFront('#timeStamps');
     this.bringToFront('.line-selections');
   }

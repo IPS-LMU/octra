@@ -736,7 +736,7 @@ export class IDBEffects {
         AnnotationActions.duplicateLevel.do,
         AuthenticationActions.loginLocal.prepare,
         AnnotationActions.addMultipleASRSegments.success,
-        AnnotationActions.initTranscriptionService.success,
+        AnnotationActions.sanitizeAnnotation.success,
         AnnotationActions.combinePhrases.success,
       ),
       withLatestFrom(this.store),

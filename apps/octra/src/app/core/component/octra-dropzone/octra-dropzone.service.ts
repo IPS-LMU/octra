@@ -378,34 +378,6 @@ export class OctraDropzoneService {
       if (new RegExp(regexStr).exec(fileProgress.file.fullname) === null) {
         fileProgress.warning = 'File names are not the same.';
       }
-      for (const lvl of importResult.annotjson.levels) {
-        if (lvl.type === AnnotationLevelType.SEGMENT) {
-          const level = lvl as OSegmentLevel<OSegment>;
-
-          if (level.items[0].sampleStart !== 0) {
-            let temp = [];
-            temp.push(new OSegment(0, 0, level.items[0].sampleStart!, [new OLabel(level.name, '')]));
-            temp = temp.concat(level.items.map((a) => new OSegment(a.id, a.sampleStart!, a.sampleDur!, a.labels)));
-            level.items = temp;
-
-            for (let j = 1; j < level.items.length + 1; j++) {
-              level.items[j - 1].id = j;
-            }
-          }
-
-          const last = level.items[level.items.length - 1];
-          if (last.sampleStart! + last.sampleDur! !== this._oaudiofile.duration) {
-            level.items.push(
-              new OSegment(
-                last.id + 1,
-                last.sampleStart! + last.sampleDur!,
-                this._oaudiofile.duration! * this._oaudiofile.sampleRate - (last.sampleStart! + last.sampleDur!),
-                [new OLabel(level.name, '')],
-              ),
-            );
-          }
-        }
-      }
       this._oannotation = importResult.annotjson;
       fileProgress.status = 'valid';
       this.updateStatistics();

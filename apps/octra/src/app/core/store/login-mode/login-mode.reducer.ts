@@ -249,6 +249,27 @@ export class LoginModeReducers {
         }
         return state;
       }),
+      on(AnnotationActions.loadAudio.success, (state: AnnotationState, { mode, audioDuration }) => {
+        if (this.mode === mode) {
+          return {
+            ...state,
+            audio: {
+              ...state.audio,
+              audioDuration,
+            },
+          };
+        }
+        return state;
+      }),
+      on(AnnotationActions.sanitizeAnnotation.success, (state: AnnotationState, { mode, annotation }) => {
+        if (this.mode === mode) {
+          return {
+            ...state,
+            transcript: annotation,
+          };
+        }
+        return state;
+      }),
       on(
         LoginModeActions.startAnnotation.success,
         (state: AnnotationState, { task, project, mode, projectSettings, guidelines, selectedGuidelines }) => {

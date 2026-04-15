@@ -349,6 +349,7 @@ export class AnnotationEffects {
                         selectedGuidelines: a.selectedGuidelines,
                         currentProject: a.currentProject,
                         audioFile: a.audioFile,
+                        audioDuration: this.audio.audioManager.resource.info.duration.clone(),
                       }),
                     );
                   }
@@ -382,6 +383,7 @@ export class AnnotationEffects {
                     task: a.task,
                     currentProject: a.currentProject,
                     audioFile: a.audioFile,
+                    audioDuration: this.audio.audioManager.resource.info.duration.clone(),
                   }),
                 );
               } else {
@@ -421,6 +423,76 @@ export class AnnotationEffects {
         }),
       ),
     { dispatch: false },
+  );
+
+  annotationSanitize$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.sanitizeAnnotation.do),
+      withLatestFrom(this.store),
+      exhaustMap(([action, state]) => {
+        // fix annotation boundaries
+        const modeState = getModeState(state);
+
+        if (action.audioDuration === undefined) {
+          return of(
+            AnnotationActions.sanitizeAnnotation.fail({
+              error: 'Undefined audio duration',
+            }),
+          );
+        }
+
+        try {
+          const annotation = modeState.transcript.clone();
+          for (const level of annotation.levels) {
+            if (level.type === 'SEGMENT') {
+              const segmentLevel = level as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
+              let lastItem = segmentLevel.items[segmentLevel.items.length - 1];
+
+              while (lastItem !== undefined && lastItem.time.samples !== action.audioDuration.samples) {
+                console.log('while');
+                const diff = action.audioDuration ? action.audioDuration.sub(lastItem.time) : undefined;
+
+                if (diff !== undefined) {
+                  if (diff.samples > 0) {
+                    if (diff.samples > diff.sampleRate / 5) {
+                      // add a segment at the end
+                      segmentLevel.items.push(
+                        annotation.createSegment(
+                          action.audioDuration,
+                          lastItem.labels.map((a) => {
+                            if (a.name !== 'Speaker') {
+                              return new OLabel(a.name, '');
+                            }
+                            return a.clone();
+                          }),
+                        ),
+                      );
+                    } else if (diff.samples < diff.sampleRate / 5) {
+                      // extend segment
+                      segmentLevel.items[segmentLevel.items.length - 1].time = action.audioDuration.clone();
+                    }
+                  } else if (diff.samples < 0 || Number.isNaN(diff.samples)) {
+                    // weird, shouldn't happen. Remove unit
+                    segmentLevel.items.splice(-1);
+                  }
+                }
+
+                lastItem = segmentLevel.items[segmentLevel.items.length - 1];
+              }
+            }
+          }
+
+          return of(
+            AnnotationActions.sanitizeAnnotation.success({
+              annotation,
+              mode: action.mode,
+            }),
+          );
+        } catch (e) {
+          return of(AnnotationActions.sanitizeAnnotation.fail({ error: e.message }));
+        }
+      }),
+    ),
   );
 
   onTranscriptionEnd$ = createEffect(
@@ -846,7 +918,7 @@ export class AnnotationEffects {
   loadSegmentsSuccess$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AnnotationActions.initTranscriptionService.success),
+        ofType(AnnotationActions.sanitizeAnnotation.success),
         withLatestFrom(this.store),
         tap(([action, state]) => {
           this.routingService.navigate('transcription initialized', ['/intern/transcr'], AppInfo.queryParamsHandling);
@@ -867,7 +939,23 @@ export class AnnotationEffects {
     { dispatch: false },
   );
 
-  onAudioLoadSuccess$ = createEffect(() =>
+  sanitizeAnnotationAfterTranscriptionServiceInit$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.initTranscriptionService.success),
+      withLatestFrom(this.store),
+      exhaustMap(([a, state]) => {
+        const mode = getModeState(state);
+        return of(
+          AnnotationActions.sanitizeAnnotation.do({
+            mode: a.mode,
+            audioDuration: mode.audio.audioDuration,
+          }),
+        );
+      }),
+    ),
+  );
+
+  onAnnotationSanitized$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnotationActions.loadAudio.success),
       withLatestFrom(this.store),
@@ -1411,11 +1499,8 @@ export class AnnotationEffects {
         withLatestFrom(this.store),
         tap(([action, state]) => {
           const currentMode = getModeState(state);
-          const annotation = currentMode?.transcript.serialize(
-            currentMode.audio.fileName,
-            this.audio.audioManager.resource.info.sampleRate,
-            this.audio.audioManager.resource.info.duration,
-          );
+          const annotation = currentMode?.transcript
+            .serialize(currentMode.audio.fileName, this.audio.audioManager.resource.info.sampleRate, this.audio.audioManager.resource.info.duration);
           const converter = new AnnotJSONConverter();
           const result = converter.export(annotation!);
           window.parent.postMessage(
@@ -1836,7 +1921,7 @@ export class AnnotationEffects {
                 return isValidAnnotation(
                   io,
                   this.audio.audioManager.resource.getOAudioFile(),
-                  modeState.importOptions ? modeState.importOptions!['SRT'] : undefined
+                  modeState.importOptions ? modeState.importOptions!['SRT'] : undefined,
                 );
               })
             : undefined;
@@ -2107,11 +2192,13 @@ export class AnnotationEffects {
           }
         }
 
-        const oannotjson = modeState.transcript!.serialize(
-          this.audio.audioManager.resource.info.fullname,
-          this.audio.audioManager.resource.info.sampleRate,
-          this.audio.audioManager.resource.info.duration,
-        );
+        const oannotjson = modeState
+          .transcript!
+          .serialize(
+            this.audio.audioManager.resource.info.fullname,
+            this.audio.audioManager.resource.info.sampleRate,
+            this.audio.audioManager.resource.info.duration,
+          );
         const result = converter.export(oannotjson, this.audio.audioManager.resource.getOAudioFile(), 0);
 
         if (!result.error && result.file) {

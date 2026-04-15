@@ -14,6 +14,7 @@ import { FeedBackForm } from '../../../obj/FeedbackForm/FeedBackForm';
 import { SessionFile } from '../../../obj/SessionFile';
 import { ILog } from '../../../obj/Settings/logging';
 import { getModeState, RootState } from '../../index';
+import { SampleUnit } from '@octra/media';
 
 export interface GuidelinesItem {
   filename: string;
@@ -89,6 +90,7 @@ export interface AnnotationState extends UndoRedoState {
     loaded: boolean;
     fileName: string;
     sampleRate: number;
+    audioDuration?: SampleUnit;
     file?: TaskInputOutputDto; // TODO <- add audio file here
   };
   guidelines?: {

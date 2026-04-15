@@ -4,10 +4,10 @@ import {
   AnnotationLevelType,
   ASRContext,
   OctraAnnotation,
-  OctraAnnotationAnyLevel,
+  OctraAnnotationAnyLevel, OctraAnnotationLevel,
   OctraAnnotationSegment,
   OEvent,
-  OItem,
+  OItem
 } from '@octra/annotation';
 import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
 import { SampleUnit } from '@octra/media';
@@ -40,6 +40,24 @@ export class AnnotationActions {
         currentProject: ProjectDto;
         guidelines: GuidelinesItem[];
         selectedGuidelines?: GuidelinesItem;
+        mode: LoginMode;
+        audioDuration: SampleUnit;
+      }>(),
+      fail: props<{
+        error: string;
+      }>(),
+    },
+  });
+
+  static sanitizeAnnotation = createActionGroup({
+    source: 'annotation/sanitize',
+    events: {
+      do: props<{
+        audioDuration?: SampleUnit;
+        mode: LoginMode;
+      }>(),
+      success: props<{
+        annotation: OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>;
         mode: LoginMode;
       }>(),
       fail: props<{

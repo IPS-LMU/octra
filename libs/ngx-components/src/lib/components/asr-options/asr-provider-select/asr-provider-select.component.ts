@@ -1,8 +1,9 @@
-import { NgStyle } from '@angular/common';
+import { NgClass, NgStyle } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   inject,
   Input,
@@ -21,7 +22,7 @@ import {
   ValidationErrors,
   Validator,
 } from '@angular/forms';
-import { NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdown, NgbDropdownMenu, NgbDropdownToggle, NgbPopover, PlacementArray } from '@ng-bootstrap/ng-bootstrap';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 import { ASROptionsTranslations, ServiceProvider } from '../types';
 
@@ -35,7 +36,7 @@ const defaultI18n: ASROptionsTranslations = {
   selector: 'octra-asr-provider-select',
   templateUrl: './asr-provider-select.component.html',
   styleUrls: ['./asr-provider-select.component.scss'],
-  imports: [NgbDropdown, FormsModule, NgbDropdownMenu, NgbDropdownToggle, NgbPopover, NgStyle],
+  imports: [NgbDropdown, FormsModule, NgbDropdownMenu, NgbDropdownToggle, NgbPopover, NgStyle, NgClass],
   providers: [
     {
       provide: NG_VALIDATORS,
@@ -51,6 +52,9 @@ const defaultI18n: ASROptionsTranslations = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OctraProviderSelectComponent extends SubscriberComponent implements OnChanges, ControlValueAccessor, Validator {
+  protected cd = inject(ChangeDetectorRef);
+  protected elementRef = inject(ElementRef);
+
   @Output() ocbFocus = new EventEmitter<void>();
   @Input() name = '';
   @Input() id = 'providerDropdown';
@@ -75,7 +79,12 @@ export class OctraProviderSelectComponent extends SubscriberComponent implements
 
   @Input() asrProviders?: ServiceProvider[];
   @Input() required = false;
+  @Input() container: 'body' | undefined = 'body';
+  @Input() placement: PlacementArray = 'bottom-left';
   @Input() placeholder = 'ASR Provider';
+  @Input() dropMenuClass?: string;
+  @Input() dropdownClass?: string;
+  @Input() asrDescriptionPopoverClass?: string;
   protected autoClose = true;
 
   @ViewChild('providerInput', { static: true }) input?: NgModel;
@@ -98,8 +107,6 @@ export class OctraProviderSelectComponent extends SubscriberComponent implements
 
   protected touched = false;
   protected disabled = false;
-
-  protected cd = inject(ChangeDetectorRef);
 
   constructor() {
     super();

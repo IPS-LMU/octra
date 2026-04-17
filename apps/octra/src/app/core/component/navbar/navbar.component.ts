@@ -344,6 +344,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
     this.appStoreService.setShortcutsEnabled(false);
     const ref = this.offcanvasService.open(this.canvasContent, {
       position: 'end',
+      panelClass: "options-panel"
     });
     this.subscribe(
       ref.dismissed,

@@ -1,12 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import {
   AbstractControl,
   ControlValueAccessor,
@@ -17,14 +9,10 @@ import {
   ValidationErrors,
   Validator,
 } from '@angular/forms';
-import {
-  NgbDropdown,
-  NgbDropdownItem,
-  NgbDropdownMenu,
-  NgbDropdownToggle,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdown, NgbDropdownItem, NgbDropdownMenu, NgbDropdownToggle, PlacementArray } from '@ng-bootstrap/ng-bootstrap';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 import { ASROptionsTranslations, ServiceProvider } from '../types';
+import { NgStyle } from '@angular/common';
 
 const defaultI18n: ASROptionsTranslations = {
   header: 'Language and Provider',
@@ -36,7 +24,7 @@ const defaultI18n: ASROptionsTranslations = {
   selector: 'octra-asr-language-select',
   templateUrl: './asr-language-select.component.html',
   styleUrls: ['./asr-language-select.component.scss'],
-  imports: [NgbDropdown, FormsModule, NgbDropdownMenu, NgbDropdownItem, NgbDropdownToggle],
+  imports: [NgbDropdown, FormsModule, NgbDropdownMenu, NgbDropdownItem, NgbDropdownToggle, NgStyle],
   providers: [
     {
       provide: NG_VALIDATORS,
@@ -51,6 +39,9 @@ const defaultI18n: ASROptionsTranslations = {
   ],
 })
 export class OctraASRLanguageSelectComponent extends SubscriberComponent implements OnChanges, ControlValueAccessor, Validator {
+  protected cd = inject(ChangeDetectorRef);
+  protected elementRef = inject(ElementRef);
+
   @Input() languageSettings?: {
     services: ServiceProvider[];
   } | null;
@@ -81,6 +72,10 @@ export class OctraASRLanguageSelectComponent extends SubscriberComponent impleme
   @Input() placeholder?: string = 'Language';
   @Input() required = false;
   @Input() name = '';
+  @Input() dropMenuClass?: string;
+  @Input() dropdownClass?: string;
+  @Input() container: 'body' | undefined = 'body';
+  @Input() placement: PlacementArray = 'bottom-left';
 
   @ViewChild('languageInput', { static: true }) input?: NgModel;
 

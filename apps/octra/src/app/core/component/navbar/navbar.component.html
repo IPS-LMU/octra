@@ -1,26 +1,13 @@
 @if (appStorage.snapshot.application.loading.status !== 'WAITING') {
-  <nav
-    class="navbar fixed-top navbar-expand-md navbar-dark bg-primary py-0"
-    aria-label="Fourth navbar example"
-    #navbar
-    id="navbar"
-  >
+  <nav class="navbar fixed-top navbar-expand-md navbar-dark bg-primary py-0" aria-label="Fourth navbar example" #navbar id="navbar">
     <div class="container-fluid">
-      <a
-        [ngbPopover]="versionPopover"
-        popoverClass="version-popover"
-        class="navbar-brand"
+      <a [ngbPopover]="versionPopover" popoverClass="version-popover" class="navbar-brand"
         >OCTRA 2
-        @if (
-          appStorage.useMode !== undefined && appStorage.useMode !== null
-        ) {
+        @if (appStorage.useMode !== undefined && appStorage.useMode !== null) {
           ({{ appStorage.useMode }})
         }
         @if (environment.beta_version || environment.dev_version) {
-          <span
-            class="text-outline-white d-inline-block d-md-none text-danger fw-bold"
-            style="font-size: 0.85rem"
-          >
+          <span class="text-outline-white d-inline-block d-md-none text-danger fw-bold" style="font-size: 0.85rem">
             @if (environment.dev_version) {
               in development
             } @else {
@@ -63,40 +50,23 @@
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div
-        class="collapse navbar-collapse"
-        id="navbarsExample04"
-        #collapse="ngbCollapse"
-        [(ngbCollapse)]="navbarServ.isCollapsed"
-      >
+      <div class="collapse navbar-collapse" id="navbarsExample04" #collapse="ngbCollapse" [(ngbCollapse)]="navbarServ.isCollapsed">
         @if (!appStorage.loggedIn) {
           <ul class="navbar-nav me-auto mb-2 mb-md-0">
             <li [routerLinkActive]="['active']" class="nav-item active">
-              <a
-                [queryParamsHandling]="'merge'"
-                [routerLink]="['/login']"
-                class="nav-link"
-                (click)="navbarServ.isCollapsed = true"
-                >{{ 'g.login' | transloco }}</a
-              >
+              <a [queryParamsHandling]="'merge'" [routerLink]="['/login']" class="nav-link" (click)="navbarServ.isCollapsed = true">{{
+                'g.login' | transloco
+              }}</a>
             </li>
             <li [routerLinkActive]="['active']" class="nav-item">
-              <a
-                [queryParamsHandling]="'merge'"
-                [routerLink]="['/features']"
-                class="nav-link"
-                (click)="navbarServ.isCollapsed = true"
-                >{{ 'g.features' | transloco }}</a
-              >
+              <a [queryParamsHandling]="'merge'" [routerLink]="['/features']" class="nav-link" (click)="navbarServ.isCollapsed = true">{{
+                'g.features' | transloco
+              }}</a>
             </li>
             <li [routerLinkActive]="['active']" class="nav-item">
-              <a
-                [queryParamsHandling]="'merge'"
-                [routerLink]="['/news']"
-                class="nav-link"
-                (click)="navbarServ.isCollapsed = true"
-                >{{ 'g.news' | transloco }}</a
-              >
+              <a [queryParamsHandling]="'merge'" [routerLink]="['/news']" class="nav-link" (click)="navbarServ.isCollapsed = true">{{
+                'g.news' | transloco
+              }}</a>
             </li>
             <li class="nav-item">
               <a
@@ -109,21 +79,13 @@
               </a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                href="https://github.com/IPS-LMU/octra"
-                target="_blank"
-                (click)="navbarServ.isCollapsed = true"
-              >
+              <a class="nav-link" href="https://github.com/IPS-LMU/octra" target="_blank" (click)="navbarServ.isCollapsed = true">
                 <i class="bi bi-github"></i>
                 Github
               </a>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link"
-                (click)="navbarServ.isCollapsed = true; openAboutModal()"
-              >
+              <a class="nav-link" (click)="navbarServ.isCollapsed = true; openAboutModal()">
                 {{ 'g.about' | transloco }}
               </a>
             </li>
@@ -131,11 +93,7 @@
         } @else {
           <ul class="navbar-nav me-auto">
             @for (editor of editors; track editor.meta.name) {
-              @if (
-                appStorage.loggedIn &&
-                navbarServ.showInterfaces &&
-                interfaceActive(editor.meta.name)
-              ) {
+              @if (appStorage.loggedIn && navbarServ.showInterfaces && interfaceActive(editor.meta.name)) {
                 <li class="nav-item" (click)="setInterface(editor)">
                   <a
                     class="nav-link"
@@ -162,18 +120,9 @@
                 </li>
               }
             }
-            @if (
-              appStorage.loggedIn &&
-              navbarServ.showInterfaces &&
-              isAdministrator
-            ) {
+            @if (appStorage.loggedIn && navbarServ.showInterfaces && isAdministrator) {
               <li class="nav-item">
-                <a
-                  (mouseup)="
-                    navbarServ.isCollapsed = true; openStatisticsModal()
-                  "
-                  class="nav-link"
-                >
+                <a (mouseup)="navbarServ.isCollapsed = true; openStatisticsModal()" class="nav-link">
                   <i class="bi bi-pie-chart-fill"></i>
                   <span class="d-md-none d-xxl-inline"> Statistics</span></a
                 >
@@ -190,31 +139,18 @@
               class="nav-item dropdown"
               [ngStyle]="{
                 display:
-                  !appStorage.loggedIn ||
-                  appStorage.onlineSession?.currentProject === undefined ||
-                  !appStorage.audioLoaded
-                    ? 'none'
-                    : 'inherit',
+                  !appStorage.loggedIn || appStorage.onlineSession?.currentProject === undefined || !appStorage.audioLoaded ? 'none' : 'inherit',
               }"
               ngbDropdown
               placement="bottom-left"
             >
-              <a
-                ngbDropdownToggle
-                type="button"
-                class="nav-link dropdown-toggle"
-              >
-                <span class="d-inline d-md-none mt-2">
-                  {{ 'p.selected level' | transloco }}:
-                </span>
+              <a ngbDropdownToggle type="button" class="nav-link dropdown-toggle">
+                <span class="d-inline d-md-none mt-2"> {{ 'p.selected level' | transloco }}: </span>
                 {{
                   annotationStoreService.currentLevel !== undefined &&
                   annotationStoreService.currentLevel!.name !== undefined &&
                   annotationStoreService.currentLevel!.name!.length > 30
-                    ? annotationStoreService.currentLevel!.name!.substring(
-                        0,
-                        30
-                      ) + '...'
+                    ? annotationStoreService.currentLevel!.name!.substring(0, 30) + '...'
                     : annotationStoreService.currentLevel!.name!
                 }}
                 <i class="bi bi-book-half navbar-icon"></i>
@@ -228,19 +164,11 @@
               >
                 <table class="w-100">
                   <tbody>
-                    @for (
-                      level of annotationStoreService.transcript!.levels;
-                      track level.name;
-                      let i = $index
-                    ) {
+                    @for (level of annotationStoreService.transcript!.levels; track level.name; let i = $index) {
                       <tr
                         [ngClass]="{
-                          selected:
-                            annotationStoreService.currentLevelIndex === i,
-                          last:
-                            i ===
-                            annotationStoreService.transcript!.levels.length -
-                              1,
+                          selected: annotationStoreService.currentLevelIndex === i,
+                          last: i === annotationStoreService.transcript!.levels.length - 1,
                         }"
                         class="level-row"
                       >
@@ -260,18 +188,13 @@
                             disabled: !isLevelTypeSupported(level.type),
                           }"
                         >
-                          <input
-                            (blur)="onLevelNameLeave($event, i)"
-                            maxlength="100"
-                            type="text"
-                            value="{{ level.name }}"
-                            style="width: 100%"
-                          />
+                          <input (blur)="onLevelNameLeave($event, i)" maxlength="100" type="text" value="{{ level.name }}" style="width: 100%" />
                         </td>
                         <td
                           [ngClass]="{
-                            disabled: !isLevelTypeSupported(level.type)
-                          }">
+                            disabled: !isLevelTypeSupported(level.type),
+                          }"
+                        >
                           <span class="badge bg-info">{{ level.type }}</span>
                         </td>
                         <td
@@ -281,31 +204,17 @@
                           }"
                           class="p-2"
                         >
-                          @if (
-                            annotationStoreService.transcript!.levels.length > 1
-                          ) {
-                            <i
-                              class="bi bi-trash"
-                              (click)="onLevelRemoveClick(level)"
-                              style="cursor: pointer"
-                            ></i>
+                          @if (annotationStoreService.transcript!.levels.length > 1) {
+                            <i class="bi bi-trash" (click)="onLevelRemoveClick(level)" style="cursor: pointer"></i>
                           }
                           @if (level.type === annotJSONType.SEGMENT) {
-                            <i
-                              class="bi bi-back"
-                              (mousedown)="onLevelDuplicateClick(i)"
-                              style="margin-left: 3px; cursor: pointer"
-                            ></i>
+                            <i class="bi bi-back" (mousedown)="onLevelDuplicateClick(i)" style="margin-left: 3px; cursor: pointer"></i>
                           }
                         </td>
                       </tr>
                     }
                     <tr>
-                      <td
-                        colspan="4"
-                        (click)="onLevelAddClick()"
-                        class="level-add-row rounded rounded-bottom-3"
-                      >
+                      <td colspan="4" (click)="onLevelAddClick()" class="level-add-row rounded rounded-bottom-3">
                         <i class="bi bi-plus-lg"></i>
                       </td>
                     </tr>
@@ -317,60 +226,33 @@
           <!--
                   infoDropdown
                   -->
-          @if (
-            appStorage.loggedIn &&
-            appStorage.audioLoaded &&
-            audio.audioManager !== undefined &&
-            audio.audioManager?.resource !== undefined
-          ) {
-            <li
-              class="nav-item dropdown"
-              ngbDropdown
-              [container]="'body'"
-              display="dynamic"
-              placement="bottom-end"
-            >
+          @if (appStorage.loggedIn && appStorage.audioLoaded && audio.audioManager !== undefined && audio.audioManager?.resource !== undefined) {
+            <li class="nav-item dropdown" ngbDropdown [container]="'body'" display="dynamic" placement="bottom-end">
               <a ngbDropdownToggle type="button" class="nav-link">
                 <i class="bi bi-info-circle-fill navbar-icon"></i>
                 <span class="d-inline d-md-none">
                   {{ 'g.information' | transloco }}
                 </span>
               </a>
-              <div
-                ngbDropdownMenu
-                class="dropdown-menu dropdown dropdown-primary dropdown-menu-right"
-                role="menu"
-              >
+              <div ngbDropdownMenu class="dropdown-menu dropdown dropdown-primary dropdown-menu-right" role="menu">
                 <table class="table table-sm table-striped info-menu">
-                  @if (
-                    appStorage.useMode === 'online' ||
-                    appStorage.useMode === 'demo'
-                  ) {
+                  @if (appStorage.useMode === 'online' || appStorage.useMode === 'demo') {
                     <tr>
                       <td>
                         <span>{{ 'g.project' | transloco }}:</span>
                       </td>
                       <td>
-                        <span>{{
-                          appStorage.onlineSession?.currentProject?.name
-                        }}</span>
+                        <span>{{ appStorage.onlineSession?.currentProject?.name }}</span>
                       </td>
                     </tr>
                   }
-                  @if (
-                    appStorage.useMode === 'online' ||
-                    appStorage.useMode === 'demo'
-                  ) {
+                  @if (appStorage.useMode === 'online' || appStorage.useMode === 'demo') {
                     <tr>
                       <td>
                         <span>{{ 'g.free jobs' | transloco }}:</span>
                       </td>
                       <td>
-                        <span>{{
-                          getFreeAnnotationTasks(
-                            appStorage.onlineSession?.currentProject
-                          )
-                        }}</span>
+                        <span>{{ getFreeAnnotationTasks(appStorage.onlineSession?.currentProject) }}</span>
                       </td>
                     </tr>
                   }
@@ -379,9 +261,7 @@
                       <span>{{ 'g.name' | transloco }}:</span>
                     </td>
                     <td>
-                      <span>{{
-                        audio.audioManager!.resource.info.fullname
-                      }}</span>
+                      <span>{{ audio.audioManager!.resource.info.fullname }}</span>
                     </td>
                   </tr>
                   <tr>
@@ -408,9 +288,7 @@
                       <span>{{ 'g.sampleRate' | transloco }}:</span>
                     </td>
                     <td>
-                      <span>{{
-                        audio.audioManager!.resource!.info.sampleRate
-                      }}</span>
+                      <span>{{ audio.audioManager!.resource!.info.sampleRate }}</span>
                     </td>
                   </tr>
                   <tr>
@@ -418,12 +296,7 @@
                       <span>{{ 'g.bitspersecond' | transloco }}:</span>
                     </td>
                     <td>
-                      <span
-                        >{{
-                          audio.audioManager!.resource!.info.bitrate
-                        }}
-                        Bit/s</span
-                      >
+                      <span>{{ audio.audioManager!.resource!.info.bitrate }} Bit/s</span>
                     </td>
                   </tr>
                   <tr>
@@ -431,16 +304,10 @@
                       <span>{{ 'g.filesize' | transloco }}:</span>
                     </td>
                     <td>
-                      <span
-                        >{{ navbarServ.fileSize?.size }}
-                        {{ navbarServ.fileSize?.label }}</span
-                      >
+                      <span>{{ navbarServ.fileSize?.size }} {{ navbarServ.fileSize?.label }}</span>
                     </td>
                   </tr>
-                  @if (
-                    appStorage.useMode === 'online' ||
-                    appStorage.useMode === 'demo'
-                  ) {
+                  @if (appStorage.useMode === 'online' || appStorage.useMode === 'demo') {
                     <tr>
                       <td>
                         <span>{{ 'g.id' | transloco }}:</span>
@@ -455,29 +322,14 @@
             </li>
           }
           @if (
-            appStorage.loggedIn &&
-            appStorage.audioLoaded &&
-            navbarServ.showExport &&
-            (settService.projectsettings?.octra?.tools ?? []).length > 0
+            appStorage.loggedIn && appStorage.audioLoaded && navbarServ.showExport && (settService.projectsettings?.octra?.tools ?? []).length > 0
           ) {
-            <li
-              class="nav-item dropdown"
-              ngbDropdown
-              [container]="'body'"
-              display="dynamic"
-              placement="bottom-end"
-            >
+            <li class="nav-item dropdown" ngbDropdown [container]="'body'" display="dynamic" placement="bottom-end">
               <a ngbDropdownToggle type="button" class="nav-link">
                 <i class="bi bi-tools navbar-icon"></i>
-                <span class="d-md-none d-xxl-inline">
-                  {{ 'g.tools' | transloco }}</span
-                >
+                <span class="d-md-none d-xxl-inline"> {{ 'g.tools' | transloco }}</span>
               </a>
-              <div
-                ngbDropdownMenu
-                class="dropdown-menu dropdown dropdown-primary dropdown-menu-right tools-dropdown"
-                role="menu"
-              >
+              <div ngbDropdownMenu class="dropdown-menu dropdown dropdown-primary dropdown-menu-right tools-dropdown" role="menu">
                 @for (tool of tools; track tool.name) {
                   @if (isToolEnabled(tool.name)) {
                     <ng-template #popover>
@@ -500,17 +352,11 @@
               </div>
             </li>
           }
-          @if (
-            appStorage.loggedIn &&
-            appStorage.audioLoaded &&
-            navbarServ.showExport
-          ) {
+          @if (appStorage.loggedIn && appStorage.audioLoaded && navbarServ.showExport) {
             <li class="nav-item">
               <a (mouseup)="openExportModal()" class="nav-link">
                 <i class="bi bi-download navbar-icon"></i>
-                <span class="d-md-none d-xxl-inline">
-                  {{ 'g.export' | transloco }}</span
-                >
+                <span class="d-md-none d-xxl-inline"> {{ 'g.export' | transloco }}</span>
               </a>
             </li>
           }
@@ -518,25 +364,16 @@
           <ng-template #canvasContent let-offcanvas>
             <div class="offcanvas-header">
               <h4 class="offcanvas-title">{{ 'g.settings' | transloco }}</h4>
-              <button
-                type="button"
-                class="btn-close"
-                aria-label="Close"
-                (click)="offcanvas.dismiss('Cross click')"
-              ></button>
+              <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss('Cross click')"></button>
             </div>
             <div class="offcanvas-body">
               <table class="table w-100">
                 <tr>
                   <td>
-                    <label class="form-check-label" for="easymode"
-                      >{{ 'settings.easy mode' | transloco }}:</label
-                    >
+                    <label class="form-check-label" for="easymode">{{ 'settings.easy mode' | transloco }}:</label>
                   </td>
                   <td class="align-middle">
-                    <div
-                      class="form-check form-switch form-check-reverse form-check-inline"
-                    >
+                    <div class="form-check form-switch form-check-reverse form-check-inline">
                       <input
                         class="form-check-input"
                         type="checkbox"
@@ -550,14 +387,10 @@
                 </tr>
                 <tr>
                   <td>
-                    <label for="playonhover"
-                      >{{ 'settings.play on hover' | transloco }}:</label
-                    >
+                    <label for="playonhover">{{ 'settings.play on hover' | transloco }}:</label>
                   </td>
                   <td>
-                    <div
-                      class="form-check form-switch form-check-reverse form-check-inline"
-                    >
+                    <div class="form-check form-switch form-check-reverse form-check-inline">
                       <input
                         class="form-check-input"
                         type="checkbox"
@@ -571,14 +404,10 @@
                 </tr>
                 <tr>
                   <td>
-                    <label for="followplaycursor"
-                      >{{ 'settings.follow playcursor' | transloco }}:</label
-                    >
+                    <label for="followplaycursor">{{ 'settings.follow playcursor' | transloco }}:</label>
                   </td>
                   <td>
-                    <div
-                      class="form-check form-switch form-check-reverse form-check-inline"
-                    >
+                    <div class="form-check form-switch form-check-reverse form-check-inline">
                       <input
                         class="form-check-input"
                         type="checkbox"
@@ -592,14 +421,10 @@
                 </tr>
                 <tr>
                   <td>
-                    <label for="logging"
-                      >{{ 'settings.logging' | transloco }}:</label
-                    >
+                    <label for="logging">{{ 'settings.logging' | transloco }}:</label>
                   </td>
                   <td>
-                    <div
-                      class="form-check form-switch form-check-reverse form-check-inline"
-                    >
+                    <div class="form-check form-switch form-check-reverse form-check-inline">
                       <input
                         class="form-check-input"
                         type="checkbox"
@@ -614,14 +439,10 @@
                 </tr>
                 <tr>
                   <td>
-                    <label for="showMagnifier"
-                      >{{ 'settings.show magnifier' | transloco }}:</label
-                    >
+                    <label for="showMagnifier">{{ 'settings.show magnifier' | transloco }}:</label>
                   </td>
                   <td>
-                    <div
-                      class="form-check form-switch form-check-reverse form-check-inline"
-                    >
+                    <div class="form-check form-switch form-check-reverse form-check-inline">
                       <input
                         class="form-check-input"
                         type="checkbox"
@@ -637,15 +458,9 @@
               @if (appStorage?.interface === '2D-Editor') {
                 <hr style="border: 1px solid lightgray" />
                 <br />
-                <label style="font-size: 1rem"
-                  >{{ 'settings.seconds per line' | transloco }}:</label
-                >
+                <label style="font-size: 1.2rem">{{ 'settings.seconds per line' | transloco }}:</label>
                 <br />
-                <div
-                  class="btn-group w-100"
-                  role="group"
-                  aria-label="Basic example"
-                >
+                <div class="btn-group w-100" role="group" aria-label="Basic example">
                   <button
                     [ngClass]="{
                       'btn-primary': appStorage.secondsPerLine === 5,
@@ -709,9 +524,7 @@
                 </div>
                 <br /><br />
                 <hr />
-                <label style="font-size: 1rem" class="mb-2">{{
-                  'g.asr options' | transloco
-                }}</label>
+                <label style="font-size: 1.2rem" class="mb-2">{{ 'g.asr options' | transloco }}</label>
                 <octra-asr-options
                   [options]="asrStoreService.asrOptions$ | async"
                   (optionsChange)="asrStoreService.setASRSettings($event)"
@@ -734,11 +547,9 @@
             </div>
           </ng-template>
           <li
-            class="nav-item dropdown"
+            class="nav-item"
             [ngStyle]="{
-              display: !(appStorage.audioLoaded && appStorage.loggedIn)
-                ? 'none'
-                : 'inherit',
+              display: !(appStorage.audioLoaded && appStorage.loggedIn) ? 'none' : 'inherit',
             }"
           >
             <a type="button" class="nav-link" (click)="openEnd()">
@@ -749,47 +560,25 @@
             </a>
           </li>
           <!-- profile -->
-          @if (
-            appStorage.loggedIn &&
-            (appStorage.useMode === 'online' || appStorage.useMode === 'demo')
-          ) {
-            <li
-              class="nav-item dropdown"
-              ngbDropdown
-              [container]="'body'"
-              display="dynamic"
-              placement="bottom-end"
-            >
+          @if (appStorage.loggedIn && (appStorage.useMode === 'online' || appStorage.useMode === 'demo')) {
+            <li class="nav-item dropdown" ngbDropdown [container]="'body'" display="dynamic" placement="bottom-end">
               <a ngbDropdownToggle type="button" class="nav-link">
                 <i class="bi bi-person-circle"></i>
                 <span class="d-inline d-md-none">
                   {{ 'g.account' | transloco }}
                 </span>
               </a>
-              <div
-                ngbDropdownMenu
-                class="dropdown-menu dropdown dropdown-primary dropdown-menu-right"
-                role="menu"
-              >
+              <div ngbDropdownMenu class="dropdown-menu dropdown dropdown-primary dropdown-menu-right" role="menu">
                 <a class="dropdown-item">
                   <i class="bi bi-person-circle"></i>
                   {{ (authStoreService.me$ | async)?.username }}
                 </a>
                 @if (
                   appStorage.useMode === 'online' &&
-                  appStorage.snapshot.application.appConfiguration?.octraBackend
-                    ?.enabled &&
-                  appStorage.snapshot.application.appConfiguration?.octraBackend
-                    ?.url
+                  appStorage.snapshot.application.appConfiguration?.octraBackend?.enabled &&
+                  appStorage.snapshot.application.appConfiguration?.octraBackend?.url
                 ) {
-                  <a
-                    class="dropdown-item"
-                    [href]="
-                      appStorage.snapshot.application.appConfiguration
-                        ?.octraBackend?.url
-                    "
-                    target="_blank"
-                  >
+                  <a class="dropdown-item" [href]="appStorage.snapshot.application.appConfiguration?.octraBackend?.url" target="_blank">
                     <i class="bi bi-tools"></i>
                     {{ 'p.manage account' | transloco }}
                   </a>
@@ -813,10 +602,7 @@
                                     -->
           @if (api.appProperties?.send_feedback) {
             <li class="nav-item">
-              <a
-                (mouseup)="navbarServ.isCollapsed = true; openBugReport()"
-                class="nav-link"
-              >
+              <a (mouseup)="navbarServ.isCollapsed = true; openBugReport()" class="nav-link">
                 <i
                   class="bi bi-question-circle-fill navbar-icon"
                   style="color: #fcffba"
@@ -832,39 +618,21 @@
             </li>
           }
           <!-- languageDropdown -->
-          <li
-            class="nav-item dropdown"
-            ngbDropdown
-            [container]="'body'"
-            display="dynamic"
-            placement="bottom-end"
-          >
+          <li class="nav-item dropdown" ngbDropdown [container]="'body'" display="dynamic" placement="bottom-end">
             <a ngbDropdownToggle type="button" class="nav-link dropdown-toggle">
               {{ langService.getActiveLang() | uppercase }}
               <span class="caret"></span>
             </a>
-            <div
-              ngbDropdownMenu
-              class="dropdown-menu dropdown dropdown-primary dropdown-menu-right"
-              role="menu"
-            >
+            <div ngbDropdownMenu class="dropdown-menu dropdown dropdown-primary dropdown-menu-right" role="menu">
               @if (settService.appSettings !== undefined) {
-                @for (
-                  item of settService.appSettings.octra.languages;
-                  track item
-                ) {
-                  <a (click)="changeLanguage(item)" class="dropdown-item">
-                    {{ item | uppercase }}</a
-                  >
+                @for (item of settService.appSettings.octra.languages; track item) {
+                  <a (click)="changeLanguage(item)" class="dropdown-item"> {{ item | uppercase }}</a>
                 }
               }
               <div class="dropdown-divider"></div>
               <div class="dropdown-item" style="font-size: 0.8rem">
-                <a
-                  href="https://clarin.phonetik.uni-muenchen.de/apps/octra/translation/start.php"
-                  target="_blank"
-                  ><i class="bi bi-translate"></i>
-                  {{ 'p.contribute translations' | transloco }}</a
+                <a href="https://clarin.phonetik.uni-muenchen.de/apps/octra/translation/start.php" target="_blank"
+                  ><i class="bi bi-translate"></i> {{ 'p.contribute translations' | transloco }}</a
                 >
               </div>
             </div>

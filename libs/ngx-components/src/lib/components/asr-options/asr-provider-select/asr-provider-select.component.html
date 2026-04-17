@@ -1,11 +1,13 @@
 <div
   class="d-block"
   ngbDropdown
-  placement="bottom-right"
-  container="body"
+  [placement]="placement"
+  [container]="container"
   #dropdown="ngbDropdown"
   [autoClose]="autoClose"
   (openChange)="onProviderDropdownOpenChange($event)"
+  style="font-size: 1em"
+  [dropdownClass]="dropdownClass"
 >
   <input
     type="text"
@@ -25,52 +27,41 @@
   <div
     ngbDropdownMenu
     [attr.aria-labelledby]="id"
-    style="max-height: 150px; max-width: 400px"
-    class="overflow-y-auto"
+    [class]="dropMenuClass"
     [id]="id + 'Menu'"
+    [ngStyle]="{
+      'font-size': elementRef.nativeElement.style.fontSize,
+    }"
   >
-    <span class="d-block mb-2 ms-2"
+    <span class="d-block mb-2 ms-2" style="font-size: 1em"
       ><b>{{ i18n.asrProvider }}</b></span
     >
     <ul class="list-group">
       @for (provider of filtered; track provider) {
         <li class="list-group-item p-1 pointer">
           <div class="px-1 py-2">
-            <div
-              class="row g-1 px-0 justify-items-center align-items-center pointer"
-            >
+            <div class="row g-1 px-0 justify-items-center align-items-center pointer">
               <div class="col-3" (click)="selectProvider(provider, dropdown)">
                 {{ provider.provider }}
               </div>
-              <div
-                class="col-5 text-start"
-                (click)="selectProvider(provider, dropdown)"
-              >
-                <img
-                  [src]="provider.logoURL"
-                  [alt]="provider.provider + ' logo'"
-                  style="max-height: 50px; max-width: 100%"
-                />
+              <div class="col-5 text-start" (click)="selectProvider(provider, dropdown)">
+                <img [src]="provider.logoURL" [alt]="provider.provider + ' logo'" style="max-height: 50px; max-width: 100%" />
               </div>
-              <div class="col" (click)="selectProvider(provider, dropdown)">
-                <div class="progress">
-                  <ng-template #popTemplate>
-                    <div
-                      id="quota-tooltip"
-                      [innerHtml]="
-                        '<div class=\'text-center\'>' +
-                        getQuotaLabel(provider) +
-                        '</div>'
-                      "
-                    ></div>
-                  </ng-template>
-                  <!-- [popover]="popTemplate" -->
+              <div class="col">
+                <ng-template #quotaPopTemplate>
+                  <div
+                    [ngStyle]="{
+                      'font-size': elementRef.nativeElement.style.fontSize,
+                    }"
+                    [innerHtml]="'<div class=\'text-center\'>' + getQuotaLabel(provider) + '</div>'"
+                  ></div>
+                </ng-template>
+                <div class="progress align-items-center">
                   <div
                     class="progress-bar bg-success"
-                    role="progressbar"
-                    [ngbPopover]="popTemplate"
+                    [ngbPopover]="quotaPopTemplate"
                     container="body"
-                    triggers="mouseenter:mouseleave"
+                    role="progressbar"
                     [ngStyle]="{
                       width: 100 - getQuotaPercentage(provider) + '%',
                     }"
@@ -84,6 +75,9 @@
                     <div
                       class="progress-bar bg-danger"
                       role="progressbar"
+                      [ngbPopover]="quotaPopTemplate"
+
+                      container="body"
                       [ngStyle]="{
                         width: getQuotaPercentage(provider) + '%',
                       }"
@@ -109,10 +103,13 @@
                   triggers="manual"
                   #asrInfoPopover="ngbPopover"
                   (hidden)="autoClose = true"
+                  [popoverClass]="asrDescriptionPopoverClass"
                   (click)="toggleAsrInfoPopover(asrInfoPopover)"
                 ></i>
                 <ng-template #asrDescription>
-                  <table class="table table-sm table-borderless provider-info">
+                  <table
+                    class="table table-sm table-borderless provider-info"
+                  >
                     <tbody>
                       <tr>
                         <td>
@@ -150,9 +147,7 @@
                           <i class="bi bi-person-check"></i>
                         </td>
                         <td>
-                          <a [href]="provider?.termsURL" target="_blank"
-                            >Terms &amp; Conditions</a
-                          >
+                          <a [href]="provider?.termsURL" target="_blank">Terms &amp; Conditions</a>
                         </td>
                       </tr>
                       <tr>
@@ -160,9 +155,7 @@
                           <i class="bi bi-globe-americas"></i>
                         </td>
                         <td>
-                          <a [href]="provider?.homepageURL" target="_blank"
-                            >Homepage</a
-                          >
+                          <a [href]="provider?.homepageURL" target="_blank">Homepage</a>
                         </td>
                       </tr>
                     </tbody>

@@ -2,16 +2,20 @@
   <div class="row g-0">
     <label for="languageDropdown" class="form-label">{{ i18n.header }}:</label>
   </div>
-  <div class="row g-0 asr-language-options mb-3">
+  <div class="row g-1 asr-language-options mb-3">
     <div class="col-4">
       <octra-asr-provider-select
         #providerSelection
-        class="d-inline-block"
+        class="d-inline-block w-100"
         [ngModel]="fields.provider.selected"
         [asrProviders]="languageSettings?.services"
         (ngModelChange)="setProvider($event)"
         [i18n]="asrTranslations"
         [required]="true"
+        [container]="'body'"
+        [placement]="'bottom-left'"
+        dropMenuClass="provider-select-menu"
+        asrDescriptionPopoverClass="asr-description-popover"
         name="asrProviderLanguage"
         id="asrProviderLanguage"
         (ocbFocus)="asrLanguageSelection.unfocus(); mausSelection.unfocus()"
@@ -20,7 +24,7 @@
     <div class="col-4">
       <octra-asr-language-select
         #asrLanguageSelection
-        class="d-inline-block"
+        class="d-inline-block w-100"
         [ngModel]="fields.asr.selected"
         (ngModelChange)="setASRLanguage($event)"
         [title]="'asr.asr language' | transloco"
@@ -32,12 +36,13 @@
         [options]="options"
         name="asrLanguage"
         id="asrLanguage"
+        dropMenuClass="asr-language-select"
         (ocbFocus)="providerSelection.unfocus(); mausSelection.unfocus()"
       ></octra-asr-language-select>
     </div>
     <div class="col-4">
       <octra-asr-language-select
-        class="d-inline-block"
+        class="d-inline-block w-100"
         #mausSelection
         [(ngModel)]="fields.maus.selected"
         (ngModelChange)="setMAUSLanguage($event)"
@@ -49,6 +54,7 @@
         [languageSettings]="languageSettings"
         [i18n]="asrTranslations"
         [required]="true"
+        dropMenuClass="maus-language-select"
         (ocbFocus)="asrLanguageSelection.unfocus(); providerSelection.unfocus()"
       ></octra-asr-language-select>
     </div>
@@ -58,9 +64,7 @@
     <div class="row g-0">
       <div class="col">
         <div class="mb-3">
-          <label for="asrAccessCode" class="form-label"
-            >{{ i18n.accessCode }}:</label
-          >
+          <label for="asrAccessCode" class="form-label">{{ i18n.accessCode }}:</label>
           <div class="input-group">
             <input
               [type]="accessCodeVisible ? 'text' : 'password'"
@@ -71,10 +75,7 @@
               [(ngModel)]="fields.asr.accessCode"
               (ngModelChange)="onAccessCodeChange($event, true)"
             />
-            <div
-              class="input-group-text pointer"
-              (click)="accessCodeVisible = !accessCodeVisible"
-            >
+            <div class="input-group-text pointer" (click)="accessCodeVisible = !accessCodeVisible">
               <i
                 class="bi"
                 [ngClass]="{

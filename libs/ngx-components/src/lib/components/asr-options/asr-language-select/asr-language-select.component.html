@@ -1,8 +1,9 @@
 <div
   ngbDropdown
   #dropdown="ngbDropdown"
-  placement="bottom-left"
-  container="body"
+  [placement]="placement"
+  [container]="container"
+  dropdownClass="dropdownClass"
   (openChange)="onLanguageDropdownOpenChange($event)"
 >
   <input
@@ -27,6 +28,10 @@
     style="max-height: 150px"
     class="overflow-y-auto"
     [id]="id + 'Menu'"
+    [class]="dropMenuClass"
+    [ngStyle]="{
+      'font-size': elementRef.nativeElement.style.fontSize,
+    }"
   >
     <span class="d-block mb-2 ms-2"
       ><b>{{ title }}</b></span

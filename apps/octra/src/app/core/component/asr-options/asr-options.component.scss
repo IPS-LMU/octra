@@ -33,14 +33,6 @@
   opacity: 1;
 }
 
-#dropdown-button,
-#dropdown-button2,
-#dropdown-button3 {
-  float: left;
-  display: block;
-  margin: 0 1px;
-}
-
 .asr-label {
   position: absolute;
   margin-top: 4px;
@@ -50,12 +42,6 @@
   text-align: center;
 }
 
-#dropdown-basic2 .dropdown-item {
-  min-height: 0.9em;
-  font-size: 0.8em;
-  max-width: none;
-}
-
 table thead th {
   font-weight: 200;
   color: gray;
@@ -63,15 +49,6 @@ table thead th {
 
 .inactive {
   opacity: 0.5;
-}
-
-.dropdown-menu * {
-  font-size: 0.85rem;
-}
-
-input,
-input::placeholder {
-  font-size: 0.85rem;
 }
 
 .progress {

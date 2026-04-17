@@ -1,22 +1,14 @@
-input,
-input::placeholder {
-  font-size: 0.85rem;
+:host {
+  font-size: 1em;
 }
 
-.dropdown-menu * {
-  font-size: 0.85rem;
+.form-control {
+  font-size: 1em !important;
 }
 
 .progress {
-  height: 15px !important;
-}
-
-.progress-bar {
-  font-size: 11px !important;
-}
-
-.provider-info {
-  font-size: 12px !important;
+  height: 1.2em !important;
+  font-size: 0.9em !important;
 }
 
 .provider-info tbody tr td {
@@ -33,4 +25,10 @@ input::placeholder {
 
 .pointer {
   cursor: pointer;
+}
+
+.dropdown-menu {
+  max-height: 150px;
+  width: 100%;
+  overflow-y: auto !important;
 }

@@ -186,7 +186,7 @@ export class AnnotationStoreService {
   transcriptString$ = this.transcript$.pipe(
     map((transcript) => {
       if (transcript) {
-        const annotation = transcript.serialize(
+        const annotation = transcript.clone().serialize(
           this.audio.audioManager.resource.name,
           this.audio.audioManager.resource.info.sampleRate,
           this.audio.audioManager.resource.info.duration.clone(),

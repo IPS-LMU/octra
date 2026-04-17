@@ -2,6 +2,20 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [1.9.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.8.1...ngx-components-1.9.0) (2026-04-17)
+
+
+### Bug Fixes
+
+* **ngx-components:** signal display doesn't update on level delete ([3bdc666](https://github.com/IPS-LMU/octra/commit/3bdc66671f7e5576f675a4302742d0f1cb691d5e))
+
+
+### Features
+
+* **ngx-components:** asr-options with more attributes and better font size compatibility ([4952b54](https://github.com/IPS-LMU/octra/commit/4952b54fb6719257a84817e72134bdf674b2f180))
+
+
+
 ## [1.8.1](https://github.com/IPS-LMU/octra/compare/ngx-components-1.8.0...ngx-components-1.8.1) (2026-03-23)
 
 

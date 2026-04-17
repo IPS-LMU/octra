@@ -207,7 +207,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         console.error(`annotation is undefined!`);
         return;
       }
-      const oannotjson = this.annotationStoreService.transcript?.serialize(
+      const oannotjson = this.annotationStoreService.transcript?.clone().serialize(
         this.audio.audioManager.resource.info.fullname,
         this.audio.audioManager.sampleRate,
         this.audio.audioManager.resource.info.duration,

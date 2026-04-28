@@ -115,6 +115,7 @@ const OCTRA = {
   buildLibs: async function () {
     await buildLibrary('ngx-components');
     await buildLibrary('ngx-utilities');
+    /*
     await run(`node prepare_web-components.js`);
     await fs.copyFile(
       `apps/web-components/README.md`,
@@ -124,6 +125,7 @@ const OCTRA = {
       `apps/web-components/CHANGELOG.md`,
       `dist/libs/web-components/CHANGELOG.md`
     );
+     */
     await JSONValidator.build();
     await buildLibrary('utilities');
     await OCTRA.buildAssets();

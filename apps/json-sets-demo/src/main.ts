@@ -29,7 +29,7 @@ const validator = new FileSetValidator({
 
 validator.validate([
   {
-    name: 'a.wav',
+    name: 'a.WAV',
     size: 1000,
     type: 'audio/wav',
   },

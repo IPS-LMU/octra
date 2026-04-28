@@ -215,7 +215,7 @@ export class JSONSetFileBlueprint extends JSONSetBlueprint<
   ): JSONSetResult {
     if (conditions.extension && conditions.extension.length > 0 && item.name) {
       for (const ext of conditions.extension) {
-        if (new RegExp(`${ext.replace(/\./g, '\\.')}$`).exec(item.name)) {
+        if (new RegExp(`(${ext.replace(/\./g, '\\.')})|(${ext.toLowerCase().replace(/\./g, '\\.')})|(${ext.toUpperCase().replace(/\./g, '\\.')})$`).exec(item.name)) {
           return new JSONSetResult({
             valid: true,
             path,

@@ -6,34 +6,22 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/esbuild:esbuild",
+      "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "platform": "node",
         "outputPath": "dist/apps/json-sets-demo",
-        "format": ["cjs"],
-        "bundle": false,
         "main": "apps/json-sets-demo/src/main.ts",
         "tsConfig": "apps/json-sets-demo/tsconfig.app.json",
         "assets": ["apps/json-sets-demo/src/assets"],
-        "generatePackageJson": true,
-        "esbuildOptions": {
-          "sourcemap": true,
-          "outExtension": {
-            ".js": ".js"
-          }
-        }
+        "generatePackageJson": true
       },
       "configurations": {
-        "development": {},
+        "development": {
+          "sourceMap": true
+        },
         "production": {
-          "esbuildOptions": {
-            "sourcemap": false,
-            "outExtension": {
-              ".js": ".js"
-            }
-          }
+          "sourceMap": false
         }
       }
     },

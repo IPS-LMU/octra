@@ -83,10 +83,14 @@
   margin-bottom: 10px;
 }
 
-.octra-feedback-modal.list-group-item{
+.octra-feedback-modal.list-group-item {
   padding-top: 20px;
 }
 
 .octra-feedback-modal.red-icon{
   color: darkred;
+}
+
+input.ng-dirty.ng-invalid{
+  border-bottom: 2px solid red;
 }

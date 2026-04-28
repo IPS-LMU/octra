@@ -31,6 +31,8 @@
                 class="form-control"
                 id="inputName"
                 name="name"
+                [minlength]="4"
+                [maxLength]="30"
                 aria-describedby="name"
                 [required]="true"
                 [placeholder]="i18n.name"
@@ -46,8 +48,10 @@
                 class="form-control"
                 id="inputEmail"
                 name="email"
+                [minlength]="10"
+                [maxLength]="40"
                 aria-describedby="email"
-                [pattern]="'[^@]+\\@.+\\.[^.]+$'"
+                [pattern]="'[^@]+\@.+\.[^.]+$'"
                 [(ngModel)]="email"
                 [required]="true"
                 placeholder="email@example.com"
@@ -254,7 +258,11 @@
       }"
       class="fit octra-feedback-modal fit text-center"
     >
-      {{ entry.timestamp | date:'short' }} {{entry.timestamp | date:'z'}}
+      @if(entry.timestamp !== undefined && entry.timestamp.includes("Z")) {
+        {{ entry.timestamp | date:'short' }}
+      } @else {
+        INVALID DATE
+      }
     </td>
     <td
       [ngClass]="{

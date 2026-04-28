@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.0.1](https://github.com/IPS-LMU/octra/compare/web-media-2.0.0...web-media-2.0.1) (2026-04-28)
+
+
+### Bug Fixes
+
+* **octra:** dragndrop doesn't react ([5deb3b0](https://github.com/IPS-LMU/octra/commit/5deb3b0ff1fdc8415cdf26d01009ed7894bb65fc))
+* **octra:** uppercase file extensions not allowed ([e768339](https://github.com/IPS-LMU/octra/commit/e768339f6d37483d3cd9d559543c016df1a6b9c5))
+
+
+
 # [2.0.0](https://github.com/IPS-LMU/octra/compare/web-media-1.3.4...web-media-2.0.0) (2026-01-28)
 
 

@@ -178,7 +178,7 @@ export class OctraDropzoneService {
           break;
       }
 
-      if (!this.oldFiles.some((a) => a.type === file.file.type && a.name === file.file.fullname && a.size === file.file.size)) {
+      if (!this.oldFiles.some((a) => a.type === file.file.type && a.name.toString() === file.file.fullname.toString() && a.size === file.file.size)) {
         result.new++;
       }
     }

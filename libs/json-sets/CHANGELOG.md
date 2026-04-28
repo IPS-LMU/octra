@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.0.2](https://github.com/IPS-LMU/octra/compare/json-sets-1.0.1...json-sets-1.0.2) (2026-04-28)
+
+
+### Bug Fixes
+
+* **json-sets:** uppercase file extension marked as invalid ([1097220](https://github.com/IPS-LMU/octra/commit/109722052505e44df4e00b8512a83196f5780608))
+
+
+
 ## [1.0.1](https://github.com/IPS-LMU/octra/compare/json-sets-1.0.0...json-sets-1.0.1) (2025-03-24)
 
 

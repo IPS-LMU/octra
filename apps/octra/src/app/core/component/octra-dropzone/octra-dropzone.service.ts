@@ -194,7 +194,7 @@ export class OctraDropzoneService {
     this._oaudiofile = undefined;
 
     const supportedAudioFormats = [...AppInfo.audioformats.map((a) => a.supportedFormats)].flat();
-    const formatLimitation = supportedAudioFormats.find((a) => fileProgress.file.fullname.includes(a.extension));
+    const formatLimitation = supportedAudioFormats.find((a) => fileProgress.file.fullname.toLowerCase().includes(a.extension.toLowerCase()));
 
     if (!formatLimitation || fileProgress.file.size > formatLimitation.maxFileSize) {
       return throwError(() => Error('Invalid file size'));
@@ -337,21 +337,20 @@ export class OctraDropzoneService {
                       break;
                     }
                   }
+                } else if (converter.name === 'AnnotJSON') {
+                  fileProgress.status = 'invalid';
+                  fileProgress.error = importResult.error;
+                  break;
+                } else {
+                  converter = undefined;
                 }
               }
             } else {
               converter = undefined;
             }
-
-            if (converter?.name === 'AnnotJSON') {
-              // stop because there is only one file format with ending "_annot.json"
-              break;
-            }
-            // else not valid converter
-            converter = undefined;
           }
 
-          if (this._oaudiofile) {
+          if (this._oaudiofile && !fileProgress.error) {
             // audio was already loaded
             if (!converter) {
               // no valid converter found
@@ -375,7 +374,7 @@ export class OctraDropzoneService {
       const regexStr = `${escapeRegex(audioName)}${converter.extensions
         .map((a) => `((?:${escapeRegex(a)})|(?:${escapeRegex(a.toLowerCase())}))`)
         .join('|')}$`;
-      if (new RegExp(regexStr).exec(fileProgress.file.fullname) === null) {
+      if (new RegExp(regexStr).exec(fileProgress.file.fullname.toLowerCase()) === null) {
         fileProgress.warning = 'File names are not the same.';
       }
       this._oannotation = importResult.annotjson;

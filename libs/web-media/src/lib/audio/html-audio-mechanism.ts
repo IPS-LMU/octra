@@ -241,7 +241,7 @@ export class HtmlAudioMechanism extends AudioMechanism {
             samples: audioBuffer.getChannelData(0).length,
           };
 
-          if (['.mp3', '.m4a'].includes(info.extension)) {
+          if (['.mp3', '.m4a'].includes(info.extension.toLowerCase())) {
             // fix number of samples. web value by web audio api is more exact.
             info.duration = new SampleUnit(
               Math.ceil(audioBuffer.duration * info.sampleRate),

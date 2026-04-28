@@ -142,7 +142,7 @@ export const isValidAnnotation = (io: TaskInputOutputDto, audiofile: any, option
 
       const { extension } = FileInfo.extractFileName(io.filename);
 
-      if (result?.annotjson && converter.extensions.includes(extension)) {
+      if (result?.annotjson && converter.extensions.map(a => a.toLowerCase()).includes(extension.toLowerCase())) {
         return {
           annotjson: result.annotjson,
           converter: converter.name,
@@ -150,7 +150,7 @@ export const isValidAnnotation = (io: TaskInputOutputDto, audiofile: any, option
         };
       } else if (converter.name === 'AnnotJSON' && /_annot\.json$/g.exec(io.filename) !== null) {
         throw new Error(`Can't read AnnotJSON file: ${result.error}`);
-      } else if (converter.extensions.includes(extension)) {
+      } else if (converter.extensions.map(a => a.toLowerCase()).includes(extension.toLowerCase())) {
         throw new Error(`Can't parse transcript ${io.filename}: ${converter.name}: ${result.error}`);
       }
     }

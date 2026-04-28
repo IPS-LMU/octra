@@ -19,7 +19,7 @@
             <tr>
               <td>
                 *{{ extension.extension }}
-                @if (extension.extension === '.wav') {
+                @if (extension.extension.toLowerCase() === '.wav') {
                   <i
                     class="bi bi-patch-check-fill text-success recommended"
                     [ngbPopover]="'g.recommended' | transloco"

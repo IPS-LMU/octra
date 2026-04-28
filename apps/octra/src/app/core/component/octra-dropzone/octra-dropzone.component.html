@@ -56,7 +56,7 @@
             fileProgress.file.type.includes('audio') &&
             fileProgress.status === 'progress'
           ) {
-            @if (fileProgress.file.extension === '.wav') {
+            @if (fileProgress.file.extension.toLowerCase() === '.wav') {
               <div class="progress">
                 <div
                   class="progress-bar"

@@ -107,7 +107,7 @@ export class AudioManager {
   ): AudioFormat | undefined {
     return audioformats.find((a) => {
       return (
-        a.supportedFormats.findIndex((a) => a.extension === extension) > -1
+        a.supportedFormats.findIndex((a) => a.extension.toLowerCase() === extension.toLowerCase()) > -1
       );
     });
   }

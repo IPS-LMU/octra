@@ -202,7 +202,7 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
           audioArrayBuffer,
           annotation: JSON.parse(
             new AnnotJSONConverter().export(
-              this.annotationStoreService.transcript.clone().serialize(resource.info.fullname, resource.info.sampleRate, resource.info.duration),
+              this.annotationStoreService.transcript.serialize(resource.info.fullname, resource.info.sampleRate, resource.info.duration),
             ).file!.content,
           ),
           styles: {

@@ -42,6 +42,8 @@ import { AuthenticationStoreService } from '../../../store/authentication';
 import { AnnotationActions } from '../../../store/login-mode/annotation/annotation.actions';
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 
+
+declare const a: any;
 @Component({
   selector: 'octra-transcription',
   templateUrl: './transcription.component.html',

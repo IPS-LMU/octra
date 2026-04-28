@@ -79,9 +79,7 @@ const OCTRA = {
     await setBuildVariable();
   },
   buildBetaDevUpdate: async function () {
-    await run(
-      'node ./build.js beta=false isUpdate=true url=/apps/octra/octra-dev/'
-    );
+    await run('node ./build.js beta=dev isUpdate=true url=/apps/octra/octra-dev/');
     await setBuildVariable();
   },
   buildBetaProdUpdate: async function () {

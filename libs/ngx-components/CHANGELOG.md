@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.9.1](https://github.com/IPS-LMU/octra/compare/ngx-components-1.9.0...ngx-components-1.9.1) (2026-04-28)
+
+
+### Bug Fixes
+
+* **ngx-components:** can't open bugreport modal because of invalid timestamp ([00332c4](https://github.com/IPS-LMU/octra/commit/00332c4c409d922fd76d6fec96b15143aa1b6286))
+
+
+
 # [1.9.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.8.1...ngx-components-1.9.0) (2026-04-17)
 
 

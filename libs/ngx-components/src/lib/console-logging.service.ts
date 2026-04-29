@@ -98,13 +98,13 @@ export class ConsoleLoggingService {
       } else {
         if (error instanceof Error) {
           error = this.censorMessage(error, this.options.confidentialList);
-          debug = error.message;
-          stack = error.stack;
+          debug = this.censorMessage(error.message);
+          stack = this.censorMessage(error.stack);
         } else {
           if (typeof error === 'object') {
             // some other type of object
             debug = 'OBJECT';
-            stack = JSON.stringify(error);
+            stack = this.censorMessage(JSON.stringify(error), this.options.confidentialList);
           } else {
             debug = error;
           }

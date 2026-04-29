@@ -89,7 +89,7 @@ export class ConsoleLoggingService {
       let stack: string | undefined = '';
 
       if (typeof error === 'string') {
-        debug = error;
+        debug = this.censorMessage(error);
 
         if (error === 'ERROR' && context !== undefined && context.stack && context.message) {
           debug = this.censorMessage(context.message, this.options.confidentialList);
@@ -98,15 +98,15 @@ export class ConsoleLoggingService {
       } else {
         if (error instanceof Error) {
           error = this.censorMessage(error, this.options.confidentialList);
-          debug = this.censorMessage(error.message);
-          stack = this.censorMessage(error.stack);
+          debug = this.censorMessage(error.message, this.options.confidentialList);
+          stack = this.censorMessage(error.stack, this.options.confidentialList);
         } else {
           if (typeof error === 'object') {
             // some other type of object
             debug = 'OBJECT';
-            stack = this.censorMessage(JSON.stringify(error), this.options.confidentialList);
+            stack = JSON.stringify(this.censorMessage(error, this.options.confidentialList));
           } else {
-            debug = error;
+            debug = this.censorMessage(error);
           }
         }
       }
@@ -239,21 +239,22 @@ export class ConsoleLoggingService {
     );
   }
 
-  private censorMessage<T>(obj: T, confidentialList?: string[]): T {
-    if (confidentialList && confidentialList.length > 0) {
-      if (typeof obj === 'string') {
-        const regex = new RegExp(confidentialList.map((a) => `(?:${a})`).join('|'), 'g');
-        const result = obj.replace(regex, '$1[CENSORED]$2');
-        return result as T;
-      } else {
-        if (obj instanceof Error) {
-          Object.assign(obj, {
-            message: this.censorMessage(obj.message, confidentialList),
-            stack: this.censorMessage(obj.stack, confidentialList),
-          });
+  public censorMessage<T>(obj: T, confidentialList?: string[]): T {
+    try {
+      if (confidentialList && confidentialList.length > 0) {
+        if (typeof obj === 'string') {
+          const regex = new RegExp(confidentialList.map((a) => `(?:${a})`).join('|'), 'g');
+          const result = obj.replace(regex, '$1[CENSORED]$2');
+          return result as T;
+        } else if (typeof obj === 'object') {
+          for (const key of Object.keys(obj)) {
+            obj[key] = this.censorMessage(obj, confidentialList);
+          }
         }
       }
+      return obj;
+    } catch (e) {
+      return obj;
     }
-    return obj;
   }
 }

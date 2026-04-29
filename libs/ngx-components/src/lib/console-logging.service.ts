@@ -248,7 +248,7 @@ export class ConsoleLoggingService {
           return result as T;
         } else if (typeof obj === 'object') {
           for (const key of Object.keys(obj)) {
-            obj[key] = this.censorMessage(obj, confidentialList);
+            obj[key] = this.censorMessage(obj[key], confidentialList);
           }
         }
       }

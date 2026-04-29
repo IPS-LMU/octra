@@ -89,7 +89,7 @@ export class ConsoleLoggingService {
       let stack: string | undefined = '';
 
       if (typeof error === 'string') {
-        debug = this.censorMessage(error);
+        debug = this.censorMessage(error, this.options.confidentialList);
 
         if (error === 'ERROR' && context !== undefined && context.stack && context.message) {
           debug = this.censorMessage(context.message, this.options.confidentialList);

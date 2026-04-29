@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.9.3](https://github.com/IPS-LMU/octra/compare/ngx-components-1.9.2...ngx-components-1.9.3) (2026-04-29)
+
+
+### Bug Fixes
+
+* **ngx-components:** console logger does not censor properly ([15fe224](https://github.com/IPS-LMU/octra/commit/15fe2243714eb166ef93ca19636fbc691c1c7516))
+
+
+
 ## [1.9.2](https://github.com/IPS-LMU/octra/compare/ngx-components-1.9.1...ngx-components-1.9.2) (2026-04-29)
 
 

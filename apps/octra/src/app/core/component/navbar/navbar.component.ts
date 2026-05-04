@@ -206,7 +206,9 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
   }
 
   setInterface(editor: typeof OCTRAEditor) {
-    this.navbarServ.interfacechange.emit(editor);
+    this.navbarServ.interfacechange.emit({
+      editor,
+    });
     this.cd.markForCheck();
   }
 

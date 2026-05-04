@@ -28,7 +28,7 @@ import { MultiThreadingService } from '../../../multi-threading.service';
 import { Position, Size } from '../../../obj';
 import { PlayCursor } from '../../../obj/play-cursor';
 import { AudioViewerShortcutEvent } from './audio-viewer.component';
-import { AudioviewerConfig } from './audio-viewer.config';
+import { AudioViewerConfig } from './audio-viewer.config';
 import Vector2d = Konva.Vector2d;
 import Group = Konva.Group;
 import Layer = Konva.Layer;
@@ -327,13 +327,13 @@ export class AudioViewerService {
     this._zoomY = value;
   }
 
-  private _settings = new AudioviewerConfig();
+  private _settings = new AudioViewerConfig();
 
-  get settings(): AudioviewerConfig {
+  get settings(): AudioViewerConfig {
     return this._settings;
   }
 
-  set settings(value: AudioviewerConfig) {
+  set settings(value: AudioViewerConfig) {
     this._settings = value;
   }
 
@@ -588,7 +588,7 @@ export class AudioViewerService {
               line.visible(this.isVisibleInView(line.x(), line.y(), line.width(), line.height()));
 
               this.layers.background.add(line);
-              y += this.settings.lineheight + this.settings.margin.top;
+              y += this.settings.lineheight + this.settings.margin.top + this.settings.margin.bottom;
               this.canvasElements.lastLine = line;
               drawnWidth += lineWidth;
             }
@@ -629,7 +629,7 @@ export class AudioViewerService {
         );
 
         selectionGroup.add(selectElem);
-        y += this.settings.lineheight + this.settings.margin.top;
+        y += this.settings.lineheight + this.settings.margin.top + this.settings.margin.bottom;
         drawnWidth += lineWidth;
       }
 
@@ -736,6 +736,25 @@ export class AudioViewerService {
       const deltaY = absY / (this.canvasElements.lastLine.y() + this.canvasElements.lastLine.height());
       this.scrollWithDeltaY(-deltaY);
     }
+  }
+
+  public scrollToUnit(id: number) {
+    const unitIndex = this.currentLevel?.items?.findIndex((a) => a.id === id) ?? 0;
+    const leftNeighbour = unitIndex > 0 ? (this.currentLevel.items[unitIndex - 1] as OctraAnnotationSegment) : undefined;
+    const maxRows = Math.ceil(this.audioTCalculator.audioPxWidth / this._innerWidth);
+    const rowHeight = this._settings.lineheight + this.settings.margin.top + this.settings.margin.bottom;
+    const maxAbsY = maxRows * rowHeight;
+    let calculatesAbsY = 0;
+
+    if (leftNeighbour) {
+      const absXUnit = this.audioTCalculator.samplestoAbsX(leftNeighbour.time);
+      const rowIndex = Math.floor(absXUnit / this._innerWidth);
+      const absY = rowIndex * rowHeight;
+      calculatesAbsY = absY + this.viewport.height > maxAbsY && this.viewport.height < maxAbsY ? maxAbsY - this.viewport.height : absY;
+    }
+
+    this.scrollToAbsY(calculatesAbsY);
+    this.canvasElements.scrollbarSelector.y((calculatesAbsY / maxAbsY) * this.viewport.height);
   }
 
   async onSecondsPerLineChanged(secondsPerLine: number) {
@@ -1155,11 +1174,11 @@ export class AudioViewerService {
 
               const yStart =
                 (this.innerWidth < this.AudioPxWidth ? Math.floor(absXStart / this.innerWidth) : 0) *
-                (this.settings.lineheight + this.settings.margin.top);
+                (this.settings.lineheight + this.settings.margin.top + this.settings.margin.bottom);
 
               const yEnd =
                 (this.innerWidth < this.AudioPxWidth ? Math.ceil(absXEnd / this.innerWidth) : 0) *
-                (this.settings.lineheight + this.settings.margin.top);
+                (this.settings.lineheight + this.settings.margin.top + this.settings.margin.bottom);
 
               if (this.isVisibleInView(0, yStart, this._innerWidth!, yEnd - yStart === 0 ? this.settings.lineheight : yEnd - yStart)) {
                 const createdShapes = this.createSegmentOnCanvas(
@@ -1208,10 +1227,10 @@ export class AudioViewerService {
             }
             const timeStampLabels = new Konva.Shape({
               id: 'timeStamps',
-              width: this.innerWidth,
+              width: this.innerWidth - 10,
               height: this.size.height,
-              x: this.settings.margin.left,
-              y: this.settings.margin.top,
+              x: 5,
+              y: 5,
               fontSize: 10,
               fontFamily: 'Arial',
               transformsEnabled: 'position',
@@ -2210,7 +2229,7 @@ export class AudioViewerService {
                   const segment = this.currentLevel.items[segInde];
                   this.selectSegment(segInde)
                     .then(({ posY1, posY2 }) => {
-                      if(this.currentLevel) {
+                      if (this.currentLevel) {
                         this._focused = false;
                         this.drawWholeSelection();
                         this.stage?.draw();
@@ -2451,13 +2470,13 @@ export class AudioViewerService {
         const beginX = this.audioTCalculator.samplestoAbsX(begin.time);
         const posY1 =
           this.innerWidth < this.AudioPxWidth
-            ? Math.floor(beginX / this.innerWidth + 1) * (this.settings.lineheight + this.settings.margin.bottom) - this.settings.margin.bottom
+            ? Math.floor(beginX / this.innerWidth) * (this.settings.lineheight + this.settings.margin.bottom) - this.settings.margin.bottom
             : 0;
 
         let posY2 = 0;
 
         if (this.innerWidth < this.AudioPxWidth) {
-          posY2 = Math.floor(absX / this.innerWidth + 1) * (this.settings.lineheight + this.settings.margin.bottom) - this.settings.margin.bottom;
+          posY2 = Math.floor(absX / this.innerWidth) * (this.settings.lineheight + this.settings.margin.bottom) - this.settings.margin.bottom;
         }
 
         const boundarySelect = this.getSegmentSelection(segment.time.samples - 1);
@@ -2476,6 +2495,7 @@ export class AudioViewerService {
           }
         }
 
+        this.drawWholeSelection();
         return { posY1, posY2 };
       } else {
         throw new Error('Segment not selected.');
@@ -3125,8 +3145,8 @@ export class AudioViewerService {
         });
         const length = this.layers.overlay.getContext().measureText(startTimeString).width;
         context.fillStyle = 'dimgray';
-        context.fillText(startTimeString, 3, y + 8);
-        context.fillText(endTimeString, (j < numOfLines - 1 ? this.innerWidth : this.canvasElements.lastLine.width()) - length - 3, y + 8);
+        context.fillText(startTimeString, 0, y + 8);
+        context.fillText(endTimeString, (j < numOfLines - 1 ? this.innerWidth : this.canvasElements.lastLine.width()) - length - 10, y + 8);
       }
     }
   };

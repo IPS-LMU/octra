@@ -18,6 +18,7 @@ import { PlayBackStatus } from '@octra/media';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { AudioChunk } from '@octra/web-media';
 import { DefaultComponent } from '../default.component';
+import { isNumber } from '@octra/utilities';
 
 export interface Buttons {
   play: {
@@ -53,41 +54,28 @@ export interface Buttons {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgClass, FormsModule, TranslocoPipe, OctraUtilitiesModule],
 })
-export class AudioNavigationComponent
-  extends DefaultComponent
-  implements OnChanges
-{
+export class AudioNavigationComponent extends DefaultComponent implements OnChanges {
   private cd = inject(ChangeDetectorRef);
 
   @Output() buttonClick = new EventEmitter<{
     type: string;
     timestamp: number;
   }>();
-  @Output() volumeChange = new EventEmitter<{
-    old_value: number;
-    new_value: number;
-    timestamp: number;
-  }>();
   @Output() afterVolumeChange = new EventEmitter<{
-    new_value: number;
-    timestamp: number;
-  }>();
-  @Output() playbackRateChange = new EventEmitter<{
-    old_value: number;
-    new_value: number;
+    old_value: number | undefined | null;
+    new_value: number | undefined | null;
     timestamp: number;
   }>();
   @Output() afterPlaybackRateChange = new EventEmitter<{
-    new_value: number;
+    old_value: number | undefined | null;
+    new_value: number | undefined | null;
     timestamp: number;
   }>();
   @Input() easyMode: boolean | undefined | null = false;
   @Input() audioChunk!: AudioChunk;
   @Input() stepBackwardTime = 500;
 
-  @ViewChild('audioNavContainer', { static: true }) audioNavContainer:
-    | ElementRef
-    | undefined;
+  @ViewChild('audioNavContainer', { static: true }) audioNavContainer: ElementRef | undefined;
 
   public get height() {
     if (this.audioNavContainer !== undefined) {
@@ -115,36 +103,26 @@ export class AudioNavigationComponent
     return this._isAudioPlaying;
   }
 
-  private _volume = 1;
+  protected _volume = 1;
 
   get volume(): number | undefined | null {
     return this._volume;
   }
 
   @Input() set volume(value: number | undefined | null) {
-    this.volumeChange.emit({
-      old_value: Number(this._volume),
-      new_value: Number(value),
-      timestamp: Date.now(),
-    });
     this._volume = value ?? 1;
     if (this.audioChunk) {
       this.audioChunk.volume = value ?? 1;
     }
   }
 
-  private _playbackRate = 1;
+  protected _playbackRate = 1;
 
   get playbackRate(): number | undefined | null {
     return this._playbackRate;
   }
 
   @Input() set playbackRate(value: number | undefined | null) {
-    this.playbackRateChange.emit({
-      old_value: Number(this._playbackRate),
-      new_value: Number(value),
-      timestamp: Date.now(),
-    });
     this._playbackRate = value ?? 1;
 
     if (this.audioChunk !== undefined) {
@@ -171,6 +149,27 @@ export class AudioNavigationComponent
       this.cd.markForCheck();
       this.cd.detectChanges();
     }
+  }
+
+  onPlaybackRateChange(value?: string | null) {
+    const val = isNumber(value) ? Number(value) : null;
+    this.afterPlaybackRateChange.emit({
+      old_value: Number(this._playbackRate),
+      new_value: Number(val),
+      timestamp: Date.now(),
+    });
+    this._playbackRate = val;
+  }
+
+  onVolumeChanged(value?: string | null) {
+    const val = isNumber(value) ? Number(value): null;
+
+    this.afterVolumeChange.emit({
+      old_value: Number(this._volume),
+      new_value: Number(val),
+      timestamp: Date.now(),
+    });
+    this._volume = val;
   }
 
   /**
@@ -202,26 +201,6 @@ export class AudioNavigationComponent
         break;
     }
     this.cd.detectChanges();
-  }
-
-  /***
-   * after value of volume was changed
-   */
-  afterVolumeChanged() {
-    this.afterVolumeChange.emit({
-      new_value: this.volume ?? 1,
-      timestamp: Date.now(),
-    });
-  }
-
-  /***
-   * after value of playbackRate was changed
-   */
-  afterPlaybackRateChanged() {
-    this.afterPlaybackRateChange.emit({
-      new_value: this.playbackRate ?? 1,
-      timestamp: Date.now(),
-    });
   }
 
   private initialize() {

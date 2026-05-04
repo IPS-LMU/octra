@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   inject,
   Input,
@@ -10,24 +11,31 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  Renderer2,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { ASRContext, OctraAnnotationAnyLevel, OctraAnnotationSegment, OctraAnnotationSegmentLevel } from '@octra/annotation';
+import { Actions, ofType } from '@ngrx/effects';
+import { ASRContext, OctraAnnotation, OctraAnnotationAnyLevel, OctraAnnotationSegment, OctraAnnotationSegmentLevel } from '@octra/annotation';
 import { sum } from '@octra/api-types';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
+import { AudioViewerComponent, AudioViewerConfig, AudioViewerShortcutEvent } from '@octra/ngx-components';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
-import { isFunction, SubscriptionManager } from '@octra/utilities';
-import { AudioChunk } from '@octra/web-media';
-import { Subscription, timer } from 'rxjs';
+import { contains, hasProperty, isFunction } from '@octra/utilities';
+import { AudioChunk, Shortcut, ShortcutGroup } from '@octra/web-media';
+import { HotkeysEvent } from 'hotkeys-js';
+import { tap, timer } from 'rxjs';
 import { AudioService, SettingsService, UserInteractionsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { RoutingService } from '../../shared/service/routing.service';
+import { ShortcutService } from '../../shared/service/shortcut.service';
+import { ApplicationActions } from '../../store/application/application.actions';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { AudioNavigationComponent } from '../audio-navigation';
+import { DefaultComponent } from '../default.component';
 import { TranscrEditorComponent, TranscrEditorConfig } from '../transcr-editor';
-import { TranscrEditorComponent as TranscrEditorComponent_1 } from '../transcr-editor/transcr-editor.component';
 import { ValidationPopoverComponent } from '../transcr-editor/validation-popover/validation-popover.component';
 
 @Component({
@@ -35,9 +43,18 @@ import { ValidationPopoverComponent } from '../transcr-editor/validation-popover
   templateUrl: './transcr-overview.component.html',
   styleUrls: ['./transcr-overview.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgClass, NgStyle, TranscrEditorComponent_1, ValidationPopoverComponent, OctraUtilitiesModule, TranslocoPipe],
+  imports: [
+    NgClass,
+    NgStyle,
+    ValidationPopoverComponent,
+    OctraUtilitiesModule,
+    TranslocoPipe,
+    TranscrEditorComponent,
+    AudioViewerComponent,
+    AudioNavigationComponent,
+  ],
 })
-export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
+export class TranscrOverviewComponent extends DefaultComponent implements OnInit, OnDestroy, OnChanges {
   annotationStoreService = inject(AnnotationStoreService);
   audio = inject(AudioService);
   sanitizer = inject(DomSanitizer);
@@ -46,13 +63,19 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   protected settingsService = inject(SettingsService);
   private uiService = inject(UserInteractionsService);
   protected routingService = inject(RoutingService);
+  private shortcutService = inject(ShortcutService);
+  private actions = inject(Actions);
+  private el = inject(ElementRef);
+  private renderer = inject(Renderer2);
 
-  get textEditor(): {
+  get selectedUnit(): {
     selectedSegment: number;
     state: string;
     audioChunk?: AudioChunk;
+    transcriptText?: string;
+    annotation?: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
   } {
-    return this._textEditor;
+    return this._selectedUnit;
   }
 
   editorConfig: TranscrEditorConfig = new TranscrEditorConfig({
@@ -72,21 +95,30 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       html: string;
     };
     validation: string;
+    playState: {
+      state: 'started' | 'stopped';
+      icon: 'bi bi-play-fill' | 'bi bi-stop-fill';
+    };
   }[] = [];
-  public transcript = '';
 
-  @Input() currentLevel?: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>;
+  viewerSettings?: AudioViewerConfig;
+
   _internLevel?: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>;
 
+  @Input() targetName = 'overview';
   @Input() public showTranscriptionTable = true;
+  @Input() showStatistics = true;
+  @Input() showSignal = false;
+
   public showLoading = true;
 
   @Output() segmentclicked = new EventEmitter<{
     itemID: number;
     levelID: number;
   }>();
+  @Output() statusChange = new EventEmitter<{ status: 'loading' | 'ready' | 'updated' }>();
 
-  private subscrmanager: SubscriptionManager<Subscription>;
+  @ViewChild('viewer', { static: false }) viewer!: AudioViewerComponent;
 
   public playAllState: {
     state: 'started' | 'stopped';
@@ -99,11 +131,6 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     currentSegment: -1,
     skipSilence: false,
   };
-
-  public playStateSegments: {
-    state: 'started' | 'stopped';
-    icon: 'bi bi-play-fill' | 'bi bi-stop-fill';
-  }[] = [];
 
   public popovers = {
     validation: {
@@ -122,33 +149,240 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     },
   };
 
-  private _textEditor: {
+  private _selectedUnit: {
     state: string;
     selectedSegment: number;
     audioChunk?: AudioChunk;
+    transcriptText?: string;
+    annotation?: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
   } = {
     state: 'inactive',
     selectedSegment: -1,
     audioChunk: undefined,
+    transcriptText: '',
   };
 
+  onAudioPlayPause = ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
+    this.triggerUIAction({
+      shortcut: hotkeyEvent?.shortcut ?? '',
+      shortcutName: shortcut.name,
+      value: shortcut.name,
+      type: 'audio',
+      timestamp: Date.now(),
+    });
+    if (this.selectedUnit.audioChunk?.isPlaying) {
+      this.selectedUnit.audioChunk.pausePlayback().catch((error: any) => {
+        console.error(error);
+      });
+    } else {
+      this.selectedUnit.audioChunk.startPlayback(false).catch((error: any) => {
+        console.error(error);
+      });
+    }
+  };
+
+  onAudioStop = ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
+    this.triggerUIAction({
+      shortcut: hotkeyEvent?.shortcut ?? '',
+      shortcutName: shortcut.name,
+      value: shortcut.name,
+      type: 'audio',
+      timestamp: Date.now(),
+    });
+    this.selectedUnit.audioChunk.stopPlayback().catch((error: any) => {
+      console.error(error);
+    });
+  };
+
+  onStepBackward = ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
+    this.triggerUIAction({
+      shortcut: hotkeyEvent?.shortcut ?? '',
+      shortcutName: shortcut.name,
+      value: shortcut.name,
+      type: 'audio',
+      timestamp: Date.now(),
+    });
+    this.selectedUnit.audioChunk.stepBackward().catch((error: any) => {
+      console.error(error);
+    });
+  };
+
+  onStepBackwardTime = ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
+    this.triggerUIAction({
+      shortcut: hotkeyEvent?.shortcut ?? '',
+      shortcutName: shortcut.name,
+      value: shortcut.name,
+      type: 'audio',
+      timestamp: Date.now(),
+    });
+    this.selectedUnit.audioChunk.stepBackwardTime(0.5).catch((error: any) => {
+      console.error(error);
+    });
+  };
+
+  moveToPreviousUnit = async ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
+    await this.doDirection('up');
+  };
+
+  moveToNextUnit = async ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
+    await this.doDirection('down');
+  };
+
+  onUndo = (keyboardEvent: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent, shortcutGroup?: ShortcutGroup) => {
+    this.appStorage.undo();
+  };
+  onRedo = (keyboardEvent: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent, shortcutGroup?: ShortcutGroup) => {
+    this.appStorage.redo();
+  };
+
+  private viewerShortcuts: ShortcutGroup = {
+    name: 'signal-display',
+    enabled: true,
+    items: [
+      {
+        name: 'play_pause',
+        keys: {
+          mac: 'TAB',
+          pc: 'TAB',
+        },
+        title: 'play pause',
+        focusonly: true,
+        callback: this.onAudioPlayPause,
+      },
+      {
+        name: 'stop',
+        keys: {
+          mac: 'ESC',
+          pc: 'ESC',
+        },
+        title: 'stop playback',
+        focusonly: true,
+        callback: this.onAudioStop,
+      },
+      {
+        name: 'step_backward',
+        keys: {
+          mac: 'SHIFT + BACKSPACE',
+          pc: 'SHIFT + BACKSPACE',
+        },
+        title: 'step backward',
+        focusonly: true,
+        callback: this.onStepBackward,
+      },
+      {
+        name: 'step_backwardtime',
+        keys: {
+          mac: 'SHIFT + TAB',
+          pc: 'SHIFT + TAB',
+        },
+        title: 'step backward time',
+        focusonly: true,
+        callback: this.onStepBackwardTime,
+      },
+      {
+        name: 'move_to_previous_unit',
+        keys: {
+          mac: 'SHIFT + ARROWUP',
+          pc: 'SHIFT + ARROWUP',
+        },
+        title: 'move to previous unit',
+        focusonly: true,
+        callback: this.moveToPreviousUnit,
+      },
+      {
+        name: 'move_to_next_unit',
+        keys: {
+          mac: 'SHIFT + ARROWDOWN',
+          pc: 'SHIFT + ARROWDOWN',
+        },
+        title: 'move to next unit',
+        focusonly: true,
+        callback: this.moveToNextUnit,
+      },
+      {
+        name: 'undo',
+        keys: {
+          mac: 'CMD + Z',
+          pc: 'CTRL + Z',
+        },
+        title: 'undo',
+        focusonly: false,
+        callback: this.onUndo,
+      },
+      {
+        name: 'redo',
+        keys: {
+          mac: 'SHIFT + CMD + Z',
+          pc: 'CTRL + Y',
+        },
+        title: 'redo',
+        focusonly: false,
+        callback: this.onRedo,
+      },
+    ],
+  };
+
+  private triggerUIAction($event: AudioViewerShortcutEvent) {
+    if (
+      $event.value === undefined ||
+      !(
+        // cursor move by keyboard events are note saved because this would be too much
+        (
+          contains($event.value, 'cursor') ||
+          contains($event.value, 'segment_enter') ||
+          contains($event.value, 'playonhover') ||
+          contains($event.value, 'asr')
+        )
+      )
+    ) {
+      $event.value = `${$event.type}:${$event.value}`;
+
+      let selection:
+        | {
+            start: number;
+            length: number;
+          }
+        | undefined = {
+        start: -1,
+        length: -1,
+      };
+
+      if (hasProperty($event, 'selection') && $event.selection !== undefined) {
+        selection.start = $event.selection.start.samples;
+        selection.length = $event.selection.duration.samples;
+      } else {
+        selection = undefined;
+      }
+
+      const textSelection = this.transcrEditor?.textSelection;
+      let playPosition = this.audio.audioManager.playPosition;
+      if (!this.selectedUnit.audioChunk?.isPlaying) {
+        if ($event.type === 'boundary') {
+          playPosition = this.viewer.av.MouseClickPos!;
+        }
+      }
+
+      this.uiService.addElementFromEvent('shortcut', $event, $event.timestamp, playPosition, textSelection, selection, undefined, 'table-row-viewer');
+    }
+  }
+
   public get numberOfSegments(): number {
-    if (this.currentLevel && this.currentLevel.type === 'SEGMENT') {
-      return this.currentLevel.items ? this.currentLevel.items.length : 0;
+    if (this._internLevel && this._internLevel.type === 'SEGMENT') {
+      return this._internLevel.items ? this._internLevel.items.length : 0;
     }
     return -1;
   }
 
   public get transcrSegments(): number {
-    return this.currentLevel?.items ? this.annotationStoreService.statistics.transcribed : 0;
+    return this._internLevel?.items ? this.annotationStoreService.statistics.transcribed : 0;
   }
 
   public get pauseSegments(): number {
-    return this.currentLevel?.items ? this.annotationStoreService.statistics.pause : 0;
+    return this._internLevel?.items ? this.annotationStoreService.statistics.pause : 0;
   }
 
   public get emptySegments(): number {
-    return this.currentLevel?.items ? this.annotationStoreService.statistics.empty : 0;
+    return this._internLevel?.items ? this.annotationStoreService.statistics.empty : 0;
   }
 
   public get foundErrors(): number {
@@ -170,21 +404,26 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     );
   }
 
-  constructor() {
-    this.subscrmanager = new SubscriptionManager();
-  }
-
-  ngOnDestroy() {
-    this.subscrmanager.destroy();
-    this.playAllState.state = 'stopped';
-    this.audio.audioManager.stopPlayback().catch((err) => {
+  override ngOnDestroy() {
+    super.ngOnDestroy();
+    this.audio?.audioManager?.stopPlayback().catch((err) => {
       console.error(err);
     });
+    this.shortcutService.disableGroup(this.viewerShortcuts.name);
+  }
+
+  init(level: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>) {
+    this._internLevel = level.clone();
+    this.updateView();
   }
 
   ngOnInit() {
-    this.subscrmanager.add(
-      this.audio.audiomanagers[0].statechange.subscribe({
+    this.viewerShortcuts.name = `${this.targetName}`;
+    this.shortcutService.registerShortcutGroup(this.viewerShortcuts);
+    this.shortcutService.enableGroup(this.viewerShortcuts.name);
+
+    if (!this.showSignal) {
+      this.subscribe(this.audio.audiomanagers[0].statechange, {
         next: (state) => {
           // make sure that events from playonhover are not logged
           if (state !== PlayBackStatus.PLAYING && state !== PlayBackStatus.INITIALIZED && state !== PlayBackStatus.PREPARE) {
@@ -196,17 +435,29 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
               undefined,
               undefined,
               undefined,
-              'overview',
+              this.targetName,
             );
           }
         },
         error: (error) => {
           console.error(error);
         },
-      }),
-    );
+      });
+    }
 
-    this.updateView();
+    this.subscribe(this.annotationStoreService.currentLevelIndex$, {
+      next: (index) => {
+        this.init(this.annotationStoreService.transcript.levels[index]);
+      },
+    });
+    this.subscribe(
+      this.actions.pipe(
+        ofType(ApplicationActions.undoSuccess, ApplicationActions.redoSuccess),
+        tap((a) => {
+          this.init(this.annotationStoreService.transcript.levels[this.annotationStoreService.currentLevelIndex]);
+        }),
+      ),
+    );
   }
 
   sanitizeHTML(str: string): SafeHtml {
@@ -215,30 +466,25 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
 
   async onMouseOver($event: MouseEvent, rowNumber: number, row: HTMLDivElement, validationPopover: ValidationPopoverComponent) {
     if (validationPopover) {
-      if (this.textEditor.state === 'inactive') {
+      if (this.selectedUnit.state === 'inactive') {
         let target = $event.target as HTMLElement;
         if (target.getAttribute('class') === 'val-error' || target.parentElement!.getAttribute('class') === 'val-error') {
-          if (!this.popovers.validation.mouse.enter) {
-            if (target.getAttribute('class') !== 'val-error') {
-              target = target.parentElement!;
-            }
+          if (target.getAttribute('class') !== 'val-error') {
+            target = target.parentElement!;
+          }
 
-            const errorcode = target.getAttribute('data-errorcode')!;
-            this.selectedError = await this.annotationStoreService.getErrorDetails(errorcode);
+          const errorcode = target.getAttribute('data-errorcode')!;
+          this.selectedError = await this.annotationStoreService.getErrorDetails(errorcode);
 
-            if (this.selectedError !== null) {
-              validationPopover.show();
-              validationPopover.description = this.selectedError.description;
-              validationPopover.title = this.selectedError.title;
-              this.cd.markForCheck();
-              this.cd.detectChanges();
+          if (this.selectedError !== null) {
+            validationPopover.show();
+            validationPopover.description = this.selectedError.description;
+            validationPopover.title = this.selectedError.title;
 
-              this.popovers.validation.location.y = -validationPopover.height;
-              this.popovers.validation.location.x = 0;
-              this.popovers.validation.mouse.enter = true;
-              this.cd.markForCheck();
-              this.cd.detectChanges();
-            }
+            this.popovers.validation.location.y = target.offsetTop - validationPopover.height - target.offsetHeight / 2;
+            this.popovers.validation.location.x = target.offsetLeft - target.offsetWidth;
+            this.popovers.validation.mouse.enter = true;
+            this.cd.markForCheck();
           }
         } else {
           this.selectedError = null;
@@ -252,81 +498,129 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   onMouseDown(i: number) {
-    if (this.currentLevel?.items && this.currentLevel.type === 'SEGMENT') {
-      if (this.textEditor.state === 'inactive') {
-        this.textEditor.state = 'active';
-        this.textEditor.selectedSegment = i;
+    if (this._internLevel?.items && this._internLevel.type === 'SEGMENT') {
+      if (this.selectedUnit.state !== 'inactive') {
+        this.audio?.audioManager?.stopPlayback();
+      }
 
-        const segment = this.currentLevel?.items[i] as OctraAnnotationSegment;
-        const nextSegmentTime: SampleUnit =
-          i < this.currentLevel?.items.length - 1
-            ? (this.currentLevel?.items[i + 1] as OctraAnnotationSegment).time
-            : this.audio.audioManager.resource.info.duration;
-        const audiochunk = new AudioChunk(new AudioSelection(segment.time, nextSegmentTime), this.audio.audiomanagers[0]);
+      this.selectedUnit.state = 'active';
+      this.selectedUnit.selectedSegment = i;
 
-        this.audio.audiomanagers[0].addChunk(audiochunk);
-        this.textEditor.audioChunk = audiochunk;
+      const segment = this._internLevel?.items[i] as OctraAnnotationSegment;
+      const previousSegmentTime: SampleUnit =
+        i > 0 ? (this._internLevel?.items[i - 1] as OctraAnnotationSegment).time : this.audio.audioManager.createSampleUnit(0);
 
-        this.transcript = segment.getFirstLabelWithoutName('Speaker')?.value ?? '';
-        // this.transcrEditor.focus();
+      const audioChunk = this.audio.audiomanagers[0].createNewAudioChunk(new AudioSelection(previousSegmentTime, segment.time));
+      this.selectedUnit.audioChunk = audioChunk;
+
+      this.viewerSettings = new AudioViewerConfig();
+      this.viewerSettings.margin.top = 0;
+      this.viewerSettings.margin.bottom = 0;
+      this.viewerSettings.lineheight = 100;
+      this.viewerSettings.justifySignalHeight = true;
+      this.viewerSettings.boundaries.enabled = false;
+      this.viewerSettings.boundaries.readonly = true;
+      this.viewerSettings.selection.enabled = true;
+      this.viewerSettings.frame.color = '#AAAAAA';
+      this.viewerSettings.roundValues = false;
+      this.viewerSettings.showTimePerLine = true;
+      this.viewerSettings.showProgressBars = true;
+      this.viewerSettings.multiLine = false;
+      this.viewerSettings.shortcuts.enabled = true;
+
+      this._selectedUnit.transcriptText = segment.getFirstLabelWithoutName('Speaker')?.value ?? '';
+      this._selectedUnit.annotation = this.annotationStoreService.transcript;
+      this.cd.markForCheck();
+      this.appStorage.disableUndoRedo(false);
+
+      if (this.viewer) {
+        this.viewer.name = 'transcr-window viewer';
+        this.viewer.av.drawnSelection = undefined;
       }
     }
   }
 
-  async onTextEditorLeave(i: number) {
+  changeLevel(index: number) {
+    this.annotationStoreService.setLevelIndex(index);
+  }
+
+  async onTextEditorLeave(i: number, save = false) {
     if (this.transcrEditor && this._internLevel?.items && this._internLevel.type === 'SEGMENT') {
       this.transcrEditor.updateRawText();
-      (this._internLevel?.items[i] as OctraAnnotationSegment).changeFirstLabelWithoutName('Speaker', this.transcrEditor.rawText);
-      const segment = this._internLevel?.items[i] as OctraAnnotationSegment;
-      this.annotationStoreService.validateAll();
 
+      if (save) {
+        const level = this._internLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment<ASRContext>>;
+        const item = level.items[i].clone();
+        item.replaceFirstLabelWithoutName('Speaker', () => this.transcrEditor.rawText);
+        this._internLevel = level?.changeItem(item);
+        const segment = level?.items[i] as OctraAnnotationSegment;
+        this.annotationStoreService.changeCurrentItemById(segment.id, segment);
+      }
+
+      this.selectedUnit.state = 'inactive';
+      this.selectedUnit.selectedSegment = -1;
+      if (this.selectedUnit.audioChunk) {
+        this.selectedUnit.audioChunk.stopPlayback();
+        this.playAllState.icon = 'bi bi-play-fill';
+        this.playAllState.state = 'stopped';
+        this.playAllState.currentSegment = -1;
+        this.audio.audiomanagers[0].removeChunk(this.selectedUnit.audioChunk);
+      }
+      if (save) {
+        await this.updateSegments();
+      }
       this.cd.markForCheck();
 
-      await this.updateSegments();
+      this.appStorage.enableUndoRedo(false);
 
-      this.annotationStoreService.changeCurrentItemById(segment.id, segment);
-      this.textEditor.state = 'inactive';
-      this.textEditor.selectedSegment = -1;
-      this.audio.audiomanagers[0].removeChunk(this.textEditor.audioChunk!);
-      this.cd.markForCheck();
-
-      const startSample = i > 0 ? (this.annotationStoreService.currentLevel!.items[i - 1] as OctraAnnotationSegment).time.samples : 0;
-      this.uiService.addElementFromEvent(
-        'segment',
-        {
-          value: 'updated',
-        },
-        Date.now(),
-        undefined,
-        undefined,
-        undefined,
-        {
-          start: startSample,
-          length: segment.time.samples - startSample,
-        },
-        'overview',
-      );
+      if (save) {
+        const level = this._internLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment<ASRContext>>;
+        const segment = level?.items[i] as OctraAnnotationSegment;
+        const startSample = i > 0 ? (this.annotationStoreService.currentLevel!.items[i - 1] as OctraAnnotationSegment).time.samples : 0;
+        this.uiService.addElementFromEvent(
+          'segment',
+          {
+            value: 'updated',
+          },
+          Date.now(),
+          undefined,
+          undefined,
+          undefined,
+          {
+            start: startSample,
+            length: segment.time.samples - startSample,
+          },
+          this.targetName,
+        );
+      }
     }
   }
 
   async updateView() {
     await this.updateSegments();
-    this.annotationStoreService.analyse();
+    if (this.showStatistics) {
+      this.annotationStoreService.analyse();
+    }
 
     this.cd.markForCheck();
     this.cd.detectChanges();
+    this.statusChange.emit({ status: 'updated' });
   }
 
-  public onSegmentClicked(itemID: number) {
-    this.segmentclicked.emit({
-      levelID: this.currentLevel!.id!,
-      itemID,
-    });
+  public onSegmentClicked(event: MouseEvent, itemID: number) {
+    if (!this.showSignal) {
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      this.segmentclicked.emit({
+        levelID: this._internLevel!.id!,
+        itemID,
+      });
+    }
   }
 
   private async updateSegments() {
-    this.playStateSegments = [];
     this.annotationStoreService.validateAll();
+
     if (
       this._internLevel &&
       (this.annotationStoreService.validationArray.length > 0 ||
@@ -334,11 +628,12 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         (this.routingService.staticQueryParams.guidelines_url && this.routingService.staticQueryParams.functions_url) ||
         !this.settingsService.projectsettings?.octra?.validationEnabled)
     ) {
-      if (!this.currentLevel?.items || !this.annotationStoreService.guidelines) {
+      if (!this._internLevel?.items || !this.annotationStoreService.guidelines) {
         this.shownSegments = [];
         this._internLevel?.clear();
       }
 
+      this.statusChange.emit({ status: 'loading' });
       this.showLoading = true;
       let startTime = 0;
       const result: {
@@ -350,6 +645,10 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
           html: string;
         };
         validation: string;
+        playState: {
+          state: 'started' | 'stopped';
+          icon: 'bi bi-play-fill' | 'bi bi-stop-fill';
+        };
       }[] = [];
 
       if (this._internLevel.type === 'SEGMENT') {
@@ -366,6 +665,10 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
               html: string;
             };
             validation: string;
+            playState: {
+              state: 'started' | 'stopped';
+              icon: 'bi bi-play-fill' | 'bi bi-stop-fill';
+            };
           } = await this.getShownSegment(
             new SampleUnit(startTime, segment.time.sampleRate),
             segment.time,
@@ -378,26 +681,17 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
           result.push(obj);
 
           startTime = segment.time.samples;
-
-          // set playState
-          this.playStateSegments.push({
-            state: 'stopped',
-            icon: 'bi bi-play-fill',
-          });
         }
       }
 
       this.shownSegments = result;
       this.showLoading = false;
+      this.statusChange.emit({ status: 'ready' });
       this.validationErrors = this.readValidationErrors();
     }
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['currentLevel'].currentValue) {
-      this._internLevel = (changes['currentLevel'].currentValue as OctraAnnotationAnyLevel<OctraAnnotationSegment>).clone();
-    }
-  }
+  ngOnChanges(changes: SimpleChanges) {}
 
   async getShownSegment(
     start: SampleUnit,
@@ -415,6 +709,10 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       html: string;
     };
     validation: string;
+    playState: {
+      state: 'started' | 'stopped';
+      icon: 'bi bi-play-fill' | 'bi bi-stop-fill';
+    };
   }> {
     const obj = {
       start,
@@ -425,6 +723,10 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         html: rawText ?? '',
       },
       validation: '',
+      playState: {
+        state: 'stopped' as any,
+        icon: 'bi bi-play-fill' as any,
+      },
     };
 
     if (
@@ -453,6 +755,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     obj.transcription.html = obj.transcription.html.replace(/(<p>)|(<\/p>)/g, '');
+
     return obj;
   }
 
@@ -490,6 +793,23 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  private scrollToSegmentIndex(segmentIndex: number) {
+    const container = this.el.nativeElement as HTMLDivElement;
+    const index = segmentIndex > 0 ? segmentIndex - 1 : segmentIndex;
+    const segmentRow = container.querySelector(`#transcr-overview-segment-${index}`) as HTMLTableRowElement;
+    const thead = container.querySelector('#table-head') as HTMLElement;
+    this.renderer.setStyle(container, 'scroll-margin-top', `${thead.offsetHeight + 50}px`);
+
+    const isTop = segmentRow.offsetTop < container.scrollTop;
+    const isBelow = segmentRow.offsetTop > container.scrollTop + container.offsetHeight;
+
+    if (isBelow || isTop) {
+      // scroll only if outside view
+      container.scrollTo(0, Math.max(0, segmentRow.offsetTop));
+      this.cd.markForCheck();
+    }
+  }
+
   togglePlayAll() {
     this.playAllState.icon = this.playAllState.icon === 'bi bi-play-fill' ? 'bi bi-stop-fill' : 'bi bi-play-fill';
     this.cd.markForCheck();
@@ -510,7 +830,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
             undefined,
             undefined,
             undefined,
-            'overview',
+            this.targetName,
           );
           this.playAllState.state = 'started';
           this.playAll(0);
@@ -523,8 +843,10 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       this.stopPlayback()
         .then(() => {
           this.playAllState.state = 'stopped';
-          this.playStateSegments[this.playAllState.currentSegment].state = 'stopped';
-          this.playStateSegments[this.playAllState.currentSegment].icon = 'bi bi-play-fill';
+          if (this.playAllState.currentSegment > -1) {
+            this.shownSegments[this.playAllState.currentSegment].playState.state = 'stopped';
+            this.shownSegments[this.playAllState.currentSegment].playState.icon = 'bi bi-play-fill';
+          }
 
           this.cd.markForCheck();
 
@@ -538,13 +860,41 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
             undefined,
             undefined,
             undefined,
-            'overview',
+            this.targetName,
           );
         })
         .catch((error) => {
           console.error(error);
         });
     }
+  }
+
+  onPlayBackRateChanged(event?: { new_value: number; timestamp: number }) {
+    this.appStorage.audioSpeed = event.new_value;
+    this.uiService.addElementFromEvent(
+      'slider',
+      event,
+      event.timestamp,
+      this.audio.audioManager?.playPosition,
+      this.transcrEditor?.textSelection,
+      undefined,
+      undefined,
+      'audio_speed',
+    );
+  }
+
+  onVolumeChanged(event?: { new_value: number; timestamp: number }) {
+    this.appStorage.audioVolume = event.new_value;
+    this.uiService.addElementFromEvent(
+      'slider',
+      event,
+      event.timestamp,
+      this.audio.audioManager?.playPosition,
+      this.transcrEditor?.textSelection,
+      undefined,
+      undefined,
+      'audio_volume',
+    );
   }
 
   playSegment(segmentNumber: number): Promise<void> {
@@ -555,15 +905,15 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
       }
       const level = this._internLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
 
-      if (this.playStateSegments[segmentNumber].state === 'stopped') {
+      if (this.shownSegments[segmentNumber].playState.state === 'stopped') {
+        this.scrollToSegmentIndex(segmentNumber);
         const segment: OctraAnnotationSegment = level.items[segmentNumber];
 
-        this.playStateSegments[segmentNumber].state = 'started';
-        this.playStateSegments[segmentNumber].icon = 'bi bi-stop-fill';
+        this.shownSegments[segmentNumber].playState.state = 'started';
+        this.shownSegments[segmentNumber].playState.icon = 'bi bi-stop-fill';
         this.cd.markForCheck();
 
         const startSample = segmentNumber > 0 ? level.items[segmentNumber - 1].time.samples : 0;
-
         this.playAllState.currentSegment = segmentNumber;
 
         this.cd.markForCheck();
@@ -571,20 +921,18 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         this.audio.audiomanagers[0]
           .startPlayback(new AudioSelection(this.audio.audiomanagers[0].createSampleUnit(startSample), segment.time.clone()), 1, 1)
           .then(() => {
-            this.playStateSegments[segmentNumber].state = 'stopped';
-            this.playStateSegments[segmentNumber].icon = 'bi bi-play-fill';
+            this.shownSegments[segmentNumber].playState.state = 'stopped';
+            this.shownSegments[segmentNumber].playState.icon = 'bi bi-play-fill';
             this.playAllState.currentSegment = -1;
             this.cd.markForCheck();
 
-            this.subscrmanager.add(
-              timer(100).subscribe({
-                next: () => {
-                  this.cd.markForCheck();
+            this.subscribe(timer(100), {
+              next: () => {
+                this.cd.markForCheck();
 
-                  resolve();
-                },
-              }),
-            );
+                resolve();
+              },
+            });
           })
           .catch((error) => {
             console.error(error);
@@ -594,8 +942,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         this.audio.audiomanagers[0]
           .stopPlayback()
           .then(() => {
-            this.playStateSegments[segmentNumber].state = 'stopped';
-            this.playStateSegments[segmentNumber].icon = 'bi bi-play-fill';
+            this.shownSegments[segmentNumber].playState.state = 'stopped';
+            this.shownSegments[segmentNumber].playState.icon = 'bi bi-play-fill';
             this.playAllState.currentSegment = -1;
 
             this.cd.markForCheck();
@@ -609,8 +957,11 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     });
   }
 
-  playSelectedSegment(segmentNumber: number) {
+  playSelectedSegment(event: MouseEvent, segmentNumber: number) {
     // make sure that audio is not playing
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
     if (
       (this.playAllState.state === 'started' && this.playAllState.currentSegment !== segmentNumber) ||
       this.playAllState.currentSegment !== segmentNumber
@@ -634,7 +985,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
               start: startSample,
               length: (this.annotationStoreService.currentLevel?.items[segmentNumber] as OctraAnnotationSegment).time.samples - startSample,
             },
-            'overview',
+            this.targetName,
           );
 
           this.playSegment(segmentNumber)
@@ -664,7 +1015,7 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
           start: startSample,
           length: (this.annotationStoreService.currentLevel!.items[segmentNumber] as OctraAnnotationSegment).time.samples - startSample,
         },
-        'overview',
+        this.targetName,
       );
 
       this.stopPlayback()
@@ -681,11 +1032,28 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   async onEnterPressed(i: number) {
-    await this.onTextEditorLeave(i);
+    await this.onTextEditorLeave(i, true);
     if (this._internLevel?.items && i < this._internLevel.items.length - 1) {
       this.onMouseDown(i + 1);
+    } else {
+      this.cd.markForCheck();
     }
-    this.annotationStoreService.validateAll();
+  }
+
+  async doDirection(direction: 'down' | 'up') {
+    const i = this._selectedUnit.selectedSegment;
+    if (this._selectedUnit.selectedSegment > -1) {
+      await this.onTextEditorLeave(i, true);
+    }
+
+    if (this._internLevel?.items) {
+      if (direction === 'down') {
+        this.onMouseDown(Math.min(i, this._internLevel.items.length - 2) + 1);
+      } else {
+        this.onMouseDown(Math.max(i, 1) - 1);
+      }
+    }
+
     await this.updateSegments();
     this.cd.markForCheck();
   }
@@ -697,8 +1065,8 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   public stopPlayback(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.playAllState.currentSegment > -1) {
-        this.playStateSegments[this.playAllState.currentSegment].state = 'stopped';
-        this.playStateSegments[this.playAllState.currentSegment].icon = 'bi bi-play-fill';
+        this.shownSegments[this.playAllState.currentSegment].playState.state = 'stopped';
+        this.shownSegments[this.playAllState.currentSegment].playState.icon = 'bi bi-play-fill';
         this.cd.markForCheck();
       }
       this.audio.audiomanagers[0].stopPlayback().then(resolve).catch(reject);

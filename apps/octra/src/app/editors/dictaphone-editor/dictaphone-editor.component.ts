@@ -400,6 +400,10 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
         }
       }
 
+      const idArray: number[] = (this.annotationStoreService.currentLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>).items.map(
+        (a) => a.id,
+      );
+
       segTexts = segTexts.map((a: string) => {
         return a.replace(/(^\s+)|(\s+$)/g, '');
       });
@@ -407,10 +411,16 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
       const items: OctraAnnotationSegment<ASRContext>[] = [];
 
       for (let i = 0; i < segTexts.length; i++) {
+        const id = idArray.length > i ? idArray[i] : undefined;
         const time =
           i < samplesArray.length ? new SampleUnit(samplesArray[i], this.audioManager.sampleRate) : this.audioManager.resource.info.duration;
 
-        items.push(transcript.createSegment(time, [new OLabel(transcript.currentLevel!.name, segTexts[i])]));
+        if (!id) {
+          items.push(transcript.createSegment(time, [new OLabel(transcript.currentLevel!.name, segTexts[i])]));
+        } else {
+          // reuse ID
+          items.push(new OctraAnnotationSegment(id, time, [new OLabel(transcript.currentLevel!.name, segTexts[i])]));
+        }
       }
       transcript.currentLevel.overwriteItems(items as any);
       this.annotationStoreService.overwriteTranscript(transcript);

@@ -8,7 +8,7 @@ import { AnnotationLevelType, ASRContext, OctraAnnotation, OctraAnnotationSegmen
 import { AudioSelection, SampleUnit } from '@octra/media';
 import {
   AudioViewerComponent,
-  AudioviewerConfig,
+  AudioViewerConfig,
   AudioViewerShortcutEvent,
   CurrentLevelChangeEvent,
   OctraComponentsModule,
@@ -66,7 +66,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   editorSettings: TranscrEditorConfig = new TranscrEditorConfig();
 
   public segmentselected = false;
-  public magnifierSettings!: AudioviewerConfig;
+  public magnifierSettings!: AudioViewerConfig;
   public minimagnifier = {
     component: undefined,
     isHidden: true,
@@ -368,9 +368,9 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     return '';
   }
 
-  private _miniMagnifierSettings!: AudioviewerConfig;
+  private _miniMagnifierSettings!: AudioViewerConfig;
 
-  get miniMagnifierSettings(): AudioviewerConfig {
+  get miniMagnifierSettings(): AudioViewerConfig {
     return this._miniMagnifierSettings;
   }
 
@@ -429,7 +429,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.signalDisplayTop.settings.showTimePerLine = true;
     this.signalDisplayTop.settings.margin.top = 5;
 
-    this.magnifierSettings = new AudioviewerConfig();
+    this.magnifierSettings = new AudioViewerConfig();
     this.shortcutService.registerShortcutGroup({
       name: 'signaldisplay_down_audio',
       enabled: true,
@@ -448,7 +448,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.magnifierSettings.margin.top = 5;
 
     // set settings for mini magnifier
-    this._miniMagnifierSettings = new AudioviewerConfig();
+    this._miniMagnifierSettings = new AudioViewerConfig();
     this._miniMagnifierSettings.roundValues = false;
     this._miniMagnifierSettings.shortcutsEnabled = false;
     this._miniMagnifierSettings.selection.enabled = false;

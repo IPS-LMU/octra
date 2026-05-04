@@ -22,24 +22,8 @@ import { OctraAnnotationSegment } from '@octra/annotation';
 import { OctraGuidelines } from '@octra/assets';
 import { SampleUnit } from '@octra/media';
 import { TimespanPipe } from '@octra/ngx-utilities';
-import {
-  escapeHtml,
-  escapeRegex,
-  insertString,
-  isNumber,
-  unEscapeHtml,
-} from '@octra/utilities';
-import {
-  AudioChunk,
-  AudioManager,
-  BrowserInfo,
-  findElements,
-  getAttr,
-  setStyle,
-  Shortcut,
-  ShortcutGroup,
-  ShortcutManager,
-} from '@octra/web-media';
+import { escapeHtml, escapeRegex, insertString, isNumber, unEscapeHtml } from '@octra/utilities';
+import { AudioChunk, AudioManager, BrowserInfo, findElements, getAttr, setStyle, Shortcut, ShortcutGroup, ShortcutManager } from '@octra/web-media';
 import { HotkeysEvent } from 'hotkeys-js';
 import { IControlType, IJodit, IToolbarButton } from 'jodit/types/types';
 import { JoditConfig, NgxJoditComponent } from 'ngx-jodit';
@@ -58,17 +42,9 @@ import { ValidationPopoverComponent } from './validation-popover/validation-popo
   styleUrls: ['./transcr-editor.component.scss'],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    ValidationPopoverComponent,
-    NgStyle,
-    NgxJoditComponent,
-    TranslocoPipe,
-  ],
+  imports: [ValidationPopoverComponent, NgStyle, NgxJoditComponent, TranslocoPipe],
 })
-export class TranscrEditorComponent
-  extends DefaultComponent
-  implements OnChanges, AfterViewInit, OnInit, OnDestroy
-{
+export class TranscrEditorComponent extends DefaultComponent implements OnChanges, AfterViewInit, OnInit, OnDestroy {
   private cd = inject(ChangeDetectorRef);
   private shortcutService = inject(ShortcutService);
   private langService = inject(TranslocoService);
@@ -81,8 +57,7 @@ export class TranscrEditorComponent
   @Output() markerInsert: EventEmitter<string> = new EventEmitter<string>();
   @Output() markerClick: EventEmitter<string> = new EventEmitter<string>();
   @Output() typing = new EventEmitter<string>();
-  @Output() boundaryclicked: EventEmitter<SampleUnit> =
-    new EventEmitter<SampleUnit>();
+  @Output() boundaryclicked: EventEmitter<SampleUnit> = new EventEmitter<SampleUnit>();
   @Output() boundaryinserted: EventEmitter<number> = new EventEmitter<number>();
   @Output() selectionchanged: EventEmitter<
     | {
@@ -231,10 +206,7 @@ export class TranscrEditorComponent
   }
 
   get html(): string {
-    if (
-      this.joditComponent !== undefined &&
-      this.joditComponent?.jodit?.value !== undefined
-    ) {
+    if (this.joditComponent !== undefined && this.joditComponent?.jodit?.value !== undefined) {
       return this.joditComponent.jodit.value;
     }
     return '';
@@ -286,7 +258,7 @@ export class TranscrEditorComponent
   /**
    * called after key up in editor
    */
-  onKeyUp = ($event: Event) => {
+  onKeyUp = ($event: KeyboardEvent) => {
     this.onkeyup.emit($event);
     this.triggerTyping();
   };
@@ -335,10 +307,7 @@ export class TranscrEditorComponent
     const replaceFunc = (elem: any) => {
       const tagName = elem.tagName;
       const text = tagName ? elem.outerHTML : elem.nodeValue;
-      if (
-        getAttr(elem, 'data-jodit-selection_marker') === undefined &&
-        elem.childNodes.length > 0
-      ) {
+      if (getAttr(elem, 'data-jodit-selection_marker') === undefined && elem.childNodes.length > 0) {
         elem.childNodes.forEach(replaceFunc);
       } else {
         let attr = getAttr(elem, 'data-marker-code');
@@ -367,10 +336,7 @@ export class TranscrEditorComponent
             elem.parentNode.insertBefore(textnode, elem);
             elem.remove();
           }
-        } else if (
-          getAttr(elem, 'class') === 'val-error' &&
-          tagName.toLowerCase() !== 'textspan'
-        ) {
+        } else if (getAttr(elem, 'class') === 'val-error' && tagName.toLowerCase() !== 'textspan') {
           elem.remove();
         } else if (tagName.toLowerCase() === 'span') {
           if (getAttr(elem, 'data-jodit-selection_marker') === 'start') {
@@ -420,11 +386,7 @@ export class TranscrEditorComponent
    * initializes the editor and the containing jodit editor
    */
   public initialize = () => {
-    if (
-      this.audiochunk !== undefined &&
-      this.transcrEditor &&
-      this.joditComponent
-    ) {
+    if (this.audiochunk !== undefined && this.transcrEditor && this.joditComponent) {
       this.initializeShortcuts();
       this.shortcutService.unregisterShortcutGroup('texteditor');
       this.shortcutService.registerShortcutGroup(this.shortcuts);
@@ -453,20 +415,13 @@ export class TranscrEditorComponent
       this.initialized = false;
       this.initToolbar();
 
-      if (
-        this.settings.specialMarkers.boundary &&
-        this.joditOptions.extraButtons
-      ) {
+      if (this.settings.specialMarkers.boundary && this.joditOptions.extraButtons) {
         this.joditOptions.extraButtons.push(this.createBoundaryButton() as any);
         if (this._settings.highlightingEnabled) {
-          this.joditOptions.extraButtons.push(
-            this.createHighlightingButton() as any,
-          );
+          this.joditOptions.extraButtons.push(this.createHighlightingButton() as any);
         }
       }
-      this.joditOptions.extraButtons!.push(
-        this.createFontSelectionButton() as any,
-      );
+      this.joditOptions.extraButtons!.push(this.createFontSelectionButton() as any);
 
       this.cd.markForCheck();
       this.cd.detectChanges();
@@ -486,10 +441,7 @@ export class TranscrEditorComponent
         display: 'none',
       });
       this.popovers.validationError = validationError;
-      this.toolbar?.parentNode?.insertBefore(
-        this.popovers.validationError!,
-        this.toolbar,
-      );
+      this.toolbar?.parentNode?.insertBefore(this.popovers.validationError!, this.toolbar);
 
       this.asr.status = 'inactive';
       this.asr.error = '';
@@ -511,18 +463,10 @@ export class TranscrEditorComponent
   };
 
   private changeFont = (fontName: string, trigger = false) => {
-    if (
-      this.joditComponent?.jodit &&
-      fontName &&
-      typeof fontName === 'string' &&
-      fontName !== ''
-    ) {
+    if (this.joditComponent?.jodit && fontName && typeof fontName === 'string' && fontName !== '') {
       const fontFamily = this.getFontFamily(fontName);
-      const joditContainer = this.joditComponent.jodit
-        .container as HTMLDivElement;
-      const wysiwyg = joditContainer!.querySelector(
-        '.jodit-wysiwyg',
-      ) as HTMLElement;
+      const joditContainer = this.joditComponent.jodit.container as HTMLDivElement;
+      const wysiwyg = joditContainer!.querySelector('.jodit-wysiwyg') as HTMLElement;
       wysiwyg!.style!.fontFamily = fontFamily;
 
       if (trigger) {
@@ -550,9 +494,7 @@ export class TranscrEditorComponent
   onASRQueueChange = (queue?: ASRStateQueue) => {
     if (queue !== undefined && this.audiochunk) {
       const item = queue.items.find(
-        (a) =>
-          a.time.sampleStart === (this.audiochunk as any).time.start.samples &&
-          a.time.sampleLength === this.audiochunk!.time.duration.samples,
+        (a) => a.time.sampleStart === (this.audiochunk as any).time.start.samples && a.time.sampleLength === this.audiochunk!.time.duration.samples,
       );
 
       if (item) {
@@ -588,11 +530,7 @@ export class TranscrEditorComponent
       // text only
       editor!.selection.insertHTML(markerCode + ' ');
     } else {
-      if (
-        icon.indexOf('.png') > -1 ||
-        icon.indexOf('.jpg') > -1 ||
-        icon.indexOf('.gif') > -1
-      ) {
+      if (icon.indexOf('.png') > -1 || icon.indexOf('.jpg') > -1 || icon.indexOf('.gif') > -1) {
         // it's an icon
 
         const element = this.renderer.createElement('img');
@@ -666,8 +604,14 @@ export class TranscrEditorComponent
       this.internalTyping,
       async (status) => {
         if (status === 'stopped') {
-          await this.validate();
-          await this.initPopover();
+          this.subscriptionManager.add(
+            timer(0).subscribe({
+              next: async () => {
+                await this.validate();
+                await this.initPopover();
+              },
+            }),
+          );
         }
 
         this.typing.emit(status);
@@ -691,43 +635,24 @@ export class TranscrEditorComponent
 
   async ngOnChanges(obj: SimpleChanges) {
     let renew = false;
-    if (
-      Object.keys(obj).includes('markers') &&
-      obj['markers'].currentValue !== obj['markers'].previousValue
-    ) {
+    if (Object.keys(obj).includes('markers') && obj['markers'].currentValue !== obj['markers'].previousValue) {
       if (obj['markers'].currentValue === undefined) {
         this.markers = [];
       }
       renew = true;
     }
-    if (
-      !(obj['easymode'] === undefined) &&
-      obj['easymode'].previousValue !== obj['easymode'].currentValue &&
-      !obj['easymode'].firstChange
-    ) {
+    if (!(obj['easymode'] === undefined) && obj['easymode'].previousValue !== obj['easymode'].currentValue && !obj['easymode'].firstChange) {
       renew = true;
     }
-    if (
-      obj['audiochunk'] !== undefined &&
-      obj['audiochunk'].currentValue !== undefined &&
-      !obj['audiochunk'].firstChange
-    ) {
+    if (obj['audiochunk'] !== undefined && obj['audiochunk'].currentValue !== undefined && !obj['audiochunk'].firstChange) {
       renew = true;
     }
 
-    if (
-      obj['transcript'] !== undefined &&
-      obj['transcript'].currentValue !== undefined &&
-      !obj['transcript'].firstChange
-    ) {
+    if (obj['transcript'] !== undefined && obj['transcript'].currentValue !== undefined && !obj['transcript'].firstChange) {
       //await this.setTranscript(obj['transcript'].currentValue);
     }
 
-    if (
-      obj['segments'] !== undefined &&
-      obj['segments'].currentValue !== undefined &&
-      !obj['segments'].firstChange
-    ) {
+    if (obj['segments'] !== undefined && obj['segments'].currentValue !== undefined && !obj['segments'].firstChange) {
       this.setSegments(obj['segments'].currentValue);
       this.cd.markForCheck();
     }
@@ -753,9 +678,7 @@ export class TranscrEditorComponent
     if (this.markers) {
       for (let i = 0; i < this.markers.length; i++) {
         const marker = this.markers[i];
-        this.joditOptions.extraButtons.push(
-          this.createMarkerButton(marker) as any,
-        );
+        this.joditOptions.extraButtons.push(this.createMarkerButton(marker) as any);
       }
     }
   }
@@ -789,10 +712,7 @@ export class TranscrEditorComponent
             button.setAttribute('title', tooltip);
           }
 
-          button.setAttribute(
-            'class',
-            'me-2 align-items-center px-1 h-100 octra-marker-btn btn-description',
-          );
+          button.setAttribute('class', 'me-2 align-items-center px-1 h-100 octra-marker-btn btn-description');
           if (typeof content === 'string') {
             button.innerHTML = getContent();
             if (events?.onClick) {
@@ -835,22 +755,12 @@ export class TranscrEditorComponent
       () => {
         let content = '';
         const platform = BrowserInfo.platform;
-        if (
-          marker.icon === undefined ||
-          marker.icon === '' ||
-          (marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0)
-        ) {
+        if (marker.icon === undefined || marker.icon === '' || (marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0)) {
           // text only or utf8 symbol
-          content =
-            marker.icon !== undefined &&
-            (marker.icon.indexOf('.png') < 0 || marker.icon.indexOf('.jpg') < 0)
-              ? marker.icon
-              : '';
+          content = marker.icon !== undefined && (marker.icon.indexOf('.png') < 0 || marker.icon.indexOf('.jpg') < 0) ? marker.icon : '';
 
           if (!this.easymode) {
-            content =
-              `${marker.button_text}<span class="btn-shortcut d-none d-lg-inline"> ` +
-              `[${marker.shortcut[platform]}]</span>`;
+            content = `${marker.button_text}<span class="btn-shortcut d-none d-lg-inline"> ` + `[${marker.shortcut[platform]}]</span>`;
           } else {
             content += ' ' + marker.button_text;
           }
@@ -886,60 +796,33 @@ export class TranscrEditorComponent
       this.popovers.segmentBoundary.style.display = 'none';
     }
 
-    const dataSampleDivs = findElements(
-      this.wysiwyg,
-      '.btn-icon-text[data-samples]',
-    );
+    const dataSampleDivs = findElements(this.wysiwyg, '.btn-icon-text[data-samples]');
     for (const dataSampleDiv of dataSampleDivs) {
       dataSampleDiv.removeEventListener('click', this.onDataSampleClick);
-      dataSampleDiv.removeEventListener(
-        'mouseover',
-        this.onSegmentBoundaryMouseOver,
-      );
-      dataSampleDiv.removeEventListener(
-        'mouseleave',
-        this.onSegmentBoundaryMouseLeave,
-      );
+      dataSampleDiv.removeEventListener('mouseover', this.onSegmentBoundaryMouseOver);
+      dataSampleDiv.removeEventListener('mouseleave', this.onSegmentBoundaryMouseLeave);
     }
 
     // set popover for errors
     const valErrorDivs = findElements(this.wysiwyg, '.val-error');
     for (const valErrorDiv of valErrorDivs) {
-      valErrorDiv.removeEventListener(
-        'mouseenter',
-        this.onValidationErrorMouseOver,
-      );
-      valErrorDiv.removeEventListener(
-        'mouseleave',
-        this.onSegmentBoundaryMouseLeave,
-      );
+      valErrorDiv.removeEventListener('mouseenter', this.onValidationErrorMouseOver);
+      valErrorDiv.removeEventListener('mouseleave', this.onSegmentBoundaryMouseLeave);
     }
 
     const valErrorChildren = findElements(this.wysiwyg, '.val-error *');
     for (const valErrorChild of valErrorChildren) {
-      valErrorChild.removeEventListener(
-        'mouseenter',
-        this.onValidationErrorMouseOver,
-      );
-      valErrorChild.removeEventListener(
-        'mouseleave',
-        this.onValidationErrorMouseLeave,
-      );
+      valErrorChild.removeEventListener('mouseenter', this.onValidationErrorMouseOver);
+      valErrorChild.removeEventListener('mouseleave', this.onValidationErrorMouseLeave);
     }
 
     await this.waitForValidationFinished();
 
-    const dataSamples = findElements(
-      this.wysiwyg,
-      '.btn-icon-text[data-samples]',
-    );
+    const dataSamples = findElements(this.wysiwyg, '.btn-icon-text[data-samples]');
     for (const dataSample of dataSamples) {
       dataSample.addEventListener('click', this.onDataSampleClick);
       dataSample.addEventListener('mouseover', this.onSegmentBoundaryMouseOver);
-      dataSample.addEventListener(
-        'mouseleave',
-        this.onSegmentBoundaryMouseLeave,
-      );
+      dataSample.addEventListener('mouseleave', this.onSegmentBoundaryMouseLeave);
     }
 
     const valErrors = findElements(this.wysiwyg, '.val-error');
@@ -950,14 +833,8 @@ export class TranscrEditorComponent
 
     const valErrorsChildren = findElements(this.wysiwyg, '.val-error *');
     for (const valErrorsChild of valErrorsChildren) {
-      valErrorsChild.addEventListener(
-        'mouseenter',
-        this.onValidationErrorMouseOver,
-      );
-      valErrorsChild.addEventListener(
-        'mouseleave',
-        this.onValidationErrorMouseLeave,
-      );
+      valErrorsChild.addEventListener('mouseenter', this.onValidationErrorMouseOver);
+      valErrorsChild.addEventListener('mouseleave', this.onValidationErrorMouseLeave);
     }
   }
 
@@ -992,11 +869,7 @@ export class TranscrEditorComponent
 
   createFontSelectionButton(): IControlType<IJodit, IToolbarButton> {
     const getContent = () => {
-      const currentFont = this.font
-        ? this.font
-        : BrowserInfo.platform === 'mac'
-          ? 'Helvetica'
-          : 'Arial';
+      const currentFont = this.font ? this.font : BrowserInfo.platform === 'mac' ? 'Helvetica' : 'Arial';
 
       const createOption = (fontName: string) => {
         const option = this.renderer.createElement('option');
@@ -1009,8 +882,7 @@ export class TranscrEditorComponent
         return option;
       };
 
-      const selection: HTMLSelectElement =
-        this.renderer.createElement('select');
+      const selection: HTMLSelectElement = this.renderer.createElement('select');
       selection.value = currentFont;
       selection.appendChild(createOption('Helvetica'));
       selection.appendChild(createOption('Arial'));
@@ -1032,14 +904,8 @@ export class TranscrEditorComponent
     const element = this.renderer.createElement('img');
     element.setAttribute('src', imgURL);
     element.setAttribute('class', 'btn-icon-text boundary');
-    element.setAttribute(
-      'data-samples',
-      this.audiochunk!.absolutePlayposition.samples.toString(),
-    );
-    element.setAttribute(
-      'alt',
-      '[|' + this.audiochunk!.absolutePlayposition.samples.toString() + '|]',
-    );
+    element.setAttribute('data-samples', this.audiochunk!.absolutePlayposition.samples.toString());
+    element.setAttribute('alt', '[|' + this.audiochunk!.absolutePlayposition.samples.toString() + '|]');
 
     // timeout needed to fix summernote
     this.subscribe(timer(100), () => {
@@ -1049,10 +915,7 @@ export class TranscrEditorComponent
         // set popover
         element.addEventListener('click', this.onDataSampleClick);
         element.addEventListener('mouseover', this.onSegmentBoundaryOver);
-        element.addEventListener(
-          'mouseleave',
-          this.onSegmentBoundaryMouseLeave,
-        );
+        element.addEventListener('mouseleave', this.onSegmentBoundaryMouseLeave);
       });
     });
   }
@@ -1088,10 +951,7 @@ export class TranscrEditorComponent
           return s1 + 'X' + s3;
         };
 
-        const regex = new RegExp(
-          '(\\s)*(' + escapeRegex(marker.code) + ')(\\s)*',
-          'g',
-        );
+        const regex = new RegExp('(\\s)*(' + escapeRegex(marker.code) + ')(\\s)*', 'g');
 
         rawtext = rawtext.replace(regex, replaceFunc);
       }
@@ -1143,13 +1003,8 @@ export class TranscrEditorComponent
             const startMarker = '⌈sel-start/⌉';
             const endMarker = '⌈sel-end/⌉';
             code =
-              this.lastCursorPosition!.endMarker !== undefined &&
-              this._textSelection.end >= this._textSelection.start
-                ? insertString(
-                    this._rawText,
-                    this._textSelection.end,
-                    endMarker,
-                  )
+              this.lastCursorPosition!.endMarker !== undefined && this._textSelection.end >= this._textSelection.start
+                ? insertString(this._rawText, this._textSelection.end, endMarker)
                 : code;
             code = insertString(code, this._textSelection.start, startMarker);
             code = this.tidyUpRaw(code);
@@ -1160,20 +1015,9 @@ export class TranscrEditorComponent
           code = await this.annotationStoreService.rawToHTML(code);
 
           if (!focusAtEnd) {
-            code = code.replace(
-              /([\s ]+)(<sel-start \/?><sel-end \/?><\/p>)?$/g,
-              '&nbsp;$2',
-            );
-            code = code.replace(
-              /<sel-start ?\/?>/g,
-              this.lastCursorPosition!.startMarker,
-            );
-            code = code.replace(
-              /<sel-end ?\/?>/g,
-              this.lastCursorPosition!.endMarker
-                ? this.lastCursorPosition!.endMarker
-                : '',
-            );
+            code = code.replace(/([\s ]+)(<sel-start \/?><sel-end \/?><\/p>)?$/g, '&nbsp;$2');
+            code = code.replace(/<sel-start ?\/?>/g, this.lastCursorPosition!.startMarker);
+            code = code.replace(/<sel-end ?\/?>/g, this.lastCursorPosition!.endMarker ? this.lastCursorPosition!.endMarker : '');
           }
 
           this._rawText = this.tidyUpRaw(this._rawText);
@@ -1267,18 +1111,11 @@ export class TranscrEditorComponent
       playPosition = this.audioManager.createSampleUnit(1);
     }
 
-    const segIndexPlayposition =
-      this.annotationStoreService.transcript?.getCurrentSegmentIndexBySamplePosition(
-        playPosition,
-      ) ?? -1;
+    const segIndexPlayposition = this.annotationStoreService.transcript?.getCurrentSegmentIndexBySamplePosition(playPosition) ?? -1;
 
-    if (
-      segIndexPlayposition > -1 &&
-      segIndexPlayposition !== this.lastHighlightedSegment
-    ) {
+    if (segIndexPlayposition > -1 && segIndexPlayposition !== this.lastHighlightedSegment) {
       this.saveSelection();
-      const currentlyPlayedSegment = this.annotationStoreService.currentLevel
-        .items[segIndexPlayposition]! as OctraAnnotationSegment;
+      const currentlyPlayedSegment = this.annotationStoreService.currentLevel.items[segIndexPlayposition]! as OctraAnnotationSegment;
 
       this.removeHighlight();
 
@@ -1309,10 +1146,7 @@ export class TranscrEditorComponent
           }
         };
 
-        if (
-          pointer.nodeType === 3 ||
-          (tagName && !['img', 'p', 'div'].includes(tagName.toLowerCase()))
-        ) {
+        if (pointer.nodeType === 3 || (tagName && !['img', 'p', 'div'].includes(tagName.toLowerCase()))) {
           // other content
           addElemToPuffer();
         } else if (tagName) {
@@ -1382,8 +1216,7 @@ export class TranscrEditorComponent
     if (this.markers !== undefined) {
       const platform = BrowserInfo.platform;
       return (
-        this.markers.findIndex((a: any) => a.shortcut[platform] === shortcut) >
-          -1 ||
+        this.markers.findIndex((a: any) => a.shortcut[platform] === shortcut) > -1 ||
         (shortcut === 'ALT + S' && this.settings.specialMarkers.boundary)
       );
     }
@@ -1392,10 +1225,7 @@ export class TranscrEditorComponent
   }
 
   private createBoundaryButton(): IControlType<IJodit, IToolbarButton> {
-    const boundaryDescr = this.langService.translate(
-      'special_markers.boundary.description',
-      { type: '' },
-    );
+    const boundaryDescr = this.langService.translate('special_markers.boundary.description', { type: '' });
 
     return this.createButton(
       'boundary',
@@ -1403,10 +1233,7 @@ export class TranscrEditorComponent
       () => {
         let content = '';
         // create boudary button
-        const boundaryLabel = this.langService.translate(
-          'special_markers.boundary.insert',
-          { type: '' },
-        );
+        const boundaryLabel = this.langService.translate('special_markers.boundary.insert', { type: '' });
         if (!this.easymode) {
           content =
             `<img src="assets/img/components/transcr-editor/boundary.png" class="btn-icon me-1" alt="boundary_img"/> ` +
@@ -1421,12 +1248,10 @@ export class TranscrEditorComponent
       {
         onClick: () => {
           this.markerClick.emit('boundary');
-          this.insertBoundary(
-            'assets/img/components/transcr-editor/boundary.png',
-          );
+          this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
           this.subscribe(timer(100), {
             next: () => {
-              this.validate();
+              //this.validate();
               this.initPopover();
             },
           });
@@ -1441,8 +1266,7 @@ export class TranscrEditorComponent
 
       // set cursor at the end after focus
 
-      this.joditComponent.jodit.value =
-        await this.annotationStoreService.rawToHTML(rawText);
+      this.joditComponent.jodit.value = await this.annotationStoreService.rawToHTML(rawText);
       this.subscribe(
         timer(500),
         {
@@ -1511,19 +1335,9 @@ export class TranscrEditorComponent
   }
 
   private onSegmentBoundaryOver = (event: MouseEvent) => {
-    if (
-      !(
-        getAttr(event.target as any, 'data-samples') === undefined ||
-        getAttr(event.target as any, 'data-samples') === undefined
-      )
-    ) {
+    if (!(getAttr(event.target as any, 'data-samples') === undefined || getAttr(event.target as any, 'data-samples') === undefined)) {
       this.onSegmentBoundaryMouseOver(event);
-    } else if (
-      !(
-        getAttr(event.target as any, 'data-errorcode') === undefined ||
-        getAttr(event.target as any, 'data-errorcode') === undefined
-      )
-    ) {
+    } else if (!(getAttr(event.target as any, 'data-errorcode') === undefined || getAttr(event.target as any, 'data-errorcode') === undefined)) {
       this.onValidationErrorMouseOver(event);
     }
   };
@@ -1533,9 +1347,7 @@ export class TranscrEditorComponent
       return;
     }
     const target = event.target as HTMLElement;
-    const segPopover = this.transcrEditor.nativeElement.querySelector(
-      '.seg-popover',
-    ) as HTMLDivElement;
+    const segPopover = this.transcrEditor.nativeElement.querySelector('.seg-popover') as HTMLDivElement;
 
     if (segPopover && this.workplace && this.wysiwyg) {
       const segSamples = getAttr(target, 'data-samples');
@@ -1562,8 +1374,7 @@ export class TranscrEditorComponent
         const width = segPopover.offsetWidth;
         const height = segPopover.offsetHeight;
         const marginLeft = target.offsetLeft - width / 2 + 'px';
-        const marginTop =
-          target.offsetTop + this.toolbar!.offsetHeight - height - 10 + 'px';
+        const marginTop = target.offsetTop + this.toolbar!.offsetHeight - height - 10 + 'px';
         this.renderer.setStyle(segPopover, 'margin-left', marginLeft);
         this.renderer.setStyle(segPopover, 'margin-top', marginTop);
       }
@@ -1574,16 +1385,13 @@ export class TranscrEditorComponent
     const samples = getAttr(event.target as any, 'data-samples')!;
 
     if (isNumber(samples)) {
-      this.boundaryclicked.emit(
-        new SampleUnit(Number(samples), this.audioManager.sampleRate),
-      );
+      this.boundaryclicked.emit(new SampleUnit(Number(samples), this.audioManager.sampleRate));
     }
   };
 
   private onSegmentBoundaryMouseLeave = () => {
     if (this.transcrEditor) {
-      const segPopover =
-        this.transcrEditor.nativeElement.querySelector('.seg-popover');
+      const segPopover = this.transcrEditor.nativeElement.querySelector('.seg-popover');
       if (segPopover) {
         this.renderer.setStyle(segPopover, 'display', 'none');
         this.triggerTyping();
@@ -1600,8 +1408,7 @@ export class TranscrEditorComponent
     const errorCode = getAttr(target, 'data-errorcode');
 
     if (errorCode !== undefined) {
-      const errorDetails =
-        await this.annotationStoreService.getErrorDetails(errorCode);
+      const errorDetails = await this.annotationStoreService.getErrorDetails(errorCode);
       if (errorDetails !== undefined && this.toolbar && this.wysiwyg) {
         // set values
         this.validationPopover.show();
@@ -1611,11 +1418,7 @@ export class TranscrEditorComponent
         let marginLeft = target.offsetLeft;
         const height = this.validationPopover.height;
 
-        if (
-          this.validationPopover.width + marginLeft >
-            this.wysiwyg.offsetWidth &&
-          marginLeft - this.validationPopover.width > 0
-        ) {
+        if (this.validationPopover.width + marginLeft > this.wysiwyg.offsetWidth && marginLeft - this.validationPopover.width > 0) {
           marginLeft -= this.validationPopover.width;
 
           if (target.offsetWidth > 10) {
@@ -1623,10 +1426,7 @@ export class TranscrEditorComponent
           }
         }
 
-        this.changeValidationPopoverLocation(
-          marginLeft,
-          target.offsetTop - height + this.toolbar.offsetHeight,
-        );
+        this.changeValidationPopoverLocation(marginLeft, target.offsetTop - height + this.toolbar.offsetHeight);
         this.cd.markForCheck();
       }
     } else {
@@ -1646,10 +1446,7 @@ export class TranscrEditorComponent
       while (pointer) {
         const nextSibling: ChildNode | null = pointer.nextSibling;
         pointer.remove();
-        (highlight.parentNode as HTMLElement)?.insertBefore(
-          pointer.cloneNode(true),
-          highlight,
-        );
+        (highlight.parentNode as HTMLElement)?.insertBefore(pointer.cloneNode(true), highlight);
         pointer = nextSibling;
       }
 
@@ -1713,19 +1510,13 @@ export class TranscrEditorComponent
 
   async onPaste($event: Event) {
     $event.preventDefault();
-    const bufferText = (
-      (($event as any).originalEvent || $event).clipboardData ||
-      (window as any).clipboardData
-    ).getData('Text');
+    const bufferText = ((($event as any).originalEvent || $event).clipboardData || (window as any).clipboardData).getData('Text');
     let html = bufferText
       .replace(/(<p>)|(<\/p>)/g, '')
       .replace(new RegExp(/\[\|/, 'g'), '{')
       .replace(new RegExp(/\|]/, 'g'), '}');
     html = unEscapeHtml(html);
-    html =
-      '<span>' +
-      (await this.annotationStoreService.rawToHTML(html)) +
-      '</span>';
+    html = '<span>' + (await this.annotationStoreService.rawToHTML(html)) + '</span>';
     html = html.replace(/(<p>)|(<\/p>)|(<br\/?>)/g, '');
     const htmlObj = this.renderer.createElement('span');
     htmlObj.innerHTML = html;
@@ -1752,15 +1543,10 @@ export class TranscrEditorComponent
             segmentBoundary.innerHTML = '00:00:000';
             this.popovers.segmentBoundary = segmentBoundary;
 
-            this.workplace?.parentNode?.insertBefore(
-              this.popovers.segmentBoundary!,
-              this.workplace,
-            );
+            this.workplace?.parentNode?.insertBefore(this.popovers.segmentBoundary!, this.workplace);
           }
         } else {
-          console.error(
-            "Can't set segment boundary because workplace or parentNode is undefined",
-          );
+          console.error("Can't set segment boundary because workplace or parentNode is undefined");
         }
 
         if (this.segments === undefined || this.segments.length === 0) {
@@ -1785,10 +1571,7 @@ export class TranscrEditorComponent
       this.joditComponent?.jodit?.selection.setCursorAfter(element.lastChild);
     } else {
       this.joditComponent?.jodit?.selection.focus();
-      element.innerHTML = element.innerHTML.replace(
-        /(<p>).*(<span[^>]+>[^<]+<\/span>)/g,
-        '$1$2',
-      );
+      element.innerHTML = element.innerHTML.replace(/(<p>).*(<span[^>]+>[^<]+<\/span>)/g, '$1$2');
       element.innerHTML = element.innerHTML.replace(/(<br\/?>)/g, '');
     }
   }
@@ -1800,10 +1583,7 @@ export class TranscrEditorComponent
     }
   };
 
-  private onRedoUndo = (
-    keyboardEvent: KeyboardEvent | undefined,
-    shortcutInfo: Shortcut,
-  ) => {
+  private onRedoUndo = (keyboardEvent: KeyboardEvent | undefined, shortcutInfo: Shortcut) => {
     if (shortcutInfo.name === 'undo') {
       this.joditComponent?.jodit?.history?.undo();
     } else {
@@ -1812,17 +1592,11 @@ export class TranscrEditorComponent
     this.triggerTyping();
   };
 
-  private onMarkerInsert = (
-    $event: KeyboardEvent | undefined,
-    shortcutInfo: Shortcut,
-    hotkeyEvent?: HotkeysEvent,
-  ) => {
+  private onMarkerInsert = ($event: KeyboardEvent | undefined, shortcutInfo: Shortcut, hotkeyEvent?: HotkeysEvent) => {
     if (this.markers) {
       for (const marker of this.markers) {
         for (const key of Object.keys(marker.shortcut)) {
-          if (
-            marker.shortcut[key]?.replace(/\s/g, '') === hotkeyEvent?.shortcut
-          ) {
+          if (marker.shortcut[key]?.replace(/\s/g, '') === hotkeyEvent?.shortcut) {
             this.insertMarker(marker.code, marker.icon);
             this.markerInsert.emit(marker.name);
             this.triggerTyping();

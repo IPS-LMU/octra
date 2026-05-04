@@ -1,63 +1,65 @@
 @if (annotationStoreService) {
-  <h4>{{ 'g.statistics' | transloco }}</h4>
-  <table id="statistics" class="table table-bordered">
-    <thead>
-      <tr>
-        <th>{{ 'segments.total' | transloco }}</th>
-        <th>{{ 'segments.transcribed' | transloco }}</th>
-        <th>{{ 'segments.with breaks' | transloco }}</th>
-        <th>{{ 'segments.not transcribed' | transloco }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>{{ numberOfSegments }}</td>
-        <td class="bg-success">{{ transcrSegments }}</td>
-        <td class="bg-info">{{ pauseSegments }}</td>
-        <td class="bg-danger">
-          <b
-            ><u>{{ emptySegments }}</u></b
-          >
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <div [hidden]="shownSegments.length === 0" style="text-align: center">
-    <h4 class="text-start mt-5">{{ 'g.validation' | transloco }}</h4>
+  @if (showStatistics) {
+    <h4>{{ 'g.statistics' | transloco }}</h4>
+    <table id="statistics" class="table table-bordered">
+      <thead>
+        <tr>
+          <th>{{ 'segments.total' | transloco }}</th>
+          <th>{{ 'segments.transcribed' | transloco }}</th>
+          <th>{{ 'segments.with breaks' | transloco }}</th>
+          <th>{{ 'segments.not transcribed' | transloco }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ numberOfSegments }}</td>
+          <td class="bg-success">{{ transcrSegments }}</td>
+          <td class="bg-info">{{ pauseSegments }}</td>
+          <td class="bg-danger">
+            <b
+              ><u>{{ emptySegments }}</u></b
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div [hidden]="shownSegments.length === 0" style="text-align: center">
+      <h4 class="text-start mt-5">{{ 'g.validation' | transloco }}</h4>
 
-    @if (validationFound) {
-      <table class="table table-sm table-striped w-100">
-        <thead>
-          <tr>
-            <th>{{ 'g.level' | transloco }}</th>
-            <th>{{ 'g.errors' | transloco }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (validation of validationErrors; track validation.id) {
+      @if (validationFound) {
+        <table class="table table-sm table-striped w-100">
+          <thead>
             <tr>
-              <td>{{ validation.level }}</td>
-              @if (validation.errors > 0) {
-                <td class="text-danger">
-                  {{ 'g.errors found' | transloco: { errors: validation.errors + '' } }}
-                </td>
-              } @else {
-                <td class="text-success">
-                  {{ 'g.no errors found' | transloco }}
-                </td>
-              }
+              <th>{{ 'g.level' | transloco }}</th>
+              <th>{{ 'g.errors' | transloco }}</th>
             </tr>
-          }
-        </tbody>
-      </table>
-    }
-    @if (!validationFound) {
-      <span>No validation methods found</span>
-    }
-  </div>
-  <h4 [hidden]="!showTranscriptionTable" class="mt-5">
-    {{ 'g.transcript' | transloco }}
-  </h4>
+          </thead>
+          <tbody>
+            @for (validation of validationErrors; track validation.id) {
+              <tr>
+                <td>{{ validation.level }}</td>
+                @if (validation.errors > 0) {
+                  <td class="text-danger">
+                    {{ 'g.errors found' | transloco: { errors: validation.errors + '' } }}
+                  </td>
+                } @else {
+                  <td class="text-success">
+                    {{ 'g.no errors found' | transloco }}
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+      @if (!validationFound) {
+        <span>No validation methods found</span>
+      }
+    </div>
+    <h4 [hidden]="!showTranscriptionTable" class="mt-5">
+      {{ 'g.transcript' | transloco }}
+    </h4>
+  }
   <div [hidden]="!showLoading">
     <div style="display: block; text-align: center; margin-top: -10px; position: absolute; width: 100%">
       <i class="fa fa-spinner fa-spin" style="font-size: 32px"></i>
@@ -69,7 +71,7 @@
         <tr>
           <th id="table-first-column"></th>
           <th id="table-second-column" class="text-center"><i class="bi bi-clock"></i></th>
-          <th id="table-third-column">{{ 'g.transcription' | transloco }}</th>
+          <th id="table-third-column" class="text-start">{{ 'g.transcription' | transloco }}</th>
           <th class="last-column">
             <input type="checkbox" id="skip-silence-checkbox" (click)="toggleSkipCheckbox()" [checked]="playAllState.skipSilence" />
             <label for="skip-silence-checkbox">{{ 'g.skip silence' | transloco }}</label>
@@ -143,7 +145,8 @@
                     [height]="60"
                     [validationEnabled]="
                       (appStorage.useMode !== 'url' ||
-                        (routingService.staticQueryParams.functions_url !== undefined && routingService.staticQueryParams.guidelines_url !== undefined)) &&
+                        (routingService.staticQueryParams.functions_url !== undefined &&
+                          routingService.staticQueryParams.guidelines_url !== undefined)) &&
                       (appStorage.useMode! === 'demo' || settingsService.projectsettings?.octra?.validationEnabled === true)
                     "
                     [markers]="annotationStoreService.guidelines !== undefined ? annotationStoreService.guidelines.markers : undefined"

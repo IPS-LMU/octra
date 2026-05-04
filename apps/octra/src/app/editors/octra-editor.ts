@@ -105,4 +105,8 @@ export abstract class OCTRAEditor extends DefaultComponent {
       }
     }
   }
+
+  applyContext(context?: any) {
+    // implement if needed
+  }
 }

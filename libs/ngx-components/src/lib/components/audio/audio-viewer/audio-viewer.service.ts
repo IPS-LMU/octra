@@ -738,6 +738,22 @@ export class AudioViewerService {
     }
   }
 
+  public scrollToUnit(id: number) {
+    const unitIndex = this.currentLevel?.items?.findIndex((a) => a.id === id) ?? 0;
+    const leftNeighbour = unitIndex > 0 ? (this.currentLevel.items[unitIndex - 1] as OctraAnnotationSegment) : undefined;
+    if (leftNeighbour) {
+      const absXUnit = this.audioTCalculator.samplestoAbsX(leftNeighbour.time);
+      const rowIndex = Math.floor(absXUnit / this._innerWidth);
+      const rowHeight = this._settings.lineheight + this.settings.margin.top + this.settings.margin.bottom;
+      const maxRows = Math.ceil(this.audioTCalculator.audioPxWidth / this._innerWidth);
+      const maxAbsY = maxRows * rowHeight;
+      const absY = rowIndex * rowHeight;
+      const calculatesAbsY = absY + this.viewport.height > maxAbsY ? maxAbsY - this.viewport.height : absY;
+      this.scrollToAbsY(calculatesAbsY);
+      this.canvasElements.scrollbarSelector.y((calculatesAbsY / maxAbsY) * (this.viewport.height - this.canvasElements.scrollbarSelector.height()));
+    }
+  }
+
   async onSecondsPerLineChanged(secondsPerLine: number) {
     try {
       this.secondsPerLine = secondsPerLine;
@@ -2210,7 +2226,7 @@ export class AudioViewerService {
                   const segment = this.currentLevel.items[segInde];
                   this.selectSegment(segInde)
                     .then(({ posY1, posY2 }) => {
-                      if(this.currentLevel) {
+                      if (this.currentLevel) {
                         this._focused = false;
                         this.drawWholeSelection();
                         this.stage?.draw();

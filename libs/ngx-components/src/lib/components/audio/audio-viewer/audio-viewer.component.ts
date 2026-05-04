@@ -1,5 +1,5 @@
 import {
-  AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
@@ -13,7 +13,7 @@ import {
   Renderer2,
   SimpleChanges,
   ViewChild,
-  ViewEncapsulation
+  ViewEncapsulation,
 } from '@angular/core';
 import { AnnotationAnySegment, ASRContext, OctraAnnotation, OctraAnnotationSegment } from '@octra/annotation';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
@@ -45,26 +45,21 @@ export interface CurrentLevelChangeEvent {
   providers: [AudioViewerService],
   encapsulation: ViewEncapsulation.ShadowDom,
 })
-export class AudioViewerComponent
-  implements OnInit, OnChanges, OnDestroy, AfterViewInit
-{
+export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   av = inject(AudioViewerService);
   private renderer = inject(Renderer2);
   private elementRef = inject(ElementRef);
+  private cd = inject(ChangeDetectorRef);
 
   /**
    * annotation of type OctraAnnotation
    * @param value
    */
-  @Input() set annotation(
-    value: OctraAnnotation<ASRContext, OctraAnnotationSegment> | undefined,
-  ) {
+  @Input() set annotation(value: OctraAnnotation<ASRContext, OctraAnnotationSegment> | undefined) {
     this.av.annotation = value ? value.clone() : undefined;
   }
 
-  get annotation():
-    | OctraAnnotation<ASRContext, OctraAnnotationSegment>
-    | undefined {
+  get annotation(): OctraAnnotation<ASRContext, OctraAnnotationSegment> | undefined {
     return this.av.annotation;
   }
 
@@ -83,9 +78,7 @@ export class AudioViewerComponent
   /**
    * triggered when annotation changes.
    */
-  @Output() get annotationChange(): EventEmitter<
-    OctraAnnotation<ASRContext, OctraAnnotationSegment>
-  > {
+  @Output() get annotationChange(): EventEmitter<OctraAnnotation<ASRContext, OctraAnnotationSegment>> {
     return this.av.annotationChange;
   }
 
@@ -106,11 +99,7 @@ export class AudioViewerComponent
     this.subscrManager.add(
       this.av.boundaryDragging.subscribe((event) => {
         if (event.status === 'stopped') {
-          this.renderer.setStyle(
-            this.konvaContainer?.nativeElement,
-            'cursor',
-            'auto',
-          );
+          this.renderer.setStyle(this.konvaContainer?.nativeElement, 'cursor', 'auto');
         }
       }),
     );
@@ -237,9 +226,7 @@ export class AudioViewerComponent
     return this.av.boundaryDragging;
   }
 
-  @ViewChild('konvaContainer', { static: false }) konvaContainer:
-    | ElementRef
-    | undefined;
+  @ViewChild('konvaContainer', { static: false }) konvaContainer: ElementRef | undefined;
 
   // EVENTS
   public get onInitialized() {
@@ -269,15 +256,9 @@ export class AudioViewerComponent
 
     const annotation = changes['annotation'];
     if (annotation && annotation.currentValue !== undefined) {
-      const parsedChanges = this.av.getChanges(
-        annotation.previousValue,
-        annotation.currentValue,
-      );
+      const parsedChanges = this.av.getChanges(annotation.previousValue, annotation.currentValue);
       if (annotation.previousValue && annotation.currentValue) {
-        if (
-          annotation.previousValue.selectedLevelIndex !==
-          annotation.currentValue.selectedLevelIndex
-        ) {
+        if (annotation.previousValue.selectedLevelIndex !== annotation.currentValue.selectedLevelIndex) {
           this.av.updateAllSegments(true);
         } else {
           this.afterLevelUpdated(parsedChanges, annotation.previousValue);
@@ -340,19 +321,8 @@ export class AudioViewerComponent
         // channel data is ready
         await wait(0);
 
-        if (
-          this.width &&
-          this.height &&
-          audioChunk &&
-          this.av.annotation?.currentLevel &&
-          this.av.annotation.currentLevel.items.length > 0
-        ) {
-          this.av.initialize(
-            this.width,
-            this.height,
-            this.konvaContainer?.nativeElement,
-            audioChunk,
-          );
+        if (this.width && this.height && audioChunk && this.av.annotation?.currentLevel && this.av.annotation.currentLevel.items.length > 0) {
+          this.av.initialize(this.width, this.height, this.konvaContainer?.nativeElement, audioChunk);
 
           await this.av.initializeSettings();
           this.av.initializeView();
@@ -367,25 +337,33 @@ export class AudioViewerComponent
     }
   }
 
-  private afterLevelUpdated(
-    changes: AnnotationChange[],
-    oldAnnotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>,
-  ) {
+  private afterLevelUpdated(changes: AnnotationChange[], oldAnnotation: OctraAnnotation<ASRContext, OctraAnnotationSegment>) {
     if (this.av.currentLevel && this.av.currentLevel.items.length > 0) {
       // subscribe to levelChanges for extern changes
       this.subscrManager.removeByTag('externLevelChanges');
-      this.av.applyChanges(changes.filter(a => a.affectedLevelID === this.av.currentLevel!.id), oldAnnotation);
+      this.av.applyChanges(
+        changes.filter((a) => a.affectedLevelID === this.av.currentLevel!.id),
+        oldAnnotation,
+      );
     }
   }
 
-  public selectSegment(
-    segIndex: number,
-  ): Promise<{ posY1: number; posY2: number }> {
-    return this.av.selectSegment(segIndex);
+  public async selectSegment(segIndex: number): Promise<{ posY1: number; posY2: number }> {
+    const result = await this.av.selectSegment(segIndex);
+    this.cd.markForCheck();
+    return result;
   }
 
   public scrollToAbsY(absY: number) {
     this.av.scrollToAbsY(absY);
+  }
+
+  scrollToUnit(id: number) {
+    this.av.scrollToUnit(id);
+    const index = this.annotation.currentLevel.items.findIndex((a) => a.id === id);
+    if (index > -1) {
+      this.selectSegment(index);
+    }
   }
 
   public enableShortcuts() {
@@ -453,8 +431,6 @@ export class AudioViewerComponent
         break;
     }
   };
-
-  ngAfterViewInit() {}
 }
 
 export interface AudioViewerShortcutEvent {

@@ -2,23 +2,14 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoModule } from '@jsverse/transloco';
-import {
-  NgbDropdown,
-  NgbDropdownMenu,
-  NgbDropdownToggle,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdown, NgbDropdownMenu, NgbDropdownToggle } from '@ng-bootstrap/ng-bootstrap';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { OctraComponentsModule } from '@octra/ngx-components';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { AppSharedModule } from '../../../app.shared.module';
-import {
-  DictaphoneEditorComponent,
-  LinearEditorComponent,
-  TrnEditorComponent,
-  TwoDEditorComponent,
-} from '../../../editors';
 import { TranscrWindowComponent } from '../../../editors/2D-editor/transcr-window';
+import { editorComponents } from '../../../editors/components';
 import { NewEditorComponent } from '../../../editors/new-editor/new-editor.component';
 import { PermutationsReplaceModalComponent } from '../../../editors/trn-editor/modals/permutations-replace-modal/permutations-replace-modal.component';
 import { AuthenticationNeededComponent } from '../../alerts/authentication-needed/authentication-needed.component';
@@ -44,13 +35,6 @@ import { TranscriptionEndComponent } from './transcription-end';
 
 export const ALERTS: any[] = [AuthenticationNeededComponent];
 
-export const EDITORS: any[] = [
-  DictaphoneEditorComponent,
-  TwoDEditorComponent,
-  LinearEditorComponent,
-  TrnEditorComponent,
-];
-
 @NgModule({
   imports: [
     CommonModule,
@@ -59,22 +43,10 @@ export const EDITORS: any[] = [
     InternRoutingModule,
     AppSharedModule,
     TranslocoModule,
-    StoreModule.forFeature(
-      'onlineMode',
-      new LoginModeReducers(LoginMode.ONLINE).create(),
-    ),
-    StoreModule.forFeature(
-      'demoMode',
-      new LoginModeReducers(LoginMode.DEMO).create(),
-    ),
-    StoreModule.forFeature(
-      'localMode',
-      new LoginModeReducers(LoginMode.LOCAL).create(),
-    ),
-    StoreModule.forFeature(
-      'urlMode',
-      new LoginModeReducers(LoginMode.URL).create(),
-    ),
+    StoreModule.forFeature('onlineMode', new LoginModeReducers(LoginMode.ONLINE).create()),
+    StoreModule.forFeature('demoMode', new LoginModeReducers(LoginMode.DEMO).create()),
+    StoreModule.forFeature('localMode', new LoginModeReducers(LoginMode.LOCAL).create()),
+    StoreModule.forFeature('urlMode', new LoginModeReducers(LoginMode.URL).create()),
     EffectsModule.forFeature([AnnotationEffects]),
     OctraUtilitiesModule,
     NgbDropdown,
@@ -90,7 +62,7 @@ export const EDITORS: any[] = [
     AudioNavigationComponent,
     LoadingComponent,
     LoadeditorDirective,
-    EDITORS,
+    editorComponents,
     NewEditorComponent,
     InternComponent,
     TranscrWindowComponent,
@@ -115,7 +87,6 @@ export const EDITORS: any[] = [
     AudioNavigationComponent,
     LoadingComponent,
     LoadeditorDirective,
-    EDITORS,
     NewEditorComponent,
     InternComponent,
     TranscrWindowComponent,

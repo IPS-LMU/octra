@@ -1,56 +1,24 @@
-import { NgClass, NgStyle } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  HostListener,
-  inject,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { NgStyle } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostListener, inject, OnInit, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { TranslocoService } from '@jsverse/transloco';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import {
-  AnnotationLevelType,
-  ASRContext,
-  OctraAnnotationAnyLevel,
-  OctraAnnotationSegment,
-} from '@octra/annotation';
-import { OctraGuidelines } from '@octra/assets';
-import {
-  AudioViewerComponent,
-  AudioviewerConfig,
-  OctraComponentsModule,
-} from '@octra/ngx-components';
+import { AnnotationLevelType, ASRContext, OctraAnnotationAnyLevel, OctraAnnotationSegment } from '@octra/annotation';
+import { AudioviewerConfig, OctraComponentsModule } from '@octra/ngx-components';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
-import {
-  AudioChunk,
-  AudioManager,
-  findElements,
-  getAttr,
-  ShortcutEvent,
-  ShortcutGroup,
-} from '@octra/web-media';
+import { AudioChunk, AudioManager, findElements, getAttr, ShortcutEvent, ShortcutGroup } from '@octra/web-media';
 import { timer } from 'rxjs';
-import { AudioNavigationComponent } from '../../core/component/audio-navigation';
-import {
-  ContextMenuAction,
-  ContextMenuComponent,
-} from '../../core/component/context-menu/context-menu.component';
+import { ContextMenuAction, ContextMenuComponent } from '../../core/component/context-menu/context-menu.component';
+import { NavbarService } from '../../core/component/navbar/navbar.service';
 import { TranscrEditorComponent } from '../../core/component/transcr-editor';
-import { TranscrEditorComponent as TranscrEditorComponent_1 } from '../../core/component/transcr-editor/transcr-editor.component';
 import { ValidationPopoverComponent } from '../../core/component/transcr-editor/validation-popover/validation-popover.component';
-import {
-  AlertService,
-  AudioService,
-  SettingsService,
-  UserInteractionsService,
-} from '../../core/shared/service';
+import { TranscrOverviewComponent } from '../../core/component/transcr-overview';
+import { AlertService, AudioService, SettingsService, UserInteractionsService } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
+import { ModalVisibilities } from '../../core/store/login-mode/annotation';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
-import { OCTRAEditor, OctraEditorRequirements } from '../octra-editor';
+import { TwoDEditorComponent } from '../2D-editor';
+import { OCTRAEditor, OctraEditorRequirements, SupportedOctraEditorMetaData } from '../octra-editor';
 import { PermutationsReplaceModalComponent } from './modals/permutations-replace-modal/permutations-replace-modal.component';
 
 @Component({
@@ -58,22 +26,9 @@ import { PermutationsReplaceModalComponent } from './modals/permutations-replace
   templateUrl: './trn-editor.component.html',
   styleUrls: ['./trn-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    ContextMenuComponent,
-    ValidationPopoverComponent,
-    NgStyle,
-    NgClass,
-    AudioNavigationComponent,
-    OctraComponentsModule,
-    TranscrEditorComponent_1,
-    TranslocoPipe,
-    OctraUtilitiesModule,
-  ],
+  imports: [ContextMenuComponent, ValidationPopoverComponent, NgStyle, OctraComponentsModule, OctraUtilitiesModule, TranscrOverviewComponent],
 })
-export class TrnEditorComponent
-  extends OCTRAEditor
-  implements OnInit, OctraEditorRequirements
-{
+export class TrnEditorComponent extends OCTRAEditor implements OnInit, OctraEditorRequirements {
   audio = inject(AudioService);
   private uiService = inject(UserInteractionsService);
   settingsService = inject(SettingsService);
@@ -84,26 +39,28 @@ export class TrnEditorComponent
   private translocoService = inject(TranslocoService);
   private modalService = inject(NgbModal);
   annotationStoreService = inject(AnnotationStoreService);
+  navbarService = inject(NavbarService);
+
+  static override meta: SupportedOctraEditorMetaData = {
+    name: 'TRN-Editor',
+    supportedLevelTypes: [AnnotationLevelType.SEGMENT],
+    translate: 'interfaces.TRN editor',
+    icon: 'bi bi-table',
+    supportsASR: false,
+  };
 
   get textEditor(): Texteditor {
     return this._textEditor;
   }
 
-  private currentLevel!: OctraAnnotationAnyLevel<
-    OctraAnnotationSegment<ASRContext>
-  >;
-  private guidelines!: OctraGuidelines;
-  private breakMarkerCode?: string;
-  private idCounter = 1;
-
-  public static editorname = 'TRN-Editor';
+  private currentLevel!: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>;
   public initialized: EventEmitter<void> = new EventEmitter<void>();
   public showSignalDisplay = false;
   public lastResizing = 0;
 
   @ViewChild('transcrEditor', { static: false })
   transcrEditor!: TranscrEditorComponent;
-  @ViewChild('viewer', { static: false }) viewer!: AudioViewerComponent;
+  @ViewChild('overview', { static: true }) overview!: TranscrOverviewComponent;
   @ViewChild('validationPopover', { static: true })
   validationPopover!: ValidationPopoverComponent;
   @ViewChild('contextMenu', { static: false })
@@ -270,7 +227,6 @@ export class TrnEditorComponent
   };
 
   private audioManager!: AudioManager;
-  private tempSegments!: OctraAnnotationSegment[];
   private selectedCell = {
     labelText: '',
     row: 0,
@@ -295,6 +251,20 @@ export class TrnEditorComponent
     actions: [],
   };
 
+  private currentModals: ModalVisibilities = {
+    combineTranscripts: false,
+    cutting: false,
+    demoEnd: false,
+    guidelines: false,
+    help: false,
+    inactivity: false,
+    overview: false,
+    permissions: false,
+    regReplace: false,
+    sending: false,
+    shortcuts: false,
+  };
+
   mergeAllWithSameLabel = () => {
     let intervals: {
       start: number;
@@ -310,9 +280,7 @@ export class TrnEditorComponent
 
     for (let i = 1; i < this.currentLevel.items.length; i++) {
       const segment = this.currentLevel.items[i] as OctraAnnotationSegment;
-      const previousSegment = this.currentLevel.items[
-        i - 1
-      ] as OctraAnnotationSegment;
+      const previousSegment = this.currentLevel.items[i - 1] as OctraAnnotationSegment;
 
       if (segment.getLabel('Speaker') === previousSegment.getLabel('Speaker')) {
         intervals[intervalCounter].length++;
@@ -354,31 +322,10 @@ export class TrnEditorComponent
     this.cd.markForCheck();
     this.cd.detectChanges();
 
-    this.alertService.showAlert(
-      'success',
-      this.translocoService.translate('alerts.combine segments successful'),
-    );
+    this.alertService.showAlert('success', this.translocoService.translate('alerts.combine segments successful'));
   };
 
   ngOnInit() {
-    this.subscribe(this.annotationStoreService.transcript$, {
-      next: (trasncriptState) => {
-        this.currentLevel =
-          trasncriptState!.levels[trasncriptState!.selectedLevelIndex!]!;
-        this.tempSegments = [
-          ...(this.currentLevel.items as OctraAnnotationSegment[]),
-        ];
-        this.idCounter = trasncriptState?.idCounters.item ?? 1;
-      },
-    });
-    this.subscribe(this.annotationStoreService.guidelines$, {
-      next: (guidelines) => {
-        this.guidelines = guidelines!.selected!.json;
-        this.breakMarkerCode = guidelines?.selected?.json.markers.find(
-          (a) => a.type === 'break',
-        )?.code;
-      },
-    });
     /*
     this.keyMap.register(this.shortcuts);
     this.keyMap.register(this.tableShortcuts);
@@ -421,30 +368,52 @@ export class TrnEditorComponent
         name: 'merge selected lines',
         status: 'active',
         icon: 'bi-intersect',
-        label: this.translocoService.translate(
-          'trn-editor.context menu.merge selected lines',
-        ),
+        label: this.translocoService.translate('trn-editor.context menu.merge selected lines'),
         func: this.mergeSelectedLinesContextMenu,
       },
       {
         name: 'remove transcripts of selected lines',
         status: 'active',
         icon: 'bi-eraser-fill',
-        label: this.translocoService.translate(
-          'trn-editor.context menu.remove transcripts of selected lines',
-        ),
+        label: this.translocoService.translate('trn-editor.context menu.remove transcripts of selected lines'),
         func: this.removeTranscriptsOfSelectedLinesContextMenu,
       },
       {
         name: 'remove selected lines completely',
         status: 'active',
         icon: 'bi bi-trash',
-        label: this.translocoService.translate(
-          'trn-editor.context menu.remove selected lines completely',
-        ),
+        label: this.translocoService.translate('trn-editor.context menu.remove selected lines completely'),
         func: this.removeSelectedLines,
       },
     );
+
+    this.subscribe(this.annotationStoreService.modalVisibilities$, {
+      next: (visibilities) => {
+        const overviewOpened = !this.currentModals.overview && visibilities.overview;
+        const combineTranscripts = !this.currentModals.combineTranscripts && visibilities.combineTranscripts;
+        const regReplace = !this.currentModals.regReplace && visibilities.regReplace;
+
+        const someModalOpened = overviewOpened || combineTranscripts || regReplace;
+        this.watchCurrentLevel(someModalOpened);
+        this.currentModals = visibilities;
+      },
+    });
+  }
+
+  private watchCurrentLevel(enabled: boolean) {
+    if (enabled) {
+      this.subscribe(
+        this.annotationStoreService.currentLevel$,
+        {
+          next: (currentLevel) => {
+            this.overview?.init(currentLevel);
+          },
+        },
+        'watch current level',
+      );
+    } else {
+      this.subscriptionManager.removeByTag('watch current level');
+    }
   }
 
   mergeSelectedLinesContextMenu = () => {
@@ -469,11 +438,7 @@ export class TrnEditorComponent
           previousI = i;
         }
 
-        if (
-          previousI > -1 &&
-          previousI === i - 1 &&
-          intervalCounter < intervals.length
-        ) {
+        if (previousI > -1 && previousI === i - 1 && intervalCounter < intervals.length) {
           intervals[intervalCounter].length++;
         } else {
           intervals.push({
@@ -518,12 +483,7 @@ export class TrnEditorComponent
     this.cd.markForCheck();
     this.cd.detectChanges();
 
-    this.alertService.showAlert(
-      'success',
-      this.translocoService.translate(
-        'alerts.combine segments ignore speakerlabel successful',
-      ),
-    );
+    this.alertService.showAlert('success', this.translocoService.translate('alerts.combine segments ignore speakerlabel successful'));
   };
 
   removeTranscriptsOfSelectedLinesContextMenu = () => {
@@ -574,23 +534,11 @@ export class TrnEditorComponent
 
   getStartPoint(index: number) {
     return index > 0 && this.currentLevel.type === AnnotationLevelType.SEGMENT
-      ? (
-          this.currentLevel.items[
-            index - 1
-          ] as OctraAnnotationSegment<ASRContext>
-        ).time.unix
+      ? (this.currentLevel.items[index - 1] as OctraAnnotationSegment<ASRContext>).time.unix
       : 0;
   }
 
-  openSegment() {
-    // only needed if an segment can be opened. For audio files smaller than 35 sec
-  }
-
-  onLabelKeyDown(
-    $event: KeyboardEvent,
-    labelCol: HTMLTableCellElement,
-    index: number,
-  ) {
+  onLabelKeyDown($event: KeyboardEvent, labelCol: HTMLTableCellElement, index: number) {
     if ($event.code === 'Enter') {
       $event.preventDefault();
       this.saveNewLabel(index, labelCol.innerText);
@@ -605,11 +553,7 @@ export class TrnEditorComponent
     this.selectedCell.labelText = labelCol.innerText;
   }
 
-  onSpeakerLabelMouseDown(
-    $event: any,
-    labelCol: HTMLTableCellElement,
-    rowNumber: number,
-  ) {
+  onSpeakerLabelMouseDown($event: any, labelCol: HTMLTableCellElement, rowNumber: number) {
     /*
     if (!(this.keyMap.pressedKeys.ctrl || this.keyMap.pressedKeys.cmd)) {
       labelCol.contentEditable = 'true';
@@ -627,9 +571,7 @@ export class TrnEditorComponent
 
   onTimestampMouseDown($event: any, rowNumber: number) {
     // de-/select row
-    if (this._textEditor.state !== 'active') {
-      this.onTableLineClick($event, rowNumber);
-    }
+    // TODO implement
   }
 
   onContextMenuClick($event: MouseEvent) {
@@ -637,8 +579,7 @@ export class TrnEditorComponent
     this.contextMenuProperties.x = $event.clientX;
     this.contextMenuProperties.y = $event.pageY - 80;
 
-    const isAnySegmentSelected =
-      this.shownSegments.findIndex((a) => a.isSelected) > -1;
+    const isAnySegmentSelected = this.shownSegments.findIndex((a) => a.isSelected) > -1;
 
     if (this.contextMenu !== undefined && isAnySegmentSelected) {
       this.contextMenu.showMenu();
@@ -648,19 +589,18 @@ export class TrnEditorComponent
     this.cd.detectChanges();
   }
 
-  onTranscriptCellMouseOver(
-    $event: any,
-    rowNumber: number,
-    scrollContainer: HTMLDivElement,
-  ) {
+  overviewStatusChange($event: { status: 'loading' | 'ready' | 'updated' }) {
+    if ($event.status === 'ready') {
+      this.initialized.emit();
+    }
+  }
+
+  onTranscriptCellMouseOver($event: any, rowNumber: number, scrollContainer: HTMLDivElement) {
     this.lastMouseOver = Date.now();
     let target = $event.target as HTMLElement;
 
     if (this.textEditor.state === 'inactive') {
-      if (
-        getAttr(target, '.val-error') ||
-        getAttr(target.parentElement!, '.val-error')
-      ) {
+      if (getAttr(target, '.val-error') || getAttr(target.parentElement!, '.val-error')) {
         if (!this.popovers.validation.mouse.enter) {
           if (!getAttr(target, '.val-error')) {
             target = target.parentElement!;
@@ -675,8 +615,7 @@ export class TrnEditorComponent
             }
           }
           marginTop -= scrollContainer.scrollTop;
-          const headHeight = findElements(document.body, '#table-head')[0]
-            .offsetHeight;
+          const headHeight = findElements(document.body, '#table-head')[0].offsetHeight;
 
           const errorcode = getAttr(target, 'data-errorcode');
 
@@ -687,11 +626,7 @@ export class TrnEditorComponent
             this.validationPopover.description = this.selectedError.description;
             this.validationPopover.title = this.selectedError.title;
 
-            this.popovers.validation.location.y =
-              headHeight +
-              marginTop -
-              this.validationPopover.height +
-              target.offsetTop;
+            this.popovers.validation.location.y = headHeight + marginTop - this.validationPopover.height + target.offsetTop;
             this.cd.markForCheck();
             this.cd.detectChanges();
             this.popovers.validation.location.x = $event.offsetX;
@@ -733,9 +668,7 @@ export class TrnEditorComponent
     const maxSegments = this.currentLevel.items.length;
     segmentNumber = Math.max(-1, Math.min(maxSegments, segmentNumber));
     if (segmentNumber < maxSegments - 1) {
-      const segmentLabel = findElements(document.body, '.label-column')[
-        segmentNumber + 1
-      ];
+      const segmentLabel = findElements(document.body, '.label-column')[segmentNumber + 1];
       segmentLabel.contentEditable = 'true';
       segmentLabel.focus();
       this.selectAllTextOfNode(segmentLabel);
@@ -872,16 +805,8 @@ export class TrnEditorComponent
     this.updateTempSegments();
     const segmentIndex = this._textEditor.selectedSegment;
 
-    if (
-      segmentIndex > -1 &&
-      this.currentLevel.items &&
-      segmentIndex < this.currentLevel.items.length
-    ) {
-      if (
-        this.transcrEditor.html.indexOf(
-          '<img src="assets/img/components/transcr-editor/boundary.png"',
-        ) > -1
-      ) {
+    if (segmentIndex > -1 && this.currentLevel.items && segmentIndex < this.currentLevel.items.length) {
+      if (this.transcrEditor.html.indexOf('<img src="assets/img/components/transcr-editor/boundary.png"') > -1) {
         // boundaries were inserted
         // TODO this.currentLevel.items = this.tempSegments;
       } else {
@@ -895,10 +820,6 @@ export class TrnEditorComponent
          */
       }
     }
-  }
-
-  test() {
-    this.viewer.init();
   }
 
   @HostListener('window:resize')
@@ -1046,13 +967,11 @@ export class TrnEditorComponent
   }
 
   togglePlayAll() {
-    this.playAllState.icon =
-      this.playAllState.icon === 'play' ? 'stop' : 'play';
+    this.playAllState.icon = this.playAllState.icon === 'play' ? 'stop' : 'play';
     this.cd.markForCheck();
     this.cd.detectChanges();
 
-    const playpos = (this.audio.audiomanagers[0].playPosition =
-      this.audio.audiomanagers[0].createSampleUnit(0));
+    const playpos = (this.audio.audiomanagers[0].playPosition = this.audio.audiomanagers[0].createSampleUnit(0));
 
     if (this.playAllState.icon === 'stop') {
       // start
@@ -1189,10 +1108,7 @@ export class TrnEditorComponent
      */
   }
 
-  navigateBetweenCells(
-    direction: 'up' | 'right' | 'down' | 'left',
-    segmentNumber: number,
-  ) {
+  navigateBetweenCells(direction: 'up' | 'right' | 'down' | 'left', segmentNumber: number) {
     if (!(direction === 'up' && segmentNumber === 0)) {
       this.saveAndCloseTranscrEditor().then(() => {
         const segmentsLength = this.currentLevel.items.length;
@@ -1244,8 +1160,7 @@ export class TrnEditorComponent
   public stopPlayback(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.playAllState.currentSegment > -1) {
-        this.playStateSegments[this.playAllState.currentSegment].state =
-          'stopped';
+        this.playStateSegments[this.playAllState.currentSegment].state = 'stopped';
         this.playStateSegments[this.playAllState.currentSegment].icon = 'play';
         this.playAllState.currentSegment = -1;
         this.cd.markForCheck();
@@ -1261,10 +1176,7 @@ export class TrnEditorComponent
   }
 
   onShortcutTriggered = ($event: ShortcutEvent) => {
-    const triggerUIAction = (
-      shortcutObj: any,
-      textSelection?: { start?: number; end?: number },
-    ) => {
+    const triggerUIAction = (shortcutObj: any, textSelection?: { start?: number; end?: number }) => {
       shortcutObj.value = `audio:${shortcutObj.value}`;
       this.uiService.addElementFromEvent(
         'shortcut',
@@ -1294,10 +1206,7 @@ export class TrnEditorComponent
           break;
         case 'down':
           $event.event.preventDefault();
-          this.navigateBetweenCells(
-            'down',
-            Math.min(this.currentLevel.items.length, this.selectedCell.row),
-          );
+          this.navigateBetweenCells('down', Math.min(this.currentLevel.items.length, this.selectedCell.row));
           break;
         case 'left':
           $event.event.preventDefault();
@@ -1312,11 +1221,9 @@ export class TrnEditorComponent
                 console.error(error);
               });
             } else {
-              this._textEditor.audiochunk
-                .startPlayback(false)
-                .catch((error) => {
-                  console.error(error);
-                });
+              this._textEditor.audiochunk.startPlayback(false).catch((error) => {
+                console.error(error);
+              });
             }
           }
           break;
@@ -1521,19 +1428,16 @@ export class TrnEditorComponent
      */
   }
 
-  onTableLineClick($event: any, rowNumber: number) {
-    /*
-    const selectedSegment = this.shownSegments[rowNumber];
-    if (this.keyMap.pressedKeys.cmd || this.keyMap.pressedKeys.ctrl) {
-      // de- select line
-      selectedSegment.isSelected = !selectedSegment.isSelected;
-      this.cd.markForCheck();
-      this.cd.detectChanges();
-    } else {
-      this.deselectAllRows();
-    }
-
-     */
+  override openSegment($event: { levelID: number; itemID: number }) {
+    console.log('open segment');
+    console.log($event);
+    this.navbarService.interfacechange.emit({
+      editor: TwoDEditorComponent,
+      context: {
+        command: 'open unit',
+        ...$event,
+      },
+    });
   }
 
   openPermutationsReplaceModal() {

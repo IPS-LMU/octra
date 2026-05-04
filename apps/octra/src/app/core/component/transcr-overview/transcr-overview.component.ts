@@ -19,15 +19,15 @@ import { ASRContext, OctraAnnotationAnyLevel, OctraAnnotationSegment, OctraAnnot
 import { sum } from '@octra/api-types';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
-import { isFunction, SubscriptionManager } from '@octra/utilities';
+import { isFunction } from '@octra/utilities';
 import { AudioChunk } from '@octra/web-media';
-import { Subscription, timer } from 'rxjs';
+import { timer } from 'rxjs';
 import { AudioService, SettingsService, UserInteractionsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { RoutingService } from '../../shared/service/routing.service';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { DefaultComponent } from '../default.component';
 import { TranscrEditorComponent, TranscrEditorConfig } from '../transcr-editor';
-import { TranscrEditorComponent as TranscrEditorComponent_1 } from '../transcr-editor/transcr-editor.component';
 import { ValidationPopoverComponent } from '../transcr-editor/validation-popover/validation-popover.component';
 
 @Component({
@@ -35,9 +35,9 @@ import { ValidationPopoverComponent } from '../transcr-editor/validation-popover
   templateUrl: './transcr-overview.component.html',
   styleUrls: ['./transcr-overview.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgClass, NgStyle, TranscrEditorComponent_1, ValidationPopoverComponent, OctraUtilitiesModule, TranslocoPipe],
+  imports: [NgClass, NgStyle, ValidationPopoverComponent, OctraUtilitiesModule, TranslocoPipe, TranscrEditorComponent],
 })
-export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
+export class TranscrOverviewComponent extends DefaultComponent implements OnInit, OnDestroy, OnChanges {
   annotationStoreService = inject(AnnotationStoreService);
   audio = inject(AudioService);
   sanitizer = inject(DomSanitizer);
@@ -75,18 +75,18 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   }[] = [];
   public transcript = '';
 
-  @Input() currentLevel?: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>;
   _internLevel?: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>;
 
   @Input() public showTranscriptionTable = true;
+  @Input() showStatistics = true;
+
   public showLoading = true;
 
   @Output() segmentclicked = new EventEmitter<{
     itemID: number;
     levelID: number;
   }>();
-
-  private subscrmanager: SubscriptionManager<Subscription>;
+  @Output() statusChange = new EventEmitter<{ status: 'loading' | 'ready' | 'updated' }>();
 
   public playAllState: {
     state: 'started' | 'stopped';
@@ -133,22 +133,22 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   };
 
   public get numberOfSegments(): number {
-    if (this.currentLevel && this.currentLevel.type === 'SEGMENT') {
-      return this.currentLevel.items ? this.currentLevel.items.length : 0;
+    if (this._internLevel && this._internLevel.type === 'SEGMENT') {
+      return this._internLevel.items ? this._internLevel.items.length : 0;
     }
     return -1;
   }
 
   public get transcrSegments(): number {
-    return this.currentLevel?.items ? this.annotationStoreService.statistics.transcribed : 0;
+    return this._internLevel?.items ? this.annotationStoreService.statistics.transcribed : 0;
   }
 
   public get pauseSegments(): number {
-    return this.currentLevel?.items ? this.annotationStoreService.statistics.pause : 0;
+    return this._internLevel?.items ? this.annotationStoreService.statistics.pause : 0;
   }
 
   public get emptySegments(): number {
-    return this.currentLevel?.items ? this.annotationStoreService.statistics.empty : 0;
+    return this._internLevel?.items ? this.annotationStoreService.statistics.empty : 0;
   }
 
   public get foundErrors(): number {
@@ -170,43 +170,45 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
     );
   }
 
-  constructor() {
-    this.subscrmanager = new SubscriptionManager();
-  }
-
-  ngOnDestroy() {
-    this.subscrmanager.destroy();
+  override ngOnDestroy() {
     this.playAllState.state = 'stopped';
     this.audio.audioManager.stopPlayback().catch((err) => {
       console.error(err);
     });
   }
 
-  ngOnInit() {
-    this.subscrmanager.add(
-      this.audio.audiomanagers[0].statechange.subscribe({
-        next: (state) => {
-          // make sure that events from playonhover are not logged
-          if (state !== PlayBackStatus.PLAYING && state !== PlayBackStatus.INITIALIZED && state !== PlayBackStatus.PREPARE) {
-            this.uiService.addElementFromEvent(
-              'audio',
-              { value: state.toLowerCase() },
-              Date.now(),
-              this.audio.audioManager.playPosition,
-              undefined,
-              undefined,
-              undefined,
-              'overview',
-            );
-          }
-        },
-        error: (error) => {
-          console.error(error);
-        },
-      }),
-    );
-
+  init(level: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>) {
+    this._internLevel = level.clone();
     this.updateView();
+  }
+
+  ngOnInit() {
+    this.subscribe(this.audio.audiomanagers[0].statechange, {
+      next: (state) => {
+        // make sure that events from playonhover are not logged
+        if (state !== PlayBackStatus.PLAYING && state !== PlayBackStatus.INITIALIZED && state !== PlayBackStatus.PREPARE) {
+          this.uiService.addElementFromEvent(
+            'audio',
+            { value: state.toLowerCase() },
+            Date.now(),
+            this.audio.audioManager.playPosition,
+            undefined,
+            undefined,
+            undefined,
+            'overview',
+          );
+        }
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
+
+    this.subscribe(this.annotationStoreService.currentLevelIndex$, {
+      next: (index) => {
+        this.init(this.annotationStoreService.transcript.levels[index]);
+      },
+    });
   }
 
   sanitizeHTML(str: string): SafeHtml {
@@ -252,15 +254,15 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   onMouseDown(i: number) {
-    if (this.currentLevel?.items && this.currentLevel.type === 'SEGMENT') {
+    if (this._internLevel?.items && this._internLevel.type === 'SEGMENT') {
       if (this.textEditor.state === 'inactive') {
         this.textEditor.state = 'active';
         this.textEditor.selectedSegment = i;
 
-        const segment = this.currentLevel?.items[i] as OctraAnnotationSegment;
+        const segment = this._internLevel?.items[i] as OctraAnnotationSegment;
         const nextSegmentTime: SampleUnit =
-          i < this.currentLevel?.items.length - 1
-            ? (this.currentLevel?.items[i + 1] as OctraAnnotationSegment).time
+          i < this._internLevel?.items.length - 1
+            ? (this._internLevel?.items[i + 1] as OctraAnnotationSegment).time
             : this.audio.audioManager.resource.info.duration;
         const audiochunk = new AudioChunk(new AudioSelection(segment.time, nextSegmentTime), this.audio.audiomanagers[0]);
 
@@ -275,12 +277,13 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
 
   async onTextEditorLeave(i: number) {
     if (this.transcrEditor && this._internLevel?.items && this._internLevel.type === 'SEGMENT') {
+      const level = this._internLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment<ASRContext>>;
       this.transcrEditor.updateRawText();
-      (this._internLevel?.items[i] as OctraAnnotationSegment).changeFirstLabelWithoutName('Speaker', this.transcrEditor.rawText);
-      const segment = this._internLevel?.items[i] as OctraAnnotationSegment;
+      const item = level.items[i].clone();
+      item.replaceFirstLabelWithoutName('Speaker', () => this.transcrEditor.rawText);
+      this._internLevel = level?.changeItem(item);
+      const segment = level?.items[i] as OctraAnnotationSegment;
       this.annotationStoreService.validateAll();
-
-      this.cd.markForCheck();
 
       await this.updateSegments();
 
@@ -311,15 +314,18 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
 
   async updateView() {
     await this.updateSegments();
-    this.annotationStoreService.analyse();
+    if (this.showStatistics) {
+      this.annotationStoreService.analyse();
+    }
 
     this.cd.markForCheck();
     this.cd.detectChanges();
+    this.statusChange.emit({ status: 'updated' });
   }
 
   public onSegmentClicked(itemID: number) {
     this.segmentclicked.emit({
-      levelID: this.currentLevel!.id!,
+      levelID: this._internLevel!.id!,
       itemID,
     });
   }
@@ -334,11 +340,12 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
         (this.routingService.staticQueryParams.guidelines_url && this.routingService.staticQueryParams.functions_url) ||
         !this.settingsService.projectsettings?.octra?.validationEnabled)
     ) {
-      if (!this.currentLevel?.items || !this.annotationStoreService.guidelines) {
+      if (!this._internLevel?.items || !this.annotationStoreService.guidelines) {
         this.shownSegments = [];
         this._internLevel?.clear();
       }
 
+      this.statusChange.emit({ status: 'loading' });
       this.showLoading = true;
       let startTime = 0;
       const result: {
@@ -389,15 +396,12 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
 
       this.shownSegments = result;
       this.showLoading = false;
+      this.statusChange.emit({ status: 'ready' });
       this.validationErrors = this.readValidationErrors();
     }
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['currentLevel'].currentValue) {
-      this._internLevel = (changes['currentLevel'].currentValue as OctraAnnotationAnyLevel<OctraAnnotationSegment>).clone();
-    }
-  }
+  ngOnChanges(changes: SimpleChanges) {}
 
   async getShownSegment(
     start: SampleUnit,
@@ -576,15 +580,13 @@ export class TranscrOverviewComponent implements OnInit, OnDestroy, OnChanges {
             this.playAllState.currentSegment = -1;
             this.cd.markForCheck();
 
-            this.subscrmanager.add(
-              timer(100).subscribe({
-                next: () => {
-                  this.cd.markForCheck();
+            this.subscribe(timer(100), {
+              next: () => {
+                this.cd.markForCheck();
 
-                  resolve();
-                },
-              }),
-            );
+                resolve();
+              },
+            });
           })
           .catch((error) => {
             console.error(error);

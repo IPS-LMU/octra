@@ -8,7 +8,10 @@ export class NavbarService {
   uiService = inject(UserInteractionsService);
   private audio = inject(AudioService);
 
-  public interfacechange = new EventEmitter<typeof OCTRAEditor>();
+  public interfacechange = new EventEmitter<{
+    editor: typeof OCTRAEditor;
+    context?: any;
+  }>();
   public onclick = new EventEmitter<string>();
   public openSettings = new EventEmitter<void>();
 

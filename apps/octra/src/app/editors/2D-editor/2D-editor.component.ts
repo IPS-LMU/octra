@@ -81,7 +81,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   };
 
   public audioManager!: AudioManager;
-  public audioChunkLines!: any;
+  public audioChunkLines!: AudioChunk;
   public audioChunkWindow!: AudioChunk;
   public audioChunkMagnifier!: AudioChunk;
   public miniMagnifierSettings!: AudioviewerConfig;
@@ -654,6 +654,18 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         this.appStorage.undo();
       } else if ($event.shortcutName === 'redo') {
         this.appStorage.redo();
+      }
+    }
+  }
+
+  override applyContext(context?: any) {
+    if (context?.command) {
+      if (context.command === 'open unit') {
+        this.openSegment({
+          levelID: context.levelID,
+          itemID: context.itemID,
+        });
+        this.viewer.scrollToUnit(context.itemID);
       }
     }
   }

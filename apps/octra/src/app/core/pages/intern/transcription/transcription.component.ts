@@ -261,8 +261,8 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
         callback: this.onAltSend,
       },
       {
-        name: 'feedback3',
-        title: 'feedback and send 3',
+        name: 'search and replace',
+        title: 'search and replace',
         focusonly: false,
         keys: {
           mac: 'CMD + F',
@@ -627,7 +627,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
                 },
                 error: (a) => {
                   console.error(a);
-                }
+                },
               });
               if (hasProperty(this.currentEditor.instance as any, 'openModal')) {
                 this.subscribe((this.currentEditor.instance as any).openModal, () => {

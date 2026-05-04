@@ -112,7 +112,7 @@ export class RegReplaceModalComponent extends OctraModal implements OnDestroy, O
     const selectedLevels = Object.keys(this.state.levels).filter((a) => this.state.levels[a] === true);
     const transcript = this.annotationStoreService.transcript!.clone();
 
-    if (selectedLevels. length > 0 && this.state.patternText !== '') {
+    if (selectedLevels.length > 0 && this.state.patternText !== '') {
       if (preview) {
         this.state.results = [];
 
@@ -126,9 +126,13 @@ export class RegReplaceModalComponent extends OctraModal implements OnDestroy, O
             const result = last(this.state.results);
 
             for (const item of level.items) {
+            }
+
+            for (let i = 0; i < level.items.length; i++) {
+              const item = level.items[i];
               const transcriptLabel = item.getFirstLabelWithoutName('Speaker');
               const replacements = [];
-              let html = "";
+              let html = '';
 
               if (transcriptLabel?.value) {
                 const transcript = transcriptLabel.value;
@@ -152,12 +156,16 @@ export class RegReplaceModalComponent extends OctraModal implements OnDestroy, O
                   const start = `<div class="reg-replace-marker">`;
                   const end = `</div>`;
                   html = insertString(html!, replacement.start + replacement.length, end);
-                  html = html.slice(0, replacement.start) + (escapeHtml(replacement.text) || '&nbsp;') + html.slice(replacement.start + replacement.length);
+                  html =
+                    html.slice(0, replacement.start) +
+                    (escapeHtml(replacement.text) || '&nbsp;') +
+                    html.slice(replacement.start + replacement.length);
                   html = insertString(html, replacement.start, start);
                 }
 
+                const startUnix = i > 0 && item.type === 'segment' ? (level.items[i - 1] as OctraAnnotationSegment).time.unix : 0;
                 result!.matches.push({
-                  startUnix: item.type === 'segment' ? (item as OctraAnnotationSegment).time.unix : undefined,
+                  startUnix: item.type === 'segment' ? startUnix : undefined,
                   unitID: item.id,
                   replacements,
                   html,
@@ -165,7 +173,6 @@ export class RegReplaceModalComponent extends OctraModal implements OnDestroy, O
                 });
               }
             }
-
             if (result!.matches.length === 0) {
               this.state.results.splice(this.state.results.length - 1, 1);
             }

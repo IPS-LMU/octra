@@ -4,10 +4,10 @@ import {
   AnnotationLevelType,
   ASRContext,
   OctraAnnotation,
-  OctraAnnotationAnyLevel, OctraAnnotationLevel,
+  OctraAnnotationAnyLevel,
   OctraAnnotationSegment,
   OEvent,
-  OItem
+  OItem,
 } from '@octra/annotation';
 import { ProjectDto, TaskDto, TaskInputOutputDto } from '@octra/api-types';
 import { SampleUnit } from '@octra/media';
@@ -591,6 +591,18 @@ export class AnnotationActions {
     events: {
       do: emptyProps(),
       success: emptyProps(),
+    },
+  });
+
+  static autoSave = createActionGroup({
+    source: 'annotation/auto save',
+    events: {
+      start: emptyProps(),
+      stop: emptyProps(),
+      success: emptyProps(),
+      fail: props<{
+        error: string;
+      }>(),
     },
   });
 }

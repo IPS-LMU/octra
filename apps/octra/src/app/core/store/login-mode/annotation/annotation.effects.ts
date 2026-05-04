@@ -449,7 +449,6 @@ export class AnnotationEffects {
               let lastItem = segmentLevel.items[segmentLevel.items.length - 1];
 
               while (lastItem !== undefined && lastItem.time.samples !== action.audioDuration.samples) {
-                console.log('while');
                 const diff = action.audioDuration ? action.audioDuration.sub(lastItem.time) : undefined;
 
                 if (diff !== undefined) {
@@ -502,6 +501,7 @@ export class AnnotationEffects {
         tap((a) => {
           this.routingService.navigate('end transcription', ['/intern/transcr/end'], AppInfo.queryParamsHandling);
           this.audio.destroy(true);
+          this.subscrManager.destroy();
         }),
       ),
     { dispatch: false },
@@ -514,6 +514,7 @@ export class AnnotationEffects {
       exhaustMap(([a, state]) => {
         this.store.dispatch(ApplicationActions.waitForEffects.do());
         this.audio.destroy(true);
+        this.subscrManager.destroy();
 
         if (state.application.mode === LoginMode.ONLINE) {
           if (a.freeTask && state.onlineMode.currentSession.currentProject && state.onlineMode.currentSession.task) {
@@ -899,6 +900,7 @@ export class AnnotationEffects {
         withLatestFrom(this.store),
         tap(([action, state]) => {
           this.audio.destroy(true);
+          this.subscrManager.destroy();
         }),
       ),
     { dispatch: false },
@@ -911,6 +913,59 @@ export class AnnotationEffects {
       exhaustMap(([a, state]) => {
         this.initMaintenance(state);
         return this.loadSegments(getModeState(state)!, state);
+      }),
+    ),
+  );
+
+  initAutoSave$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.initTranscriptionService.do),
+      withLatestFrom(this.store),
+      exhaustMap(([a, state]) => {
+        if (state.application.mode === LoginMode.ONLINE) {
+          this.subscrManager.removeByTag('auto save');
+          this.subscrManager.add(
+            interval(300000) // every 5 minutes
+              .pipe(withLatestFrom(this.store))
+              .subscribe({
+                next: ([, state]) => {
+                  this.saveTaskToServer(state, TaskStatus.busy)
+                    .pipe(
+                      exhaustMap(() => {
+                        return of(AnnotationActions.autoSave.success());
+                      }),
+                      catchError((e: any) => {
+                        return of(
+                          AnnotationActions.autoSave.fail({
+                            error: e?.error?.message ?? e?.message,
+                          }),
+                        );
+                      }),
+                    )
+                    .subscribe({
+                      next: (a) => {
+                        this.store.dispatch(a);
+                      },
+                    });
+                },
+              }),
+            'auto save',
+          );
+
+          return of(AnnotationActions.autoSave.start());
+        }
+        return of();
+      }),
+    ),
+  );
+
+  stopAutoSave = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.autoSave.stop),
+      withLatestFrom(this.store),
+      exhaustMap(([a, state]) => {
+        this.subscrManager.removeByTag('auto save');
+        return of(AnnotationActions.autoSave.stop());
       }),
     ),
   );
@@ -1404,6 +1459,7 @@ export class AnnotationEffects {
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
         if (state.application.mode === LoginMode.ONLINE) {
+          this.subscrManager.removeByTag('auto save');
           this.transcrSendingModal.timeout = timer(2000).subscribe({
             next: () => {
               this.transcrSendingModal.ref = this.modalsService.openModalRef(
@@ -1499,8 +1555,11 @@ export class AnnotationEffects {
         withLatestFrom(this.store),
         tap(([action, state]) => {
           const currentMode = getModeState(state);
-          const annotation = currentMode?.transcript
-            .serialize(currentMode.audio.fileName, this.audio.audioManager.resource.info.sampleRate, this.audio.audioManager.resource.info.duration);
+          const annotation = currentMode?.transcript.serialize(
+            currentMode.audio.fileName,
+            this.audio.audioManager.resource.info.sampleRate,
+            this.audio.audioManager.resource.info.duration,
+          );
           const converter = new AnnotJSONConverter();
           const result = converter.export(annotation!);
           window.parent.postMessage(
@@ -1555,6 +1614,7 @@ export class AnnotationEffects {
       ofType(LoginModeActions.clearOnlineSession.do),
       exhaustMap((a) => {
         this.audio.destroy(true);
+        this.subscrManager.destroy();
         return of(a.actionAfterSuccess);
       }),
     ),
@@ -1565,6 +1625,7 @@ export class AnnotationEffects {
       ofType(LoginModeActions.clearOnlineSession.do),
       exhaustMap((a) => {
         this.audio.destroy(true);
+        this.subscrManager.destroy();
         return of(a.actionAfterSuccess);
       }),
     ),
@@ -2192,13 +2253,11 @@ export class AnnotationEffects {
           }
         }
 
-        const oannotjson = modeState
-          .transcript!
-          .serialize(
-            this.audio.audioManager.resource.info.fullname,
-            this.audio.audioManager.resource.info.sampleRate,
-            this.audio.audioManager.resource.info.duration,
-          );
+        const oannotjson = modeState.transcript!.serialize(
+          this.audio.audioManager.resource.info.fullname,
+          this.audio.audioManager.resource.info.sampleRate,
+          this.audio.audioManager.resource.info.duration,
+        );
         const result = converter.export(oannotjson, this.audio.audioManager.resource.getOAudioFile(), 0);
 
         if (!result.error && result.file) {

@@ -576,12 +576,12 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
   }
 
-  onWindowAction = ({ action, segmentIndex }: { action: string; segmentIndex: number }) => {
+  onWindowAction = async ({ action, segmentIndex }: { action: string; segmentIndex: number }) => {
     if (action === 'close') {
       this.viewer.enableShortcuts();
       this.shortcutsEnabled = true;
       this.selectedIndex = segmentIndex;
-      this.viewer.selectSegment(this.selectedIndex);
+      await this.viewer.scrollToUnit(this.annotationStoreService.currentLevel.items[this.selectedIndex].id);
     } else if (action === 'overview') {
       this.shortcutsEnabled = false;
       this.openModal.emit('overview');
@@ -665,7 +665,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           levelID: context.levelID,
           itemID: context.itemID,
         });
-        this.viewer.scrollToUnit(context.itemID);
+        this.viewer.scrollToUnit(context.itemID).catch((e) => {
+          console.error(e);
+        });
       }
     }
   }

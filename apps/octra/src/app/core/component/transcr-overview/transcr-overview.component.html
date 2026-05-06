@@ -37,7 +37,7 @@
           <tbody>
             @for (validation of validationErrors; track validation.id) {
               <tr>
-                <td>{{ validation.level }}</td>
+                <td><a (click)="changeLevel($index);" class="link">{{ validation.level }}</a></td>
                 @if (validation.errors > 0) {
                   <td class="text-danger">
                     {{ 'g.errors found' | transloco: { errors: validation.errors + '' } }}
@@ -83,7 +83,7 @@
         @for (segment of shownSegments; track segment.id; let i = $index) {
           <tr
             #row
-            class="segment-row"
+            class="segment-row align-middle"
             [ngClass]="{
               'bg-success':
                 segment.transcription.text !== '' &&

@@ -741,17 +741,20 @@ export class AudioViewerService {
   public scrollToUnit(id: number) {
     const unitIndex = this.currentLevel?.items?.findIndex((a) => a.id === id) ?? 0;
     const leftNeighbour = unitIndex > 0 ? (this.currentLevel.items[unitIndex - 1] as OctraAnnotationSegment) : undefined;
+    const maxRows = Math.ceil(this.audioTCalculator.audioPxWidth / this._innerWidth);
+    const rowHeight = this._settings.lineheight + this.settings.margin.top + this.settings.margin.bottom;
+    const maxAbsY = maxRows * rowHeight;
+    let calculatesAbsY = 0;
+
     if (leftNeighbour) {
       const absXUnit = this.audioTCalculator.samplestoAbsX(leftNeighbour.time);
       const rowIndex = Math.floor(absXUnit / this._innerWidth);
-      const rowHeight = this._settings.lineheight + this.settings.margin.top + this.settings.margin.bottom;
-      const maxRows = Math.ceil(this.audioTCalculator.audioPxWidth / this._innerWidth);
-      const maxAbsY = maxRows * rowHeight;
       const absY = rowIndex * rowHeight;
-      const calculatesAbsY = absY + this.viewport.height > maxAbsY ? maxAbsY - this.viewport.height : absY;
-      this.scrollToAbsY(calculatesAbsY);
-      this.canvasElements.scrollbarSelector.y((calculatesAbsY / maxAbsY) * (this.viewport.height - this.canvasElements.scrollbarSelector.height()));
+      calculatesAbsY = absY + this.viewport.height > maxAbsY && this.viewport.height < maxAbsY ? maxAbsY - this.viewport.height : absY;
     }
+
+    this.scrollToAbsY(calculatesAbsY);
+    this.canvasElements.scrollbarSelector.y((calculatesAbsY / maxAbsY) * this.viewport.height);
   }
 
   async onSecondsPerLineChanged(secondsPerLine: number) {
@@ -2467,13 +2470,13 @@ export class AudioViewerService {
         const beginX = this.audioTCalculator.samplestoAbsX(begin.time);
         const posY1 =
           this.innerWidth < this.AudioPxWidth
-            ? Math.floor(beginX / this.innerWidth + 1) * (this.settings.lineheight + this.settings.margin.bottom) - this.settings.margin.bottom
+            ? Math.floor(beginX / this.innerWidth) * (this.settings.lineheight + this.settings.margin.bottom) - this.settings.margin.bottom
             : 0;
 
         let posY2 = 0;
 
         if (this.innerWidth < this.AudioPxWidth) {
-          posY2 = Math.floor(absX / this.innerWidth + 1) * (this.settings.lineheight + this.settings.margin.bottom) - this.settings.margin.bottom;
+          posY2 = Math.floor(absX / this.innerWidth) * (this.settings.lineheight + this.settings.margin.bottom) - this.settings.margin.bottom;
         }
 
         const boundarySelect = this.getSegmentSelection(segment.time.samples - 1);
@@ -2492,6 +2495,7 @@ export class AudioViewerService {
           }
         }
 
+        this.drawWholeSelection();
         return { posY1, posY2 };
       } else {
         throw new Error('Segment not selected.');

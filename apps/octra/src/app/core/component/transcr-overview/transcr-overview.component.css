@@ -17,7 +17,8 @@
   cursor: pointer;
 }
 
-.segment-transcript {
+.segment-transcript p {
+  margin: 0 !important;
 }
 
 .found-errors {

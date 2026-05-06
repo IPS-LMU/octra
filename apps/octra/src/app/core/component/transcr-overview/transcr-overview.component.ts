@@ -275,6 +275,10 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
     }
   }
 
+  changeLevel(index: number) {
+    this.annotationStoreService.setLevelIndex(index)
+  }
+
   async onTextEditorLeave(i: number) {
     if (this.transcrEditor && this._internLevel?.items && this._internLevel.type === 'SEGMENT') {
       const level = this._internLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment<ASRContext>>;
@@ -283,11 +287,10 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
       item.replaceFirstLabelWithoutName('Speaker', () => this.transcrEditor.rawText);
       this._internLevel = level?.changeItem(item);
       const segment = level?.items[i] as OctraAnnotationSegment;
-      this.annotationStoreService.validateAll();
-
-      await this.updateSegments();
 
       this.annotationStoreService.changeCurrentItemById(segment.id, segment);
+      this.annotationStoreService.validateAll();
+      await this.updateSegments();
       this.textEditor.state = 'inactive';
       this.textEditor.selectedSegment = -1;
       this.audio.audiomanagers[0].removeChunk(this.textEditor.audioChunk!);

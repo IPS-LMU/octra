@@ -358,11 +358,11 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     this.av.scrollToAbsY(absY);
   }
 
-  scrollToUnit(id: number) {
+  async scrollToUnit(id: number) {
     this.av.scrollToUnit(id);
     const index = this.annotation.currentLevel.items.findIndex((a) => a.id === id);
     if (index > -1) {
-      this.selectSegment(index);
+      await this.selectSegment(index);
     }
   }
 

@@ -6,8 +6,8 @@
     (buttonClick)="onButtonClick($event)"
     [audioChunk]="audioChunkLines"
     [easyMode]="appStorage.easyMode"
-    [playbackRate]="appStorage.audioSpeed"
-    [volume]="appStorage.audioVolume"
+    [(playbackRate)]="appStorage.audioSpeed"
+    [(volume)]="appStorage.audioVolume"
   >
   </octra-audio-navigation>
   <div class="d-flex flex-column h-100">

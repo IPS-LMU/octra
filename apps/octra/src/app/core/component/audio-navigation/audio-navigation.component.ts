@@ -53,41 +53,30 @@ export interface Buttons {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgClass, FormsModule, TranslocoPipe, OctraUtilitiesModule],
 })
-export class AudioNavigationComponent
-  extends DefaultComponent
-  implements OnChanges
-{
+export class AudioNavigationComponent extends DefaultComponent implements OnChanges {
   private cd = inject(ChangeDetectorRef);
 
   @Output() buttonClick = new EventEmitter<{
     type: string;
     timestamp: number;
   }>();
-  @Output() volumeChange = new EventEmitter<{
-    old_value: number;
-    new_value: number;
-    timestamp: number;
-  }>();
+  @Output() volumeChange = new EventEmitter<number | undefined | null>();
   @Output() afterVolumeChange = new EventEmitter<{
-    new_value: number;
+    old_value: number | undefined | null;
+    new_value: number | undefined | null;
     timestamp: number;
   }>();
-  @Output() playbackRateChange = new EventEmitter<{
-    old_value: number;
-    new_value: number;
-    timestamp: number;
-  }>();
+  @Output() playbackRateChange = new EventEmitter<number | undefined | null>();
   @Output() afterPlaybackRateChange = new EventEmitter<{
-    new_value: number;
+    old_value: number | undefined | null;
+    new_value: number | undefined | null;
     timestamp: number;
   }>();
   @Input() easyMode: boolean | undefined | null = false;
   @Input() audioChunk!: AudioChunk;
   @Input() stepBackwardTime = 500;
 
-  @ViewChild('audioNavContainer', { static: true }) audioNavContainer:
-    | ElementRef
-    | undefined;
+  @ViewChild('audioNavContainer', { static: true }) audioNavContainer: ElementRef | undefined;
 
   public get height() {
     if (this.audioNavContainer !== undefined) {
@@ -122,15 +111,17 @@ export class AudioNavigationComponent
   }
 
   @Input() set volume(value: number | undefined | null) {
-    this.volumeChange.emit({
+    this.afterVolumeChange.emit({
       old_value: Number(this._volume),
       new_value: Number(value),
       timestamp: Date.now(),
     });
+
     this._volume = value ?? 1;
     if (this.audioChunk) {
       this.audioChunk.volume = value ?? 1;
     }
+    this.volumeChange.emit(value);
   }
 
   private _playbackRate = 1;
@@ -140,7 +131,7 @@ export class AudioNavigationComponent
   }
 
   @Input() set playbackRate(value: number | undefined | null) {
-    this.playbackRateChange.emit({
+    this.afterPlaybackRateChange.emit({
       old_value: Number(this._playbackRate),
       new_value: Number(value),
       timestamp: Date.now(),
@@ -150,6 +141,7 @@ export class AudioNavigationComponent
     if (this.audioChunk !== undefined) {
       this.audioChunk.playbackRate = value ?? 1;
     }
+    this.playbackRateChange.emit(value);
   }
 
   /**
@@ -202,26 +194,6 @@ export class AudioNavigationComponent
         break;
     }
     this.cd.detectChanges();
-  }
-
-  /***
-   * after value of volume was changed
-   */
-  afterVolumeChanged() {
-    this.afterVolumeChange.emit({
-      new_value: this.volume ?? 1,
-      timestamp: Date.now(),
-    });
-  }
-
-  /***
-   * after value of playbackRate was changed
-   */
-  afterPlaybackRateChanged() {
-    this.afterPlaybackRateChange.emit({
-      new_value: this.playbackRate ?? 1,
-      timestamp: Date.now(),
-    });
   }
 
   private initialize() {

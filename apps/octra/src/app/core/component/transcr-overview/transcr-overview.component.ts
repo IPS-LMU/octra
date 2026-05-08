@@ -15,17 +15,21 @@ import {
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { ASRContext, OctraAnnotationAnyLevel, OctraAnnotationSegment, OctraAnnotationSegmentLevel } from '@octra/annotation';
+import { ASRContext, OctraAnnotation, OctraAnnotationAnyLevel, OctraAnnotationSegment, OctraAnnotationSegmentLevel } from '@octra/annotation';
 import { sum } from '@octra/api-types';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
+import { AudioViewerComponent, AudioViewerConfig, AudioViewerShortcutEvent } from '@octra/ngx-components';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
-import { isFunction } from '@octra/utilities';
-import { AudioChunk } from '@octra/web-media';
+import { contains, hasProperty, isFunction } from '@octra/utilities';
+import { AudioChunk, Shortcut, ShortcutGroup } from '@octra/web-media';
+import { HotkeysEvent } from 'hotkeys-js';
 import { timer } from 'rxjs';
 import { AudioService, SettingsService, UserInteractionsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { RoutingService } from '../../shared/service/routing.service';
+import { ShortcutService } from '../../shared/service/shortcut.service';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { AudioNavigationComponent } from '../audio-navigation';
 import { DefaultComponent } from '../default.component';
 import { TranscrEditorComponent, TranscrEditorConfig } from '../transcr-editor';
 import { ValidationPopoverComponent } from '../transcr-editor/validation-popover/validation-popover.component';
@@ -35,7 +39,16 @@ import { ValidationPopoverComponent } from '../transcr-editor/validation-popover
   templateUrl: './transcr-overview.component.html',
   styleUrls: ['./transcr-overview.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgClass, NgStyle, ValidationPopoverComponent, OctraUtilitiesModule, TranslocoPipe, TranscrEditorComponent],
+  imports: [
+    NgClass,
+    NgStyle,
+    ValidationPopoverComponent,
+    OctraUtilitiesModule,
+    TranslocoPipe,
+    TranscrEditorComponent,
+    AudioViewerComponent,
+    AudioNavigationComponent,
+  ],
 })
 export class TranscrOverviewComponent extends DefaultComponent implements OnInit, OnDestroy, OnChanges {
   annotationStoreService = inject(AnnotationStoreService);
@@ -46,13 +59,16 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
   protected settingsService = inject(SettingsService);
   private uiService = inject(UserInteractionsService);
   protected routingService = inject(RoutingService);
+  private shortcutService = inject(ShortcutService);
 
-  get textEditor(): {
+  get selectedUnit(): {
     selectedSegment: number;
     state: string;
     audioChunk?: AudioChunk;
+    transcriptText?: string;
+    annotation?: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
   } {
-    return this._textEditor;
+    return this._selectedUnit;
   }
 
   editorConfig: TranscrEditorConfig = new TranscrEditorConfig({
@@ -73,12 +89,15 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
     };
     validation: string;
   }[] = [];
-  public transcript = '';
+
+  viewerSettings?: AudioViewerConfig;
 
   _internLevel?: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>;
 
+  @Input() targetName = 'overview';
   @Input() public showTranscriptionTable = true;
   @Input() showStatistics = true;
+  @Input() showSignal = false;
 
   public showLoading = true;
 
@@ -87,6 +106,8 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
     levelID: number;
   }>();
   @Output() statusChange = new EventEmitter<{ status: 'loading' | 'ready' | 'updated' }>();
+
+  @ViewChild('viewer', { static: false }) viewer!: AudioViewerComponent;
 
   public playAllState: {
     state: 'started' | 'stopped';
@@ -122,15 +143,195 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
     },
   };
 
-  private _textEditor: {
+  private _selectedUnit: {
     state: string;
     selectedSegment: number;
     audioChunk?: AudioChunk;
+    transcriptText?: string;
+    annotation?: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
   } = {
     state: 'inactive',
     selectedSegment: -1,
     audioChunk: undefined,
+    transcriptText: '',
   };
+
+  onAudioPlayPause = ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
+    this.triggerUIAction({
+      shortcut: hotkeyEvent?.shortcut ?? '',
+      shortcutName: shortcut.name,
+      value: shortcut.name,
+      type: 'audio',
+      timestamp: Date.now(),
+    });
+    if (this.selectedUnit.audioChunk?.isPlaying) {
+      this.selectedUnit.audioChunk.pausePlayback().catch((error: any) => {
+        console.error(error);
+      });
+    } else {
+      this.selectedUnit.audioChunk.startPlayback(false).catch((error: any) => {
+        console.error(error);
+      });
+    }
+  };
+
+  onAudioStop = ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
+    this.triggerUIAction({
+      shortcut: hotkeyEvent?.shortcut ?? '',
+      shortcutName: shortcut.name,
+      value: shortcut.name,
+      type: 'audio',
+      timestamp: Date.now(),
+    });
+    this.selectedUnit.audioChunk.stopPlayback().catch((error: any) => {
+      console.error(error);
+    });
+  };
+
+  onStepBackward = ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
+    this.triggerUIAction({
+      shortcut: hotkeyEvent?.shortcut ?? '',
+      shortcutName: shortcut.name,
+      value: shortcut.name,
+      type: 'audio',
+      timestamp: Date.now(),
+    });
+    this.selectedUnit.audioChunk.stepBackward().catch((error: any) => {
+      console.error(error);
+    });
+  };
+
+  onStepBackwardTime = ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
+    this.triggerUIAction({
+      shortcut: hotkeyEvent?.shortcut ?? '',
+      shortcutName: shortcut.name,
+      value: shortcut.name,
+      type: 'audio',
+      timestamp: Date.now(),
+    });
+    this.selectedUnit.audioChunk.stepBackwardTime(0.5).catch((error: any) => {
+      console.error(error);
+    });
+  };
+
+  moveToPreviousUnit = async ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
+    await this.doDirection('up');
+  };
+
+  moveToNextUnit = async ($event: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent) => {
+    await this.doDirection('down');
+  };
+
+  private viewerShortcuts: ShortcutGroup = {
+    name: 'signal-display',
+    enabled: true,
+    items: [
+      {
+        name: 'play_pause',
+        keys: {
+          mac: 'TAB',
+          pc: 'TAB',
+        },
+        title: 'play pause',
+        focusonly: false,
+        callback: this.onAudioPlayPause,
+      },
+      {
+        name: 'stop',
+        keys: {
+          mac: 'ESC',
+          pc: 'ESC',
+        },
+        title: 'stop playback',
+        focusonly: false,
+        callback: this.onAudioStop,
+      },
+      {
+        name: 'step_backward',
+        keys: {
+          mac: 'SHIFT + BACKSPACE',
+          pc: 'SHIFT + BACKSPACE',
+        },
+        title: 'step backward',
+        focusonly: false,
+        callback: this.onStepBackward,
+      },
+      {
+        name: 'step_backwardtime',
+        keys: {
+          mac: 'SHIFT + TAB',
+          pc: 'SHIFT + TAB',
+        },
+        title: 'step backward time',
+        focusonly: false,
+        callback: this.onStepBackwardTime,
+      },
+      {
+        name: 'move_to_previous_unit',
+        keys: {
+          mac: 'SHIFT + ARROWUP',
+          pc: 'SHIFT + ARROWUP',
+        },
+        title: 'move to previous unit',
+        focusonly: false,
+        callback: this.moveToPreviousUnit,
+      },
+      {
+        name: 'move_to_next_unit',
+        keys: {
+          mac: 'SHIFT + ARROWDOWN',
+          pc: 'SHIFT + ARROWDOWN',
+        },
+        title: 'move to next unit',
+        focusonly: false,
+        callback: this.moveToNextUnit,
+      },
+    ],
+  };
+
+  private triggerUIAction($event: AudioViewerShortcutEvent) {
+    if (
+      $event.value === undefined ||
+      !(
+        // cursor move by keyboard events are note saved because this would be too much
+        (
+          contains($event.value, 'cursor') ||
+          contains($event.value, 'segment_enter') ||
+          contains($event.value, 'playonhover') ||
+          contains($event.value, 'asr')
+        )
+      )
+    ) {
+      $event.value = `${$event.type}:${$event.value}`;
+
+      let selection:
+        | {
+            start: number;
+            length: number;
+          }
+        | undefined = {
+        start: -1,
+        length: -1,
+      };
+
+      if (hasProperty($event, 'selection') && $event.selection !== undefined) {
+        selection.start = $event.selection.start.samples;
+        selection.length = $event.selection.duration.samples;
+      } else {
+        selection = undefined;
+      }
+
+      const textSelection = this.transcrEditor?.textSelection;
+      let playPosition = this.audio.audioManager.playPosition;
+      if (!this.selectedUnit.audioChunk?.isPlaying) {
+        if ($event.type === 'boundary') {
+          playPosition = this.viewer.av.MouseClickPos!;
+        }
+      }
+
+      this.uiService.addElementFromEvent('shortcut', $event, $event.timestamp, playPosition, textSelection, selection, undefined, 'table-row-viewer');
+    }
+  }
 
   public get numberOfSegments(): number {
     if (this._internLevel && this._internLevel.type === 'SEGMENT') {
@@ -171,10 +372,12 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
   }
 
   override ngOnDestroy() {
+    super.ngOnDestroy();
     this.playAllState.state = 'stopped';
     this.audio.audioManager.stopPlayback().catch((err) => {
       console.error(err);
     });
+    this.shortcutService.disableGroup(this.viewerShortcuts.name);
   }
 
   init(level: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>) {
@@ -183,26 +386,32 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
   }
 
   ngOnInit() {
-    this.subscribe(this.audio.audiomanagers[0].statechange, {
-      next: (state) => {
-        // make sure that events from playonhover are not logged
-        if (state !== PlayBackStatus.PLAYING && state !== PlayBackStatus.INITIALIZED && state !== PlayBackStatus.PREPARE) {
-          this.uiService.addElementFromEvent(
-            'audio',
-            { value: state.toLowerCase() },
-            Date.now(),
-            this.audio.audioManager.playPosition,
-            undefined,
-            undefined,
-            undefined,
-            'overview',
-          );
-        }
-      },
-      error: (error) => {
-        console.error(error);
-      },
-    });
+    this.viewerShortcuts.name = `${this.targetName}`
+    this.shortcutService.registerShortcutGroup(this.viewerShortcuts);
+    this.shortcutService.disableGroup(this.viewerShortcuts.name);
+
+    if (!this.showSignal) {
+      this.subscribe(this.audio.audiomanagers[0].statechange, {
+        next: (state) => {
+          // make sure that events from playonhover are not logged
+          if (state !== PlayBackStatus.PLAYING && state !== PlayBackStatus.INITIALIZED && state !== PlayBackStatus.PREPARE) {
+            this.uiService.addElementFromEvent(
+              'audio',
+              { value: state.toLowerCase() },
+              Date.now(),
+              this.audio.audioManager.playPosition,
+              undefined,
+              undefined,
+              undefined,
+              this.targetName,
+            );
+          }
+        },
+        error: (error) => {
+          console.error(error);
+        },
+      });
+    }
 
     this.subscribe(this.annotationStoreService.currentLevelIndex$, {
       next: (index) => {
@@ -217,7 +426,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
 
   async onMouseOver($event: MouseEvent, rowNumber: number, row: HTMLDivElement, validationPopover: ValidationPopoverComponent) {
     if (validationPopover) {
-      if (this.textEditor.state === 'inactive') {
+      if (this.selectedUnit.state === 'inactive') {
         let target = $event.target as HTMLElement;
         if (target.getAttribute('class') === 'val-error' || target.parentElement!.getAttribute('class') === 'val-error') {
           if (!this.popovers.validation.mouse.enter) {
@@ -255,28 +464,48 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
 
   onMouseDown(i: number) {
     if (this._internLevel?.items && this._internLevel.type === 'SEGMENT') {
-      if (this.textEditor.state === 'inactive') {
-        this.textEditor.state = 'active';
-        this.textEditor.selectedSegment = i;
+      if (this.selectedUnit.state === 'inactive') {
+        this.selectedUnit.state = 'active';
+        this.selectedUnit.selectedSegment = i;
 
         const segment = this._internLevel?.items[i] as OctraAnnotationSegment;
-        const nextSegmentTime: SampleUnit =
-          i < this._internLevel?.items.length - 1
-            ? (this._internLevel?.items[i + 1] as OctraAnnotationSegment).time
-            : this.audio.audioManager.resource.info.duration;
-        const audiochunk = new AudioChunk(new AudioSelection(segment.time, nextSegmentTime), this.audio.audiomanagers[0]);
+        const previousSegmentTime: SampleUnit =
+          i > 0 ? (this._internLevel?.items[i - 1] as OctraAnnotationSegment).time : this.audio.audioManager.createSampleUnit(0);
 
-        this.audio.audiomanagers[0].addChunk(audiochunk);
-        this.textEditor.audioChunk = audiochunk;
+        const audioChunk = this.audio.audiomanagers[0].createNewAudioChunk(new AudioSelection(previousSegmentTime, segment.time));
+        this.selectedUnit.audioChunk = audioChunk;
 
-        this.transcript = segment.getFirstLabelWithoutName('Speaker')?.value ?? '';
+        this.viewerSettings = new AudioViewerConfig();
+        this.viewerSettings.margin.top = 0;
+        this.viewerSettings.margin.bottom = 0;
+        this.viewerSettings.lineheight = 100;
+        this.viewerSettings.justifySignalHeight = true;
+        this.viewerSettings.boundaries.enabled = false;
+        this.viewerSettings.boundaries.readonly = true;
+        this.viewerSettings.selection.enabled = true;
+        this.viewerSettings.frame.color = '#AAAAAA';
+        this.viewerSettings.roundValues = false;
+        this.viewerSettings.showTimePerLine = true;
+        this.viewerSettings.showProgressBars = true;
+        this.viewerSettings.multiLine = false;
+        this.viewerSettings.shortcuts.enabled = true;
+
+        this._selectedUnit.transcriptText = segment.getFirstLabelWithoutName('Speaker')?.value ?? '';
+        this._selectedUnit.annotation = this.annotationStoreService.transcript;
+        this.shortcutService.enableGroup(this.viewerShortcuts.name);
         // this.transcrEditor.focus();
+        this.cd.markForCheck();
+
+        if (this.viewer) {
+          this.viewer.name = 'transcr-window viewer';
+          this.viewer.av.drawnSelection = undefined;
+        }
       }
     }
   }
 
   changeLevel(index: number) {
-    this.annotationStoreService.setLevelIndex(index)
+    this.annotationStoreService.setLevelIndex(index);
   }
 
   async onTextEditorLeave(i: number) {
@@ -291,9 +520,13 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
       this.annotationStoreService.changeCurrentItemById(segment.id, segment);
       this.annotationStoreService.validateAll();
       await this.updateSegments();
-      this.textEditor.state = 'inactive';
-      this.textEditor.selectedSegment = -1;
-      this.audio.audiomanagers[0].removeChunk(this.textEditor.audioChunk!);
+      this.selectedUnit.state = 'inactive';
+      this.selectedUnit.selectedSegment = -1;
+      if (this.selectedUnit.audioChunk) {
+        this.selectedUnit.audioChunk.stopPlayback();
+        this.audio.audiomanagers[0].removeChunk(this.selectedUnit.audioChunk);
+      }
+      this.shortcutService.disableGroup(this.viewerShortcuts.name);
       this.cd.markForCheck();
 
       const startSample = i > 0 ? (this.annotationStoreService.currentLevel!.items[i - 1] as OctraAnnotationSegment).time.samples : 0;
@@ -310,7 +543,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
           start: startSample,
           length: segment.time.samples - startSample,
         },
-        'overview',
+        this.targetName,
       );
     }
   }
@@ -327,10 +560,12 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
   }
 
   public onSegmentClicked(itemID: number) {
-    this.segmentclicked.emit({
-      levelID: this._internLevel!.id!,
-      itemID,
-    });
+    if (!this.showSignal) {
+      this.segmentclicked.emit({
+        levelID: this._internLevel!.id!,
+        itemID,
+      });
+    }
   }
 
   private async updateSegments() {
@@ -517,7 +752,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
             undefined,
             undefined,
             undefined,
-            'overview',
+            this.targetName,
           );
           this.playAllState.state = 'started';
           this.playAll(0);
@@ -545,7 +780,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
             undefined,
             undefined,
             undefined,
-            'overview',
+            this.targetName,
           );
         })
         .catch((error) => {
@@ -639,7 +874,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
               start: startSample,
               length: (this.annotationStoreService.currentLevel?.items[segmentNumber] as OctraAnnotationSegment).time.samples - startSample,
             },
-            'overview',
+            this.targetName,
           );
 
           this.playSegment(segmentNumber)
@@ -669,7 +904,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
           start: startSample,
           length: (this.annotationStoreService.currentLevel!.items[segmentNumber] as OctraAnnotationSegment).time.samples - startSample,
         },
-        'overview',
+        this.targetName,
       );
 
       this.stopPlayback()
@@ -690,6 +925,25 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
     if (this._internLevel?.items && i < this._internLevel.items.length - 1) {
       this.onMouseDown(i + 1);
     }
+    this.annotationStoreService.validateAll();
+    await this.updateSegments();
+    this.cd.markForCheck();
+  }
+
+  async doDirection(direction: 'down' | 'up') {
+    const i = this._selectedUnit.selectedSegment;
+    if (this._selectedUnit.selectedSegment > -1) {
+      await this.onTextEditorLeave(i);
+    }
+
+    if (this._internLevel?.items) {
+      if (direction === 'down') {
+        this.onMouseDown(Math.min(i, this._internLevel.items.length - 2) + 1);
+      } else {
+        this.onMouseDown(Math.max(i, 1) - 1);
+      }
+    }
+
     this.annotationStoreService.validateAll();
     await this.updateSegments();
     this.cd.markForCheck();

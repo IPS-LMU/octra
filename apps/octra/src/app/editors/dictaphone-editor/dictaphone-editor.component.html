@@ -5,8 +5,8 @@
   (buttonClick)="onButtonClick($event)"
   [audioChunk]="audiochunk"
   [easyMode]="appStorage.easyMode"
-  [playbackRate]="appStorage.audioSpeed"
-  [volume]="appStorage.audioVolume"
+  [(playbackRate)]="appStorage.audioSpeed"
+  [(volume)]="appStorage.audioVolume"
 ></octra-audio-navigation>
 <octra-audioplayer #audioplayer [audioChunk]="audiochunk"></octra-audioplayer>
 <octra-transcr-editor

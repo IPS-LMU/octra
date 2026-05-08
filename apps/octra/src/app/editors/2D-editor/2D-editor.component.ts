@@ -8,7 +8,7 @@ import { AnnotationLevelType, ASRQueueItemType, getSegmentBySamplePosition, Octr
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
 import {
   AudioViewerComponent,
-  AudioviewerConfig,
+  AudioViewerConfig,
   AudioViewerShortcutEvent,
   CurrentLevelChangeEvent,
   NgbModalWrapper,
@@ -84,7 +84,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   public audioChunkLines!: AudioChunk;
   public audioChunkWindow!: AudioChunk;
   public audioChunkMagnifier!: AudioChunk;
-  public miniMagnifierSettings!: AudioviewerConfig;
+  public miniMagnifierSettings!: AudioViewerConfig;
   private mousestate = 'initiliazied';
   private intervalID = undefined;
   private factor = 8;
@@ -305,7 +305,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   constructor() {
     super();
     this.initialized = new EventEmitter<void>();
-    this.miniMagnifierSettings = new AudioviewerConfig();
+    this.miniMagnifierSettings = new AudioViewerConfig();
     this.subscribe(this.modalService.onModalAction, {
       next: this.onModalAction,
     });

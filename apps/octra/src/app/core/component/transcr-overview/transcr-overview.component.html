@@ -37,7 +37,9 @@
           <tbody>
             @for (validation of validationErrors; track validation.id) {
               <tr>
-                <td><a (click)="changeLevel($index);" class="link">{{ validation.level }}</a></td>
+                <td>
+                  <a (click)="changeLevel($index)" class="link">{{ validation.level }}</a>
+                </td>
                 @if (validation.errors > 0) {
                   <td class="text-danger">
                     {{ 'g.errors found' | transloco: { errors: validation.errors + '' } }}
@@ -122,11 +124,18 @@
                 'bg-highlight': playAllState.currentSegment === i,
               }"
             >
-              <span class="link" (click)="onSegmentClicked(segment.id)">
-                {{ segment.start.unix | timespan }}
+              <span [ngClass]="{
+                 'link': !showSignal,
+                 'text-secondary': showSignal
+              }" (click)="onSegmentClicked(segment.id)">
+                {{ segment.start.unix | timespan: {
+                showHour: true,
+                showMilliSeconds: true,
+                maxDuration: audio.audioManager.resource.info.duration.unix
+              } }}
               </span>
             </td>
-            @if (textEditor.state === 'active' && textEditor.selectedSegment === i) {
+            @if (selectedUnit.state === 'active' && selectedUnit.selectedSegment === i) {
               <td
                 [ngClass]="{
                   'bg-success':
@@ -139,6 +148,25 @@
                 (mouseleave)="onTextEditorLeave(i)"
               >
                 <div>
+                  @if (showSignal) {
+                    <octra-audio-navigation
+                      #audionav
+                      [audioChunk]="selectedUnit.audioChunk"
+                      [(playbackRate)]="appStorage.audioSpeed"
+                      [(volume)]="appStorage.audioVolume"
+                    ></octra-audio-navigation>
+                    <octra-audio-viewer
+                      #viewer
+                      [settings]="viewerSettings"
+                      [audioChunk]="selectedUnit.audioChunk"
+                      [annotation]="selectedUnit.annotation"
+                      [refreshOnInternChanges]="false"
+                      [ngStyle]="{
+                        height: '100px',
+                      }"
+                    ></octra-audio-viewer>
+                  }
+
                   <octra-transcr-editor
                     #transcrEditor
                     [settings]="editorConfig"
@@ -151,8 +179,8 @@
                     "
                     [markers]="annotationStoreService.guidelines !== undefined ? annotationStoreService.guidelines.markers : undefined"
                     [easymode]="true"
-                    [transcript]="transcript"
-                    [audiochunk]="textEditor.audioChunk"
+                    [transcript]="selectedUnit.transcriptText"
+                    [audiochunk]="selectedUnit.audioChunk"
                     [(font)]="appStorage.editorFont"
                     (enterKeyPressed)="onEnterPressed(i)"
                   ></octra-transcr-editor>

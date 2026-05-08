@@ -272,53 +272,6 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
     await this.doDirectionAction('down');
   };
 
-  private audioShortcuts: ShortcutGroup = {
-    name: '',
-    enabled: true,
-    items: [
-      {
-        name: 'play_pause',
-        keys: {
-          mac: 'TAB',
-          pc: 'TAB',
-        },
-        title: 'play pause',
-        focusonly: false,
-        callback: this.onAudioPlayPause,
-      },
-      {
-        name: 'stop',
-        keys: {
-          mac: 'ESC',
-          pc: 'ESC',
-        },
-        title: 'stop playback',
-        focusonly: false,
-        callback: this.onStopAudio,
-      },
-      {
-        name: 'step_backward',
-        keys: {
-          mac: 'SHIFT + BACKSPACE',
-          pc: 'SHIFT + BACKSPACE',
-        },
-        title: 'step backward',
-        focusonly: false,
-        callback: this.onStepBackward,
-      },
-      {
-        name: 'step_backwardtime',
-        keys: {
-          mac: 'SHIFT + TAB',
-          pc: 'SHIFT + TAB',
-        },
-        title: 'step backward time',
-        focusonly: false,
-        callback: this.onStepBackwardTime,
-      },
-    ],
-  };
-
   public transcript = '';
 
   constructor() {
@@ -448,11 +401,6 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
         '';
     }
 
-    /*
-    const shortcutGroup =
-      this.shortcutsService.getShortcutGroup('2D-Editor viewer');
-    shortcutGroup!.enabled = false;
-     */
     this.updateNeighbours();
     this.isShortAudiofile = this.audio.audioManager.resource.info.duration.seconds <= 35;
 
@@ -920,7 +868,7 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
 
     let selection = undefined;
     if (
-      this.magnifier.av.drawnSelection!.start.samples >= segment.start &&
+       this.magnifier.av.drawnSelection!.start.samples >= segment.start &&
       this.magnifier.av.drawnSelection!.end.samples <= segment.start + segment.length
     ) {
       selection = {

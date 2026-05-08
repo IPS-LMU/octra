@@ -64,7 +64,6 @@
           </div>
           <div class="col-10 col-sm-4 col-md-6">
             <input
-              (change)="afterVolumeChanged()"
               [(ngModel)]="volume"
               [disabled]="isAudioPlaying"
               class="slider"
@@ -98,7 +97,6 @@
             class="col-10 col-sm-4 col-md-6 align-items-center justify-content-center"
           >
             <input
-              (change)="afterPlaybackRateChanged()"
               [(ngModel)]="playbackRate"
               [disabled]="isAudioPlaying"
               class="slider"

@@ -21,7 +21,7 @@ import { SubscriptionManager, wait } from '@octra/utilities';
 import { AudioChunk } from '@octra/web-media';
 import Konva from 'konva';
 import { Subject, Subscription, timer } from 'rxjs';
-import { AudioviewerConfig } from './audio-viewer.config';
+import { AudioViewerConfig } from './audio-viewer.config';
 import { AnnotationChange, AudioViewerService } from './audio-viewer.service';
 import Vector2d = Konva.Vector2d;
 
@@ -125,7 +125,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
     return this.av.mouseCursorCanvasElement;
   }
 
-  public get settings(): AudioviewerConfig {
+  public get settings(): AudioViewerConfig {
     return this.av.settings;
   }
 
@@ -134,7 +134,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
    * @param value
    */
   @Input()
-  public set settings(value: AudioviewerConfig) {
+  public set settings(value: AudioViewerConfig) {
     this.av.settings = value;
   }
 

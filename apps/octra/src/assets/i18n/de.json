@@ -263,9 +263,9 @@
   },
   "interfaces": {
     "2D editor": "2D-Editor",
-    "TRN editor": "TRN-Editor",
-    "linear editor": "Linearer Editor",
-    "simple editor": "Dictaphone Editor"
+    "Table-Editor": "Table-Editor",
+    "linear editor": "Linear-Editor",
+    "simple editor": "Dictaphone-Editor"
   },
   "login": {
     "api not available": "Der Server ist aktuell nicht erreichbar. Bitte versuche es später erneut. Sollte diese Fehlermeldung nach 15 Minuten weiterhin sichtbar sein, schreibe bitte eine E-Mail an {{email_link}}.",
@@ -334,15 +334,12 @@
       "step4": "Klicke auf die \"NEU LADEN\" Schaltfläche unter diesem Schritt."
     },
     "overview": {
-      "check transcription": "Wechsle zu dem TRN-Editor und überprüfe dein Transkript."
+      "check transcription": "Wechsle zu dem Table-Editor und überprüfe dein Transkript."
     },
     "shortcuts": {
       "2D-Editor": "Tastenkombinationen des 2D-Editors",
       "2D-Editor audio": "Tastenkombinationen für die Audiowiedergabe des mehrzeiligen Signaldisplays",
       "2D-Editor viewer": "Tastenkombinationen für das mehrzeilige Signaldisplay",
-      "TRN-Editor": "Tastenkombinationen des TRN-Editors",
-      "TRN-Editor table": "Tastenkürzel für die Tabelle",
-      "TRN-Editor texteditor": "Tastenkürzel des Texteditors",
       "audioplayer": "Tastenkombinationen des Audioplayers",
       "close_save": "Speichern & Fenster schließen",
       "delete boundaries": "Ausgewählte Grenzen entfernen und Transkript zusammenführen",
@@ -390,7 +387,10 @@
       "transcription window": "Transkriptionsfenster",
       "undo": "Letzte Aktion rückgängig machen",
       "zoom in": "Ansicht vergrößern",
-      "zoom out": "Ansicht verkleinern"
+      "zoom out": "Ansicht verkleinern",
+      "Table-Editor": "Table Editor",
+      "move to previous unit": "Wechsle zur vorherigen Einheit",
+      "move to next unit": "Wechsle zur nächsten Einheit"
     },
     "supported": {
       "audio files": "Audio Dateien",
@@ -590,7 +590,7 @@
     "intelligibility of the speaker": "Sprachverständlichkeit des Sprechers",
     "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Deine definierten Transkriptionseinheiten:"
   },
-  "trn-editor": {
+  "table-editor": {
     "context menu": {
       "merge selected lines": "Führe ausgewählte Segmente zusammen (ignoriere Sprecher-Label)",
       "remove selected lines completely": "Entferne ausgewählte Segmente vollständig (entferne Transkripte & führe zusammen)",

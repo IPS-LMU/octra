@@ -28,7 +28,7 @@ import { MultiThreadingService } from '../../../multi-threading.service';
 import { Position, Size } from '../../../obj';
 import { PlayCursor } from '../../../obj/play-cursor';
 import { AudioViewerShortcutEvent } from './audio-viewer.component';
-import { AudioviewerConfig } from './audio-viewer.config';
+import { AudioViewerConfig } from './audio-viewer.config';
 import Vector2d = Konva.Vector2d;
 import Group = Konva.Group;
 import Layer = Konva.Layer;
@@ -327,13 +327,13 @@ export class AudioViewerService {
     this._zoomY = value;
   }
 
-  private _settings = new AudioviewerConfig();
+  private _settings = new AudioViewerConfig();
 
-  get settings(): AudioviewerConfig {
+  get settings(): AudioViewerConfig {
     return this._settings;
   }
 
-  set settings(value: AudioviewerConfig) {
+  set settings(value: AudioViewerConfig) {
     this._settings = value;
   }
 

@@ -1,6 +1,6 @@
 import { ShortcutGroup } from '@octra/web-media';
 
-export class AudioviewerConfig {
+export class AudioViewerConfig {
   public multiLine = false;
   public pixelPerSec = 50; // only relevant for multiline
   public justifySignalHeight = true;
@@ -246,4 +246,8 @@ export class AudioviewerConfig {
   public showProgressBars = false;
 
   speakerPattern?: string;
+
+  constructor(partial?: Partial<AudioViewerConfig>) {
+    Object.assign(this, partial);
+  }
 }

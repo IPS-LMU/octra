@@ -115,8 +115,8 @@
         (keyup)="onKeyUp()"
         [audioChunk]="audiochunk"
         [easyMode]="easyMode"
-        [playbackRate]="appStorage.audioSpeed"
-        [volume]="appStorage.audioVolume"
+        [(playbackRate)]="appStorage.audioSpeed"
+        [(volume)]="appStorage.audioVolume"
       ></octra-audio-navigation>
       <octra-audio-viewer
         #magnifier

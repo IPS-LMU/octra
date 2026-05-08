@@ -30,8 +30,8 @@
   (buttonClick)="onButtonClick($event)"
   [audioChunk]="selectedAudioChunk"
   [easyMode]="appStorage.easyMode"
-  [playbackRate]="appStorage.audioSpeed"
-  [volume]="appStorage.audioVolume"
+  [(playbackRate)]="appStorage.audioSpeed"
+  [(volume)]="appStorage.audioVolume"
 >
 </octra-audio-navigation>
 <div id="viewer">

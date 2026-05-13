@@ -216,9 +216,9 @@
     "prompt": "Prompt",
     "protocol": "Protocol",
     "quit": "Quit",
-    "quit and release": "Quit without saving",
-    "quit continue later": "Quit & continue later",
-    "quit discard": "Quit & discard annotation",
+    "close and release": "Quit without saving",
+    "close continue later": "Quit & continue later",
+    "close discard": "Quit & discard annotation",
     "recommended": "recommended",
     "reload": "reload",
     "reload now": "Reload now",
@@ -615,6 +615,22 @@
     "new update": {
       "header": "New update available",
       "body": "A new update for Octra is available. Make sure that no automatic processes are running (ASR, Word Alignment, Trimming etc.). Then reload Octra to install it. Your transcript remains stored."
+    }
+  },
+  "bottom navigation": {
+    "stars": {
+      "one": {
+        "popover": "Rate the transcription with one star (= bad) and submit."
+      },
+      "two": {
+        "popover": "Rate the transcription with two stars (= slight) and submit."
+      },
+      "three": {
+        "popover": "Rate the transcription with three stars (= good) and submit."
+      }
+    },
+    "close": {
+      "popover": "Quit OCTRA"
     }
   }
 }

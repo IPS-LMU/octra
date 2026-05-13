@@ -216,9 +216,9 @@
     "prompt": "Textvorlage",
     "protocol": "Protokoll",
     "quit": "Beenden",
-    "quit and release": "Schließen ohne Sichern",
-    "quit continue later": "Beenden & später fortsetzen",
-    "quit discard": "Beenden & Fortschritt löschen",
+    "close and release": "Schließen ohne Sichern",
+    "close continue later": "Schließen & später fortsetzen",
+    "close discard": "Schließen & Fortschritt löschen",
     "recommended": "empfohlen",
     "reload": "NEU LADEN",
     "reload now": "Jetzt neu laden",
@@ -615,6 +615,22 @@
     "new update": {
       "header": "Neue Aktualisierung verfügbar",
       "body": "Eine neue Aktualisierung für Octra ist verfügbar. Stelle sicher, dass keine automatischen Prozesse laufen (ASR, Word Alignment, Schneiden etc.). Lade dann Octra neu, um diese zu installieren. Dein Transkript bleibt erhalten."
+    }
+  },
+  "bottom navigation": {
+    "stars": {
+      "one": {
+        "popover": "Transkription mit einem Stern bewerten (= schlecht) und absenden."
+      },
+      "two": {
+        "popover": "Transkription mit zwei Sternen bewerten (= mittelmäßig) und absenden."
+      },
+      "three": {
+        "popover": "Transkription mit drei Sternen bewerten (= gut) und absenden."
+      }
+    },
+    "close": {
+      "popover": "OCTRA beenden"
     }
   }
 }

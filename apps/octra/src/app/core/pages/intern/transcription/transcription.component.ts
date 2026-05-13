@@ -20,7 +20,7 @@ import { LoadeditorDirective } from '../../../shared/directive/loadeditor.direct
 
 import { AsyncPipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalRef, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, ofType } from '@ngrx/effects';
 import { AudioManager, BrowserInfo, Shortcut, ShortcutGroup } from '@octra/web-media';
 import { HotkeysEvent } from 'hotkeys-js';
@@ -49,7 +49,7 @@ declare const a: any;
   templateUrl: './transcription.component.html',
   styleUrls: ['./transcription.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgClass, FastbarComponent, LoadeditorDirective, FormsModule, AsyncPipe, TranslocoPipe],
+  imports: [NgClass, FastbarComponent, LoadeditorDirective, FormsModule, AsyncPipe, TranslocoPipe, NgbPopover],
 })
 export class TranscriptionComponent extends DefaultComponent implements OnInit, OnDestroy {
   router = inject(Router);

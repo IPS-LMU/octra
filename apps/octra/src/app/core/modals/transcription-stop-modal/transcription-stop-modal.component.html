@@ -19,7 +19,7 @@
           class="btn btn-raised btn-danger w-100"
           (click)="close('QUIT RELEASE')"
         >
-          {{ 'g.quit and release' | transloco }}
+          {{ 'g.close and release' | transloco }}
         </button>
       </div>
     }
@@ -40,9 +40,9 @@
         (click)="close('QUIT')"
       >
         @if (appStore.useMode !== 'url') {
-          {{ 'g.quit continue later' | transloco }}
+          {{ 'g.close continue later' | transloco }}
         } @else {
-          {{ 'g.quit discard' | transloco }}
+          {{ 'g.close discard' | transloco }}
         }
       </button>
     </div>

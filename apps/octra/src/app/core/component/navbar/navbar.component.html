@@ -458,69 +458,27 @@
               @if (appStorage?.interface === '2D-Editor') {
                 <hr style="border: 1px solid lightgray" />
                 <br />
-                <label style="font-size: 1.2rem">{{ 'settings.seconds per line' | transloco }}:</label>
-                <br />
-                <div class="btn-group w-100" role="group" aria-label="Basic example">
-                  <button
-                    [ngClass]="{
-                      'btn-primary': appStorage.secondsPerLine === 5,
-                      'btn-secondary': appStorage.secondsPerLine !== 5,
-                    }"
-                    type="button"
-                    class="btn btn-sm"
-                    (click)="changeSecondsPerLine(5)"
-                    name="secondsPerLine"
-                  >
-                    5
-                  </button>
-                  <button
-                    [ngClass]="{
-                      'btn-primary': appStorage.secondsPerLine === 10,
-                      'btn-secondary': appStorage.secondsPerLine !== 10,
-                    }"
-                    type="button"
-                    class="btn btn-sm"
-                    (click)="changeSecondsPerLine(10)"
-                    name="secondsPerLine"
-                  >
-                    10
-                  </button>
-                  <button
-                    [ngClass]="{
-                      'btn-primary': appStorage.secondsPerLine === 15,
-                      'btn-secondary': appStorage.secondsPerLine !== 15,
-                    }"
-                    type="button"
-                    class="btn btn-sm"
-                    (click)="changeSecondsPerLine(15)"
-                    name="secondsPerLine"
-                  >
-                    15
-                  </button>
-                  <button
-                    [ngClass]="{
-                      'btn-primary': appStorage.secondsPerLine === 20,
-                      'btn-secondary': appStorage.secondsPerLine !== 20,
-                    }"
-                    type="button"
-                    class="btn btn-sm"
-                    (click)="changeSecondsPerLine(20)"
-                    name="secondsPerLine"
-                  >
-                    20
-                  </button>
-                  <button
-                    [ngClass]="{
-                      'btn-primary': appStorage.secondsPerLine === 60,
-                      'btn-secondary': appStorage.secondsPerLine !== 60,
-                    }"
-                    type="button"
-                    class="btn btn-sm"
-                    (click)="changeSecondsPerLine(60)"
-                    name="secondsPerLine"
-                  >
-                    60
-                  </button>
+                <label style="font-size: 1.2rem" for="lineDurationSlider">{{ 'settings.seconds per line' | transloco }}:</label>
+                <div class="mt-3">
+                  <div class="row g-0">
+                    <div class="col text-start">5s</div>
+                    <div class="col text-end">60s</div>
+                  </div>
+                  <input
+                    type="range"
+                    id="lineDurationSlider"
+                    class="form-range"
+                    [min]="5"
+                    [max]="60"
+                    [step]="1"
+                    [value]="appStorage.secondsPerLine"
+                    #lineDurationSlider
+                    name="line-duration"
+                    (change)="changeSecondsPerLine(lineDurationSlider.value)"
+                  />
+                  <div class="text-center fw-bold">
+                    {{appStorage.secondsPerLine}}s
+                  </div>
                 </div>
                 <br /><br />
                 <hr />

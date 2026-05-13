@@ -40,6 +40,7 @@ import { AnnotationStoreService } from '../../store/login-mode/annotation/annota
 import { AsrOptionsComponent } from '../asr-options/asr-options.component';
 import { DefaultComponent } from '../default.component';
 import { NavbarService } from './navbar.service';
+import { isNumber } from '@octra/utilities';
 
 @Component({
   selector: 'octra-navigation',
@@ -296,8 +297,8 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
     }
   }
 
-  public changeSecondsPerLine(seconds: number) {
-    this.appStorage.secondsPerLine = seconds;
+  public changeSecondsPerLine(seconds: string) {
+    this.appStorage.secondsPerLine = isNumber(seconds) ? Number(seconds) : 5;
     this.cd.markForCheck();
   }
 

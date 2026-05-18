@@ -263,7 +263,7 @@
   },
   "interfaces": {
     "2D editor": "2D-Editor",
-    "Table-Editor": "Table-Editor",
+    "Matrix-Editor": "Matrix-Editor",
     "linear editor": "Linear-Editor",
     "simple editor": "Dictaphone-Editor"
   },
@@ -388,7 +388,7 @@
       "undo": "Letzte Aktion rückgängig machen",
       "zoom in": "Ansicht vergrößern",
       "zoom out": "Ansicht verkleinern",
-      "Table-Editor": "Table Editor",
+      "Matrix-Editor": "Matrix Editor",
       "move to previous unit": "Wechsle zur vorherigen Einheit",
       "move to next unit": "Wechsle zur nächsten Einheit"
     },
@@ -590,7 +590,7 @@
     "intelligibility of the speaker": "Sprachverständlichkeit des Sprechers",
     "overview": "Folgende Tabelle zeigt Ihnen einen Überblick über Deine definierten Transkriptionseinheiten:"
   },
-  "table-editor": {
+  "matrix-editor": {
     "context menu": {
       "merge selected lines": "Führe ausgewählte Segmente zusammen (ignoriere Sprecher-Label)",
       "remove selected lines completely": "Entferne ausgewählte Segmente vollständig (entferne Transkripte & führe zusammen)",

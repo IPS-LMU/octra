@@ -263,7 +263,7 @@
   },
   "interfaces": {
     "2D editor": "2D-Editor",
-    "Table-Editor": "Table-Editor",
+    "Matrix-Editor": "Matrix-Editor",
     "linear editor": "Linear-Editor",
     "simple editor": "Dictaphone-Editor"
   },
@@ -388,7 +388,7 @@
       "undo": "Undo last action",
       "zoom in": "Zoom in",
       "zoom out": "Zoom out",
-      "Table-Editor": "Table Editor",
+      "Matrix-Editor": "Matrix Editor",
       "move to previous unit": "Switch to previous unit",
       "move to next unit": "Switch to next unit"
     },
@@ -590,7 +590,7 @@
     "intelligibility of the speaker": "Intelligibility of the speaker",
     "overview": "The next table shows an overview of the transcription units:"
   },
-  "table-editor": {
+  "matrix-editor": {
     "context menu": {
       "merge selected lines": "Merge selected segments (ignore speaker labels)",
       "remove selected lines completely": "Remove selected segments completely (remove transcript & merge)",

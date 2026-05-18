@@ -11,7 +11,7 @@ import { AppSharedModule } from '../../../app.shared.module';
 import { TranscrWindowComponent } from '../../../editors/2D-editor/transcr-window';
 import { editorComponents } from '../../../editors/components';
 import { NewEditorComponent } from '../../../editors/new-editor/new-editor.component';
-import { PermutationsReplaceModalComponent } from '../../../editors/table-editor/modals/permutations-replace-modal/permutations-replace-modal.component';
+import { PermutationsReplaceModalComponent } from '../../../editors/matrix-editor/modals/permutations-replace-modal/permutations-replace-modal.component';
 import { AuthenticationNeededComponent } from '../../alerts/authentication-needed/authentication-needed.component';
 import { ErrorOccurredComponent } from '../../alerts/error-occurred/error-occurred.component';
 import { FastbarComponent } from '../../component';

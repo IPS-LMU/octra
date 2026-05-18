@@ -42,7 +42,6 @@ import { AuthenticationStoreService } from '../../../store/authentication';
 import { AnnotationActions } from '../../../store/login-mode/annotation/annotation.actions';
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 
-
 declare const a: any;
 @Component({
   selector: 'octra-transcription',
@@ -595,15 +594,26 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
 
       for (const editorComponent of editorComponents) {
         if (name === editorComponent.meta.name) {
-          this.appStorage.interface = name;
-          this.interface = name;
           comp = editorComponent;
           break;
         }
       }
 
+      if (!comp && editorComponents.length > 0) {
+        // fallback to 2D-Editor
+        comp = editorComponents.find((a) => a.meta.name === '2D-Editor');
+
+        if (!comp) {
+          // fallback to first editor
+          comp = editorComponents[0];
+        }
+      }
+
       this.navbarServ.currentEditor = comp;
       if (comp) {
+        this.appStorage.interface = name;
+        this.interface = name;
+
         if (this.appLoadeditor !== undefined) {
           this.subscribe(timer(20), () => {
             const viewContainerRef = this.appLoadeditor.viewContainerRef;
@@ -628,7 +638,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
                 },
                 error: (a) => {
                   console.error(a);
-                }
+                },
               });
               if (hasProperty(this.currentEditor.instance as any, 'openModal')) {
                 this.subscribe((this.currentEditor.instance as any).openModal, () => {

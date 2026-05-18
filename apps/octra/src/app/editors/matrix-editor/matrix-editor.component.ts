@@ -12,13 +12,13 @@ import { TwoDEditorComponent } from '../2D-editor';
 import { OCTRAEditor, OctraEditorRequirements, SupportedOctraEditorMetaData } from '../octra-editor';
 
 @Component({
-  selector: 'octra-table-editor',
-  templateUrl: './table-editor.component.html',
-  styleUrls: ['./table-editor.component.scss'],
+  selector: 'octra-matrix-editor',
+  templateUrl: './matrix-editor.component.html',
+  styleUrls: ['./matrix-editor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [OctraComponentsModule, OctraUtilitiesModule, TranscrOverviewComponent],
 })
-export class TableEditorComponent extends OCTRAEditor implements OnInit, OctraEditorRequirements {
+export class MatrixEditorComponent extends OCTRAEditor implements OnInit, OctraEditorRequirements {
   audio = inject(AudioService);
   settingsService = inject(SettingsService);
   appStorage = inject(AppStorageService);
@@ -26,9 +26,9 @@ export class TableEditorComponent extends OCTRAEditor implements OnInit, OctraEd
   navbarService = inject(NavbarService);
 
   static override meta: SupportedOctraEditorMetaData = {
-    name: 'Table-Editor',
+    name: 'Matrix-Editor',
     supportedLevelTypes: [AnnotationLevelType.SEGMENT],
-    translate: 'interfaces.Table-Editor',
+    translate: 'interfaces.Matrix-Editor',
     icon: 'bi bi-table',
     supportsASR: false,
   };

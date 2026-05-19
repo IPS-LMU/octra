@@ -7,6 +7,7 @@ import { NavbarService } from '../../core/component/navbar/navbar.service';
 import { TranscrOverviewComponent } from '../../core/component/transcr-overview';
 import { AudioService, SettingsService } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
+import { ShortcutService } from '../../core/shared/service/shortcut.service';
 import { AnnotationStoreService } from '../../core/store/login-mode/annotation/annotation.store.service';
 import { TwoDEditorComponent } from '../2D-editor';
 import { OCTRAEditor, OctraEditorRequirements, SupportedOctraEditorMetaData } from '../octra-editor';
@@ -24,6 +25,7 @@ export class MatrixEditorComponent extends OCTRAEditor implements OnInit, OctraE
   appStorage = inject(AppStorageService);
   annotationStoreService = inject(AnnotationStoreService);
   navbarService = inject(NavbarService);
+  private shortcutService = inject(ShortcutService);
 
   static override meta: SupportedOctraEditorMetaData = {
     name: 'Matrix-Editor',
@@ -39,16 +41,20 @@ export class MatrixEditorComponent extends OCTRAEditor implements OnInit, OctraE
 
   ngOnInit() {
     this.initialized.emit();
+    this.enableAllShortcuts();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  afterFirstInitialization() {}
+  afterFirstInitialization() {
+  }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  enableAllShortcuts() {}
+  enableAllShortcuts() {
+    this.shortcutsEnabled = true;
+  }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  disableAllShortcuts() {}
+  disableAllShortcuts() {
+    this.shortcutsEnabled = false;
+  }
 
   overviewStatusChange($event: { status: 'loading' | 'ready' | 'updated' }) {
     if ($event.status === 'ready') {

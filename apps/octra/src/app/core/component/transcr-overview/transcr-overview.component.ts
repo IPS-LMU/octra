@@ -15,6 +15,7 @@ import {
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { Actions, ofType } from '@ngrx/effects';
 import { ASRContext, OctraAnnotation, OctraAnnotationAnyLevel, OctraAnnotationSegment, OctraAnnotationSegmentLevel } from '@octra/annotation';
 import { sum } from '@octra/api-types';
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
@@ -23,11 +24,12 @@ import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { contains, hasProperty, isFunction } from '@octra/utilities';
 import { AudioChunk, Shortcut, ShortcutGroup } from '@octra/web-media';
 import { HotkeysEvent } from 'hotkeys-js';
-import { timer } from 'rxjs';
+import { tap, timer } from 'rxjs';
 import { AudioService, SettingsService, UserInteractionsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
 import { RoutingService } from '../../shared/service/routing.service';
 import { ShortcutService } from '../../shared/service/shortcut.service';
+import { ApplicationActions } from '../../store/application/application.actions';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { AudioNavigationComponent } from '../audio-navigation';
 import { DefaultComponent } from '../default.component';
@@ -60,6 +62,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
   private uiService = inject(UserInteractionsService);
   protected routingService = inject(RoutingService);
   private shortcutService = inject(ShortcutService);
+  private actions = inject(Actions);
 
   get selectedUnit(): {
     selectedSegment: number;
@@ -88,6 +91,10 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
       html: string;
     };
     validation: string;
+    playState: {
+      state: 'started' | 'stopped';
+      icon: 'bi bi-play-fill' | 'bi bi-stop-fill';
+    };
   }[] = [];
 
   viewerSettings?: AudioViewerConfig;
@@ -120,11 +127,6 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
     currentSegment: -1,
     skipSilence: false,
   };
-
-  public playStateSegments: {
-    state: 'started' | 'stopped';
-    icon: 'bi bi-play-fill' | 'bi bi-stop-fill';
-  }[] = [];
 
   public popovers = {
     validation: {
@@ -222,6 +224,13 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
     await this.doDirection('down');
   };
 
+  onUndo = (keyboardEvent: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent, shortcutGroup?: ShortcutGroup) => {
+    this.appStorage.undo();
+  };
+  onRedo = (keyboardEvent: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent, shortcutGroup?: ShortcutGroup) => {
+    this.appStorage.redo();
+  };
+
   private viewerShortcuts: ShortcutGroup = {
     name: 'signal-display',
     enabled: true,
@@ -233,7 +242,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
           pc: 'TAB',
         },
         title: 'play pause',
-        focusonly: false,
+        focusonly: true,
         callback: this.onAudioPlayPause,
       },
       {
@@ -243,7 +252,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
           pc: 'ESC',
         },
         title: 'stop playback',
-        focusonly: false,
+        focusonly: true,
         callback: this.onAudioStop,
       },
       {
@@ -253,7 +262,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
           pc: 'SHIFT + BACKSPACE',
         },
         title: 'step backward',
-        focusonly: false,
+        focusonly: true,
         callback: this.onStepBackward,
       },
       {
@@ -263,7 +272,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
           pc: 'SHIFT + TAB',
         },
         title: 'step backward time',
-        focusonly: false,
+        focusonly: true,
         callback: this.onStepBackwardTime,
       },
       {
@@ -273,7 +282,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
           pc: 'SHIFT + ARROWUP',
         },
         title: 'move to previous unit',
-        focusonly: false,
+        focusonly: true,
         callback: this.moveToPreviousUnit,
       },
       {
@@ -283,8 +292,28 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
           pc: 'SHIFT + ARROWDOWN',
         },
         title: 'move to next unit',
-        focusonly: false,
+        focusonly: true,
         callback: this.moveToNextUnit,
+      },
+      {
+        name: 'undo',
+        keys: {
+          mac: 'CMD + Z',
+          pc: 'CTRL + Z',
+        },
+        title: 'undo',
+        focusonly: false,
+        callback: this.onUndo,
+      },
+      {
+        name: 'redo',
+        keys: {
+          mac: 'SHIFT + CMD + Z',
+          pc: 'CTRL + Y',
+        },
+        title: 'redo',
+        focusonly: false,
+        callback: this.onRedo,
       },
     ],
   };
@@ -386,9 +415,9 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
   }
 
   ngOnInit() {
-    this.viewerShortcuts.name = `${this.targetName}`
+    this.viewerShortcuts.name = `${this.targetName}`;
     this.shortcutService.registerShortcutGroup(this.viewerShortcuts);
-    this.shortcutService.disableGroup(this.viewerShortcuts.name);
+    this.shortcutService.enableGroup(this.viewerShortcuts.name);
 
     if (!this.showSignal) {
       this.subscribe(this.audio.audiomanagers[0].statechange, {
@@ -418,6 +447,14 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
         this.init(this.annotationStoreService.transcript.levels[index]);
       },
     });
+    this.subscribe(
+      this.actions.pipe(
+        ofType(ApplicationActions.undoSuccess, ApplicationActions.redoSuccess),
+        tap((a) => {
+          this.init(this.annotationStoreService.transcript.levels[this.annotationStoreService.currentLevelIndex]);
+        }),
+      ),
+    );
   }
 
   sanitizeHTML(str: string): SafeHtml {
@@ -441,14 +478,11 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
               validationPopover.show();
               validationPopover.description = this.selectedError.description;
               validationPopover.title = this.selectedError.title;
-              this.cd.markForCheck();
-              this.cd.detectChanges();
 
               this.popovers.validation.location.y = -validationPopover.height;
               this.popovers.validation.location.x = 0;
               this.popovers.validation.mouse.enter = true;
               this.cd.markForCheck();
-              this.cd.detectChanges();
             }
           }
         } else {
@@ -492,9 +526,9 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
 
         this._selectedUnit.transcriptText = segment.getFirstLabelWithoutName('Speaker')?.value ?? '';
         this._selectedUnit.annotation = this.annotationStoreService.transcript;
-        this.shortcutService.enableGroup(this.viewerShortcuts.name);
         // this.transcrEditor.focus();
         this.cd.markForCheck();
+        this.appStorage.disableUndoRedo(false);
 
         if (this.viewer) {
           this.viewer.name = 'transcr-window viewer';
@@ -518,17 +552,19 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
       const segment = level?.items[i] as OctraAnnotationSegment;
 
       this.annotationStoreService.changeCurrentItemById(segment.id, segment);
-      this.annotationStoreService.validateAll();
-      await this.updateSegments();
       this.selectedUnit.state = 'inactive';
       this.selectedUnit.selectedSegment = -1;
       if (this.selectedUnit.audioChunk) {
         this.selectedUnit.audioChunk.stopPlayback();
+        this.playAllState.icon = 'bi bi-play-fill';
+        this.playAllState.state = 'stopped';
+        this.playAllState.currentSegment = -1;
         this.audio.audiomanagers[0].removeChunk(this.selectedUnit.audioChunk);
       }
-      this.shortcutService.disableGroup(this.viewerShortcuts.name);
+      await this.updateSegments();
       this.cd.markForCheck();
 
+      this.appStorage.enableUndoRedo(false);
       const startSample = i > 0 ? (this.annotationStoreService.currentLevel!.items[i - 1] as OctraAnnotationSegment).time.samples : 0;
       this.uiService.addElementFromEvent(
         'segment',
@@ -569,8 +605,8 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
   }
 
   private async updateSegments() {
-    this.playStateSegments = [];
     this.annotationStoreService.validateAll();
+
     if (
       this._internLevel &&
       (this.annotationStoreService.validationArray.length > 0 ||
@@ -595,6 +631,10 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
           html: string;
         };
         validation: string;
+        playState: {
+          state: 'started' | 'stopped';
+          icon: 'bi bi-play-fill' | 'bi bi-stop-fill';
+        };
       }[] = [];
 
       if (this._internLevel.type === 'SEGMENT') {
@@ -611,6 +651,10 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
               html: string;
             };
             validation: string;
+            playState: {
+              state: 'started' | 'stopped';
+              icon: 'bi bi-play-fill' | 'bi bi-stop-fill';
+            };
           } = await this.getShownSegment(
             new SampleUnit(startTime, segment.time.sampleRate),
             segment.time,
@@ -623,12 +667,6 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
           result.push(obj);
 
           startTime = segment.time.samples;
-
-          // set playState
-          this.playStateSegments.push({
-            state: 'stopped',
-            icon: 'bi bi-play-fill',
-          });
         }
       }
 
@@ -657,6 +695,10 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
       html: string;
     };
     validation: string;
+    playState: {
+      state: 'started' | 'stopped';
+      icon: 'bi bi-play-fill' | 'bi bi-stop-fill';
+    };
   }> {
     const obj = {
       start,
@@ -667,6 +709,10 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
         html: rawText ?? '',
       },
       validation: '',
+      playState: {
+        state: 'stopped' as any,
+        icon: 'bi bi-play-fill' as any,
+      },
     };
 
     if (
@@ -695,6 +741,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
     }
 
     obj.transcription.html = obj.transcription.html.replace(/(<p>)|(<\/p>)/g, '');
+
     return obj;
   }
 
@@ -765,8 +812,8 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
       this.stopPlayback()
         .then(() => {
           this.playAllState.state = 'stopped';
-          this.playStateSegments[this.playAllState.currentSegment].state = 'stopped';
-          this.playStateSegments[this.playAllState.currentSegment].icon = 'bi bi-play-fill';
+          this.shownSegments[this.playAllState.currentSegment].playState.state = 'stopped';
+          this.shownSegments[this.playAllState.currentSegment].playState.icon = 'bi bi-play-fill';
 
           this.cd.markForCheck();
 
@@ -797,11 +844,11 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
       }
       const level = this._internLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
 
-      if (this.playStateSegments[segmentNumber].state === 'stopped') {
+      if (this.shownSegments[segmentNumber].playState.state === 'stopped') {
         const segment: OctraAnnotationSegment = level.items[segmentNumber];
 
-        this.playStateSegments[segmentNumber].state = 'started';
-        this.playStateSegments[segmentNumber].icon = 'bi bi-stop-fill';
+        this.shownSegments[segmentNumber].playState.state = 'started';
+        this.shownSegments[segmentNumber].playState.icon = 'bi bi-stop-fill';
         this.cd.markForCheck();
 
         const startSample = segmentNumber > 0 ? level.items[segmentNumber - 1].time.samples : 0;
@@ -813,8 +860,8 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
         this.audio.audiomanagers[0]
           .startPlayback(new AudioSelection(this.audio.audiomanagers[0].createSampleUnit(startSample), segment.time.clone()), 1, 1)
           .then(() => {
-            this.playStateSegments[segmentNumber].state = 'stopped';
-            this.playStateSegments[segmentNumber].icon = 'bi bi-play-fill';
+            this.shownSegments[segmentNumber].playState.state = 'stopped';
+            this.shownSegments[segmentNumber].playState.icon = 'bi bi-play-fill';
             this.playAllState.currentSegment = -1;
             this.cd.markForCheck();
 
@@ -834,8 +881,8 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
         this.audio.audiomanagers[0]
           .stopPlayback()
           .then(() => {
-            this.playStateSegments[segmentNumber].state = 'stopped';
-            this.playStateSegments[segmentNumber].icon = 'bi bi-play-fill';
+            this.shownSegments[segmentNumber].playState.state = 'stopped';
+            this.shownSegments[segmentNumber].playState.icon = 'bi bi-play-fill';
             this.playAllState.currentSegment = -1;
 
             this.cd.markForCheck();
@@ -924,10 +971,9 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
     await this.onTextEditorLeave(i);
     if (this._internLevel?.items && i < this._internLevel.items.length - 1) {
       this.onMouseDown(i + 1);
+    } else {
+      this.cd.markForCheck();
     }
-    this.annotationStoreService.validateAll();
-    await this.updateSegments();
-    this.cd.markForCheck();
   }
 
   async doDirection(direction: 'down' | 'up') {
@@ -944,7 +990,6 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
       }
     }
 
-    this.annotationStoreService.validateAll();
     await this.updateSegments();
     this.cd.markForCheck();
   }
@@ -956,8 +1001,8 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
   public stopPlayback(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.playAllState.currentSegment > -1) {
-        this.playStateSegments[this.playAllState.currentSegment].state = 'stopped';
-        this.playStateSegments[this.playAllState.currentSegment].icon = 'bi bi-play-fill';
+        this.shownSegments[this.playAllState.currentSegment].playState.state = 'stopped';
+        this.shownSegments[this.playAllState.currentSegment].playState.icon = 'bi bi-play-fill';
         this.cd.markForCheck();
       }
       this.audio.audiomanagers[0].stopPlayback().then(resolve).catch(reject);

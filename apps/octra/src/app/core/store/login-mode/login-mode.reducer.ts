@@ -31,8 +31,8 @@ const { createUndoRedoReducer } = undoRedo({
     AnnotationActions.changeCurrentLevelItems.do.type,
     AnnotationActions.removeCurrentLevelItems.do.type,
     AnnotationActions.changeCurrentItemById.do.type,
-    AnnotationActions.combinePhrases.success.type,
-  ],
+    AnnotationActions.combinePhrases.success.type
+  ]
 });
 
 export class LoginModeReducers {

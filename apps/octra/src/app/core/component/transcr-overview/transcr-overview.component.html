@@ -223,7 +223,7 @@
                 'bg-highlight': playAllState.currentSegment === i,
               }"
             >
-              <i [class]="playStateSegments[i]?.icon" (click)="playSelectedSegment(i)"></i>
+              <i [class]="segment.playState.icon" (click)="playSelectedSegment(i)"></i>
             </td>
           </tr>
         }

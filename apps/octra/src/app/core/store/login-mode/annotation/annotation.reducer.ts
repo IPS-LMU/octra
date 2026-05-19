@@ -300,16 +300,16 @@ export class AnnotationStateReducers {
       })),
       on(AnnotationActions.changeCurrentLevelItems.do, (state: AnnotationState, { items, mode }) => {
         if (this.mode === mode) {
-          const currentLevel = state.transcript.currentLevel;
+          const currentLevel = state.transcript.clone().currentLevel;
 
           if (currentLevel) {
             for (const item of items) {
               const index = state.transcript.currentLevel?.items.findIndex((a) => a.id === item.id);
               if (index !== undefined && index > -1) {
-                state.transcript = state.transcript.clone().changeCurrentItemByIndex(index, item);
+                state.transcript = state.transcript.changeCurrentItemByIndex(index, item);
               } else {
                 // add item
-                state.transcript = state.transcript.clone().addItemToCurrentLevel((item as any).time, item.labels, (item as any).context);
+                state.transcript = state.transcript.addItemToCurrentLevel((item as any).time, item.labels, (item as any).context);
               }
             }
           }

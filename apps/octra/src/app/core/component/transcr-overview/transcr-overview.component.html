@@ -85,6 +85,7 @@
         @for (segment of shownSegments; track segment.id; let i = $index) {
           <tr
             #row
+            [id]="'transcr-overview-segment-' + i"
             class="segment-row align-middle"
             [ngClass]="{
               'bg-success':

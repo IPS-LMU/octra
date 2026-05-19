@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   inject,
   Input,
@@ -10,6 +11,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  Renderer2,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -63,6 +65,8 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
   protected routingService = inject(RoutingService);
   private shortcutService = inject(ShortcutService);
   private actions = inject(Actions);
+  private el = inject(ElementRef);
+  private renderer = inject(Renderer2);
 
   get selectedUnit(): {
     selectedSegment: number;
@@ -402,8 +406,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
 
   override ngOnDestroy() {
     super.ngOnDestroy();
-    this.playAllState.state = 'stopped';
-    this.audio.audioManager.stopPlayback().catch((err) => {
+    this.audio?.audioManager?.stopPlayback().catch((err) => {
       console.error(err);
     });
     this.shortcutService.disableGroup(this.viewerShortcuts.name);
@@ -542,16 +545,19 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
     this.annotationStoreService.setLevelIndex(index);
   }
 
-  async onTextEditorLeave(i: number) {
+  async onTextEditorLeave(i: number, save = false) {
     if (this.transcrEditor && this._internLevel?.items && this._internLevel.type === 'SEGMENT') {
-      const level = this._internLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment<ASRContext>>;
       this.transcrEditor.updateRawText();
-      const item = level.items[i].clone();
-      item.replaceFirstLabelWithoutName('Speaker', () => this.transcrEditor.rawText);
-      this._internLevel = level?.changeItem(item);
-      const segment = level?.items[i] as OctraAnnotationSegment;
 
-      this.annotationStoreService.changeCurrentItemById(segment.id, segment);
+      if (save) {
+        const level = this._internLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment<ASRContext>>;
+        const item = level.items[i].clone();
+        item.replaceFirstLabelWithoutName('Speaker', () => this.transcrEditor.rawText);
+        this._internLevel = level?.changeItem(item);
+        const segment = level?.items[i] as OctraAnnotationSegment;
+        this.annotationStoreService.changeCurrentItemById(segment.id, segment);
+      }
+
       this.selectedUnit.state = 'inactive';
       this.selectedUnit.selectedSegment = -1;
       if (this.selectedUnit.audioChunk) {
@@ -561,26 +567,33 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
         this.playAllState.currentSegment = -1;
         this.audio.audiomanagers[0].removeChunk(this.selectedUnit.audioChunk);
       }
-      await this.updateSegments();
+      if (save) {
+        await this.updateSegments();
+      }
       this.cd.markForCheck();
 
       this.appStorage.enableUndoRedo(false);
-      const startSample = i > 0 ? (this.annotationStoreService.currentLevel!.items[i - 1] as OctraAnnotationSegment).time.samples : 0;
-      this.uiService.addElementFromEvent(
-        'segment',
-        {
-          value: 'updated',
-        },
-        Date.now(),
-        undefined,
-        undefined,
-        undefined,
-        {
-          start: startSample,
-          length: segment.time.samples - startSample,
-        },
-        this.targetName,
-      );
+
+      if (save) {
+        const level = this._internLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment<ASRContext>>;
+        const segment = level?.items[i] as OctraAnnotationSegment;
+        const startSample = i > 0 ? (this.annotationStoreService.currentLevel!.items[i - 1] as OctraAnnotationSegment).time.samples : 0;
+        this.uiService.addElementFromEvent(
+          'segment',
+          {
+            value: 'updated',
+          },
+          Date.now(),
+          undefined,
+          undefined,
+          undefined,
+          {
+            start: startSample,
+            length: segment.time.samples - startSample,
+          },
+          this.targetName,
+        );
+      }
     }
   }
 
@@ -779,6 +792,23 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
     }
   }
 
+  private scrollToSegmentIndex(segmentIndex: number) {
+    const container = this.el.nativeElement as HTMLDivElement;
+    const index = segmentIndex > 0 ? segmentIndex - 1 : segmentIndex;
+    const segmentRow = container.querySelector(`#transcr-overview-segment-${index}`) as HTMLTableRowElement;
+    const thead = container.querySelector('#table-head') as HTMLElement;
+    this.renderer.setStyle(container, 'scroll-margin-top', `${thead.offsetHeight + 50}px`);
+
+    const isTop = segmentRow.offsetTop < container.scrollTop;
+    const isBelow = segmentRow.offsetTop > container.scrollTop + container.offsetHeight;
+
+    if (isBelow || isTop) {
+      // scroll only if outside view
+      container.scrollTo(0, Math.max(0, segmentRow.offsetTop));
+      this.cd.markForCheck();
+    }
+  }
+
   togglePlayAll() {
     this.playAllState.icon = this.playAllState.icon === 'bi bi-play-fill' ? 'bi bi-stop-fill' : 'bi bi-play-fill';
     this.cd.markForCheck();
@@ -812,8 +842,10 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
       this.stopPlayback()
         .then(() => {
           this.playAllState.state = 'stopped';
-          this.shownSegments[this.playAllState.currentSegment].playState.state = 'stopped';
-          this.shownSegments[this.playAllState.currentSegment].playState.icon = 'bi bi-play-fill';
+          if (this.playAllState.currentSegment > -1) {
+            this.shownSegments[this.playAllState.currentSegment].playState.state = 'stopped';
+            this.shownSegments[this.playAllState.currentSegment].playState.icon = 'bi bi-play-fill';
+          }
 
           this.cd.markForCheck();
 
@@ -845,6 +877,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
       const level = this._internLevel as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;
 
       if (this.shownSegments[segmentNumber].playState.state === 'stopped') {
+        this.scrollToSegmentIndex(segmentNumber);
         const segment: OctraAnnotationSegment = level.items[segmentNumber];
 
         this.shownSegments[segmentNumber].playState.state = 'started';
@@ -852,7 +885,6 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
         this.cd.markForCheck();
 
         const startSample = segmentNumber > 0 ? level.items[segmentNumber - 1].time.samples : 0;
-
         this.playAllState.currentSegment = segmentNumber;
 
         this.cd.markForCheck();
@@ -968,7 +1000,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
   }
 
   async onEnterPressed(i: number) {
-    await this.onTextEditorLeave(i);
+    await this.onTextEditorLeave(i, true);
     if (this._internLevel?.items && i < this._internLevel.items.length - 1) {
       this.onMouseDown(i + 1);
     } else {
@@ -979,7 +1011,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
   async doDirection(direction: 'down' | 'up') {
     const i = this._selectedUnit.selectedSegment;
     if (this._selectedUnit.selectedSegment > -1) {
-      await this.onTextEditorLeave(i);
+      await this.onTextEditorLeave(i, true);
     }
 
     if (this._internLevel?.items) {

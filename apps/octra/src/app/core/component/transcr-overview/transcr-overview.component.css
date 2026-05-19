@@ -1,3 +1,8 @@
+:host {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
 .red {
   background-color: #fac6d0;
 }
@@ -78,4 +83,10 @@
   background-color: yellow !important;
   border: 1px solid #ffdd00 !important;
   color: black;
+}
+
+#transcription-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }

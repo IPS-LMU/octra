@@ -70,7 +70,7 @@
   @if (shownSegments.length > 0) {
     <table id="transcription-table" class="table table-bordered" [hidden]="!showTranscriptionTable">
       <thead id="table-head">
-        <tr>
+        <tr (click)="onTextEditorLeave(-1)">
           <th id="table-first-column"></th>
           <th id="table-second-column" class="text-center"><i class="bi bi-clock"></i></th>
           <th id="table-third-column" class="text-start">{{ 'g.transcription' | transloco }}</th>
@@ -98,6 +98,7 @@
           >
             <td
               style="width: 25px; vertical-align: middle"
+              (click)="onTextEditorLeave(i)"
               [ngClass]="{
                 'bg-success':
                   segment.transcription.text !== '' &&
@@ -116,6 +117,7 @@
             </td>
             <td
               class="segment-number text-center"
+              (click)="onTextEditorLeave(i)"
               [ngClass]="{
                 'bg-success':
                   segment.transcription.text !== '' &&
@@ -125,15 +127,22 @@
                 'bg-highlight': playAllState.currentSegment === i,
               }"
             >
-              <span [ngClass]="{
-                 'link': !showSignal,
-                 'text-secondary': showSignal
-              }" (click)="onSegmentClicked(segment.id)">
-                {{ segment.start.unix | timespan: {
-                showHour: true,
-                showMilliSeconds: true,
-                maxDuration: audio.audioManager.resource.info.duration.unix
-              } }}
+              <span
+                [ngClass]="{
+                  link: !showSignal,
+                  'text-secondary': showSignal,
+                }"
+                (click)="onSegmentClicked($event, segment.id)"
+              >
+                {{
+                  segment.start.unix
+                    | timespan
+                      : {
+                          showHour: true,
+                          showMilliSeconds: true,
+                          maxDuration: audio.audioManager.resource.info.duration.unix,
+                        }
+                }}
               </span>
             </td>
             @if (selectedUnit.state === 'active' && selectedUnit.selectedSegment === i) {
@@ -146,7 +155,6 @@
                   'bg-danger': segment.transcription.text === '',
                   'bg-highlight': playAllState.currentSegment === i,
                 }"
-                (mouseleave)="onTextEditorLeave(i)"
               >
                 <div>
                   @if (showSignal) {
@@ -215,6 +223,7 @@
             }
             <td
               class="last-column"
+              (click)="onTextEditorLeave(i)"
               [ngClass]="{
                 'bg-success':
                   segment.transcription.text !== '' &&
@@ -224,7 +233,7 @@
                 'bg-highlight': playAllState.currentSegment === i,
               }"
             >
-              <i [class]="segment.playState.icon" (click)="playSelectedSegment(i)"></i>
+              <i [class]="segment.playState.icon" (click)="playSelectedSegment($event, i)"></i>
             </td>
           </tr>
         }

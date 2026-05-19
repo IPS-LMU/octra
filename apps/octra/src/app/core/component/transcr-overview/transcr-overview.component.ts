@@ -501,42 +501,44 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
 
   onMouseDown(i: number) {
     if (this._internLevel?.items && this._internLevel.type === 'SEGMENT') {
-      if (this.selectedUnit.state === 'inactive') {
-        this.selectedUnit.state = 'active';
-        this.selectedUnit.selectedSegment = i;
+      if (this.selectedUnit.state !== 'inactive') {
+        this.audio?.audioManager?.stopPlayback();
+      }
 
-        const segment = this._internLevel?.items[i] as OctraAnnotationSegment;
-        const previousSegmentTime: SampleUnit =
-          i > 0 ? (this._internLevel?.items[i - 1] as OctraAnnotationSegment).time : this.audio.audioManager.createSampleUnit(0);
+      this.selectedUnit.state = 'active';
+      this.selectedUnit.selectedSegment = i;
 
-        const audioChunk = this.audio.audiomanagers[0].createNewAudioChunk(new AudioSelection(previousSegmentTime, segment.time));
-        this.selectedUnit.audioChunk = audioChunk;
+      const segment = this._internLevel?.items[i] as OctraAnnotationSegment;
+      const previousSegmentTime: SampleUnit =
+        i > 0 ? (this._internLevel?.items[i - 1] as OctraAnnotationSegment).time : this.audio.audioManager.createSampleUnit(0);
 
-        this.viewerSettings = new AudioViewerConfig();
-        this.viewerSettings.margin.top = 0;
-        this.viewerSettings.margin.bottom = 0;
-        this.viewerSettings.lineheight = 100;
-        this.viewerSettings.justifySignalHeight = true;
-        this.viewerSettings.boundaries.enabled = false;
-        this.viewerSettings.boundaries.readonly = true;
-        this.viewerSettings.selection.enabled = true;
-        this.viewerSettings.frame.color = '#AAAAAA';
-        this.viewerSettings.roundValues = false;
-        this.viewerSettings.showTimePerLine = true;
-        this.viewerSettings.showProgressBars = true;
-        this.viewerSettings.multiLine = false;
-        this.viewerSettings.shortcuts.enabled = true;
+      const audioChunk = this.audio.audiomanagers[0].createNewAudioChunk(new AudioSelection(previousSegmentTime, segment.time));
+      this.selectedUnit.audioChunk = audioChunk;
 
-        this._selectedUnit.transcriptText = segment.getFirstLabelWithoutName('Speaker')?.value ?? '';
-        this._selectedUnit.annotation = this.annotationStoreService.transcript;
-        // this.transcrEditor.focus();
-        this.cd.markForCheck();
-        this.appStorage.disableUndoRedo(false);
+      this.viewerSettings = new AudioViewerConfig();
+      this.viewerSettings.margin.top = 0;
+      this.viewerSettings.margin.bottom = 0;
+      this.viewerSettings.lineheight = 100;
+      this.viewerSettings.justifySignalHeight = true;
+      this.viewerSettings.boundaries.enabled = false;
+      this.viewerSettings.boundaries.readonly = true;
+      this.viewerSettings.selection.enabled = true;
+      this.viewerSettings.frame.color = '#AAAAAA';
+      this.viewerSettings.roundValues = false;
+      this.viewerSettings.showTimePerLine = true;
+      this.viewerSettings.showProgressBars = true;
+      this.viewerSettings.multiLine = false;
+      this.viewerSettings.shortcuts.enabled = true;
 
-        if (this.viewer) {
-          this.viewer.name = 'transcr-window viewer';
-          this.viewer.av.drawnSelection = undefined;
-        }
+      this._selectedUnit.transcriptText = segment.getFirstLabelWithoutName('Speaker')?.value ?? '';
+      this._selectedUnit.annotation = this.annotationStoreService.transcript;
+      // this.transcrEditor.focus();
+      this.cd.markForCheck();
+      this.appStorage.disableUndoRedo(false);
+
+      if (this.viewer) {
+        this.viewer.name = 'transcr-window viewer';
+        this.viewer.av.drawnSelection = undefined;
       }
     }
   }
@@ -608,8 +610,10 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
     this.statusChange.emit({ status: 'updated' });
   }
 
-  public onSegmentClicked(itemID: number) {
+  public onSegmentClicked(event: MouseEvent, itemID: number) {
     if (!this.showSignal) {
+      event.stopPropagation();
+      event.stopImmediatePropagation();
       this.segmentclicked.emit({
         levelID: this._internLevel!.id!,
         itemID,
@@ -928,8 +932,11 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
     });
   }
 
-  playSelectedSegment(segmentNumber: number) {
+  playSelectedSegment(event: MouseEvent, segmentNumber: number) {
     // make sure that audio is not playing
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
     if (
       (this.playAllState.state === 'started' && this.playAllState.currentSegment !== segmentNumber) ||
       this.playAllState.currentSegment !== segmentNumber

@@ -588,7 +588,7 @@ export class AudioViewerService {
               line.visible(this.isVisibleInView(line.x(), line.y(), line.width(), line.height()));
 
               this.layers.background.add(line);
-              y += this.settings.lineheight + this.settings.margin.top;
+              y += this.settings.lineheight + this.settings.margin.top + this.settings.margin.bottom;
               this.canvasElements.lastLine = line;
               drawnWidth += lineWidth;
             }
@@ -629,7 +629,7 @@ export class AudioViewerService {
         );
 
         selectionGroup.add(selectElem);
-        y += this.settings.lineheight + this.settings.margin.top;
+        y += this.settings.lineheight + this.settings.margin.top + this.settings.margin.bottom;
         drawnWidth += lineWidth;
       }
 
@@ -1174,11 +1174,11 @@ export class AudioViewerService {
 
               const yStart =
                 (this.innerWidth < this.AudioPxWidth ? Math.floor(absXStart / this.innerWidth) : 0) *
-                (this.settings.lineheight + this.settings.margin.top);
+                (this.settings.lineheight + this.settings.margin.top + this.settings.margin.bottom);
 
               const yEnd =
                 (this.innerWidth < this.AudioPxWidth ? Math.ceil(absXEnd / this.innerWidth) : 0) *
-                (this.settings.lineheight + this.settings.margin.top);
+                (this.settings.lineheight + this.settings.margin.top + this.settings.margin.bottom);
 
               if (this.isVisibleInView(0, yStart, this._innerWidth!, yEnd - yStart === 0 ? this.settings.lineheight : yEnd - yStart)) {
                 const createdShapes = this.createSegmentOnCanvas(
@@ -1227,10 +1227,10 @@ export class AudioViewerService {
             }
             const timeStampLabels = new Konva.Shape({
               id: 'timeStamps',
-              width: this.innerWidth,
+              width: this.innerWidth - 10,
               height: this.size.height,
-              x: this.settings.margin.left,
-              y: this.settings.margin.top,
+              x: 5,
+              y: 5,
               fontSize: 10,
               fontFamily: 'Arial',
               transformsEnabled: 'position',
@@ -3145,8 +3145,8 @@ export class AudioViewerService {
         });
         const length = this.layers.overlay.getContext().measureText(startTimeString).width;
         context.fillStyle = 'dimgray';
-        context.fillText(startTimeString, 3, y + 8);
-        context.fillText(endTimeString, (j < numOfLines - 1 ? this.innerWidth : this.canvasElements.lastLine.width()) - length - 3, y + 8);
+        context.fillText(startTimeString, 0, y + 8);
+        context.fillText(endTimeString, (j < numOfLines - 1 ? this.innerWidth : this.canvasElements.lastLine.width()) - length - 10, y + 8);
       }
     }
   };

@@ -1,15 +1,6 @@
 import { EventEmitter, inject, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import {
-  AnnotationLevelType,
-  Converter,
-  IFile,
-  ImportResult,
-  OAnnotJSON,
-  OLabel,
-  OSegment,
-  OSegmentLevel,
-} from '@octra/annotation';
+import { Converter, IFile, ImportResult, OAnnotJSON } from '@octra/annotation';
 import { OAudiofile } from '@octra/media';
 import { escapeRegex, SubscriptionManager } from '@octra/utilities';
 import { AudioManager, FileInfo, readFile } from '@octra/web-media';
@@ -140,17 +131,17 @@ export class OctraDropzoneService {
     }
   }
 
-  private readFile(fileProgress: FileProgress): Observable<void> {
-    fileProgress.status = 'progress';
+  private readFile(progressFile: FileProgress): Observable<void> {
+    progressFile.status = 'progress';
     this.updateStatistics();
 
-    if (AudioManager.isValidAudioFileName(fileProgress.file.fullname, AppInfo.audioformats)) {
+    if (AudioManager.isValidAudioFileName(progressFile.file.fullname, AppInfo.audioformats)) {
       // process as audio
-      return this.readAudioFile(fileProgress);
+      return this.readAudioFile(progressFile);
     }
 
     // process text file
-    return this.readTextFile(fileProgress);
+    return this.readTextFile(progressFile);
   }
 
   private updateStatistics() {
@@ -190,28 +181,28 @@ export class OctraDropzoneService {
     });
   }
 
-  private readAudioFile(fileProgress: FileProgress) {
+  private readAudioFile(progressFile: FileProgress) {
     this._oaudiofile = undefined;
 
     const supportedAudioFormats = [...AppInfo.audioformats.map((a) => a.supportedFormats)].flat();
-    const formatLimitation = supportedAudioFormats.find((a) => fileProgress.file.fullname.toLowerCase().includes(a.extension.toLowerCase()));
+    const formatLimitation = supportedAudioFormats.find((a) => progressFile.file.fullname.toLowerCase().includes(a.extension.toLowerCase()));
 
-    if (!formatLimitation || fileProgress.file.size > formatLimitation.maxFileSize) {
+    if (!formatLimitation || progressFile.file.size > formatLimitation.maxFileSize) {
       return throwError(() => Error('Invalid file size'));
     }
 
     return forkJoin([
-      readFile<ArrayBuffer>(fileProgress.file.file!, 'arraybuffer').pipe(
+      readFile<ArrayBuffer>(progressFile.file.file!, 'arraybuffer').pipe(
         map((a) => {
-          fileProgress.progress = a.progress * 0.5;
+          progressFile.progress = a.progress * 0.5;
           return a;
         }),
       ),
     ]).pipe(
       exhaustMap(([reading]) => {
         // completed
-        if (fileProgress.file.size <= AppInfo.maxAudioFileSize * 1024 * 1024) {
-          return forkJoin([this.decodeArrayBuffer(reading.result!, fileProgress)]).pipe(
+        if (progressFile.file.size <= AppInfo.maxAudioFileSize * 1024 * 1024) {
+          return forkJoin([this.decodeArrayBuffer(reading.result!, progressFile)]).pipe(
             map(([result]) => {
               // audio decoding completed
               this._audioManager = result.audioManager;
@@ -225,20 +216,20 @@ export class OctraDropzoneService {
 
                 this._audioManager = result.audioManager;
                 this._oaudiofile = new OAudiofile();
-                this._oaudiofile.name = fileProgress.file.fullname;
-                this._oaudiofile.size = fileProgress.file.size;
+                this._oaudiofile.name = progressFile.file.fullname;
+                this._oaudiofile.size = progressFile.file.size;
                 this._oaudiofile.duration = this._audioManager.resource.info.duration.samples;
                 this._oaudiofile.sampleRate = this._audioManager.sampleRate;
                 this._oaudiofile.arraybuffer = reading.result;
 
-                fileProgress.status = 'valid';
-                this.checkForValidFiles();
+                progressFile.status = 'valid';
+                this.checkForValidFiles().catch(console.error);
               }
             }),
           );
         } else {
-          fileProgress.status = 'invalid';
-          fileProgress.error = `The file size is bigger than ${AppInfo.maxAudioFileSize} MB.`;
+          progressFile.status = 'invalid';
+          progressFile.error = `The file size is bigger than ${AppInfo.maxAudioFileSize} MB.`;
           this.updateStatistics();
           return throwError(() => new Error(`The file size is bigger than ${AppInfo.maxAudioFileSize} MB.`));
         }
@@ -246,20 +237,20 @@ export class OctraDropzoneService {
     );
   }
 
-  private readTextFile(fileProgress: FileProgress) {
+  private readTextFile(progressFile: FileProgress) {
     return forkJoin([
-      readFile<string>(fileProgress.file.file!, 'text', 'utf-8').pipe(
+      readFile<string>(progressFile.file.file!, 'text', 'utf-8').pipe(
         map((a) => {
-          fileProgress.progress = a.progress;
+          progressFile.progress = a.progress;
           return a;
         }),
       ),
     ]).pipe(
       map(([a]) => {
         // text file read complete
-        fileProgress.progress = a.progress;
-        fileProgress.status = 'waiting';
-        fileProgress.content = a.result;
+        progressFile.progress = a.progress;
+        progressFile.status = 'waiting';
+        progressFile.content = a.result;
         this.checkForValidFiles();
       }),
     );
@@ -276,42 +267,48 @@ export class OctraDropzoneService {
   }
 
   private async checkForValidFiles(showOptionsModal = true) {
-    for (const fileProgress of this._files) {
-      console.log(fileProgress);
-      if (fileProgress.status !== 'progress') {
-        const isAudioFile = AudioManager.isValidAudioFileName(fileProgress.file.fullname, AppInfo.audioformats);
-        if (!isAudioFile && !(fileProgress.file.type.includes('image') || fileProgress.file.type.includes('video'))) {
+    for (let i = 0; i < this._files.length; i++) {
+      if (this._files[i].status !== 'progress') {
+        const isAudioFile = AudioManager.isValidAudioFileName(this._files[i].file.fullname, AppInfo.audioformats);
+        if (!isAudioFile && !(this._files[i].file.type.includes('image') || this._files[i].file.type.includes('video'))) {
           if (!this._oaudiofile) {
-            fileProgress.status = 'waiting';
+            this._files[i] = {
+              ...this._files[i],
+              status: 'waiting',
+            };
             this.updateStatistics();
             break;
           }
           let converter: Converter | undefined;
           // is transcript file
-          for (let i = 0; i < AppInfo.converters.length; i++) {
-            converter = AppInfo.converters[i];
+          for (let j = 0; j < AppInfo.converters.length; j++) {
+            converter = AppInfo.converters[j];
+
             if (
               new RegExp(`${converter.extensions.map((a) => `(?:${escapeRegex(a.toLowerCase())})`).join('|')}$`).exec(
-                fileProgress.file.fullname.toLowerCase(),
+                this._files[i].file.fullname.toLowerCase(),
               ) !== null
             ) {
               if (converter.conversion.import) {
                 const ofile: IFile = {
-                  name: fileProgress.file.fullname,
-                  type: fileProgress.file.type,
-                  content: fileProgress.content as string,
+                  name: this._files[i].file.fullname,
+                  type: this._files[i].file.type,
+                  content: this._files[i].content as string,
                   encoding: converter.encoding,
                 };
 
-                const optionsSchema: any = converter.needsOptionsForImport(ofile, this._oaudiofile!);
-                fileProgress.needsOptions = optionsSchema;
-                fileProgress.converter = converter;
+                const needsOptions: any = converter.needsOptionsForImport(ofile, this._oaudiofile!);
+                this._files[i] = {
+                  ...this._files[i],
+                  needsOptions,
+                  converter,
+                };
 
-                if (optionsSchema && showOptionsModal) {
-                  await this.openImportOptionsModal(fileProgress);
+                if (needsOptions && showOptionsModal) {
+                  await this.openImportOptionsModal(this._files[i]);
                 }
 
-                const importResult: ImportResult | undefined = converter.import(ofile, this._oaudiofile!, fileProgress.options);
+                const importResult: ImportResult | undefined = converter.import(ofile, this._oaudiofile!, this._files[i].options);
 
                 if (importResult && !importResult.error) {
                   if (importResult.audiofile !== undefined) {
@@ -320,7 +317,7 @@ export class OctraDropzoneService {
                     const audioProcess: FileProgress = {
                       id: OctraDropzoneService.id++,
                       status: 'progress',
-                      file: fileProgress.file,
+                      file: this._files[i].file,
                       content: importResult?.audiofile?.arraybuffer,
                       checked_converters: 0,
                       progress: 0,
@@ -332,14 +329,17 @@ export class OctraDropzoneService {
                       addedFiles: this._files,
                     });
                   } else {
-                    await this.setAnnotation(fileProgress, converter, importResult);
+                    await this.setAnnotation(this._files[i], converter, importResult);
                     if (this._oannotation) {
                       break;
                     }
                   }
                 } else if (converter.name === 'AnnotJSON') {
-                  fileProgress.status = 'invalid';
-                  fileProgress.error = importResult.error;
+                  this._files[i] = {
+                    ...this._files[i],
+                    status: 'invalid',
+                    error: importResult?.error,
+                  };
                   break;
                 } else {
                   converter = undefined;
@@ -350,15 +350,20 @@ export class OctraDropzoneService {
             }
           }
 
-          if (this._oaudiofile && !fileProgress.error) {
+          if (this._oaudiofile && !this._files[i].error) {
             // audio was already loaded
             if (!converter) {
               // no valid converter found
-              fileProgress.status = 'invalid';
-              fileProgress.error = 'File format not supported.';
+              this._files[i] = {
+                ...this._files[i],
+                status: 'invalid',
+                error: 'File format not supported.',
+              };
             } else {
-              fileProgress.status = 'valid';
-              fileProgress.error = '';
+              this._files[i] = {
+                ...this._files[i],
+                status: 'valid',
+              };
             }
           }
         }

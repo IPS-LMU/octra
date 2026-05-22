@@ -2,6 +2,94 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.1.0](https://github.com/IPS-LMU/octra/compare/octra-2.0.0...octra-2.1.0) (2026-05-22)
+
+
+### Bug Fixes
+
+* **2D-Editor:** signal on detail editor becomes smaller on each direction change ([588eb04](https://github.com/IPS-LMU/octra/commit/588eb0424d1b368ffb38b8f2ce46862a4ce342b4))
+* **annotation:** renaming the level name doesn't change the speaker labels ([7a749da](https://github.com/IPS-LMU/octra/commit/7a749da8f8523b7fdaccc3fe030e4ec8677f07ce))
+* **annotation:** SRTConverter doesn't cleanup annotation on import properly ([76efb24](https://github.com/IPS-LMU/octra/commit/76efb242aae07a60468ea51bddead8f9813ca70c))
+* **ngx-components:** can't send tool properties as part of feedback ([04bc465](https://github.com/IPS-LMU/octra/commit/04bc46534770811db0538909e479a874957356a9))
+* **ngx-components:** console logger does not censor properly ([2f91569](https://github.com/IPS-LMU/octra/commit/2f9156995a9ad1687dd44cbcf89e3b8c10f953b8))
+* **ngx-components:** octra fails to open annotation on invalid boundaries ([9d637c7](https://github.com/IPS-LMU/octra/commit/9d637c7bc3037068ccb59852372b6c503bfe6992))
+* **ngx-components:** prevent console logging before initialization ([42a9fbb](https://github.com/IPS-LMU/octra/commit/42a9fbbee596732a61927fec63d4f47ec991089c))
+* **octra:** ASR fails on appended access code on provider other than Google ([d843a51](https://github.com/IPS-LMU/octra/commit/d843a514fcf0f9fae0c535d75c82a784b5a58aa9))
+* **octra:** can't load other audio formats than wave in URL mode and given mediatype. ([d7257bc](https://github.com/IPS-LMU/octra/commit/d7257bc0b0a6bd83f8a4dd3a8487be858fa5b0be))
+* **octra:** combine phrases tool doesn't work properly ([faa38e0](https://github.com/IPS-LMU/octra/commit/faa38e05b10087a03a6b48bd7e29c03812a5aa28))
+* **octra:** cursor in transcr editor jumps to invalid position on marker insert ([d9b283f](https://github.com/IPS-LMU/octra/commit/d9b283f794c70f3e6dbd4e14bdf467e341723231))
+* **octra:** don't show update notification on URL mode ([565a873](https://github.com/IPS-LMU/octra/commit/565a873b65fa5208e2cb7f22ed93df3b5f3a8f87))
+* **octra:** dragndrop doesn't react ([5deb3b0](https://github.com/IPS-LMU/octra/commit/5deb3b0ff1fdc8415cdf26d01009ed7894bb65fc))
+* **octra:** dragnDrop doesn't work when user drops a pair of files ([0098aef](https://github.com/IPS-LMU/octra/commit/0098aefbbe0a1ad166d8d62e20a3b566477bd4bd))
+* **octra:** dropzone does not recognize same file names with capitalized extension ([263f65f](https://github.com/IPS-LMU/octra/commit/263f65f7d8c7728a77a6f74d32e0449ca55817f1))
+* **octra:** files are not re-validated after changing import options ([0aee0d0](https://github.com/IPS-LMU/octra/commit/0aee0d0a0eaf9455ff1ab7a5d79b29e0d7fd7bac))
+* **octra:** getMarkerPositions() fails on empty markers array ([3c58e63](https://github.com/IPS-LMU/octra/commit/3c58e636d14d692b3b068704fcb4d2b076e04c8d))
+* **octra:** importing SRT format from Online or URL mode does not include importOptions ([657af6d](https://github.com/IPS-LMU/octra/commit/657af6d430f48a00d10ae5e27a0dc8b5710827d9))
+* **octra:** incorrect transcript loaded on resume task and other issues ([1a8a608](https://github.com/IPS-LMU/octra/commit/1a8a608117b782006b4dd814ae78e302e77e11c7))
+* **octra:** inserting tracking code throws error ([20d769f](https://github.com/IPS-LMU/octra/commit/20d769fc9e3008adb44c6cbfc436fa1205626225))
+* **octra:** issues with zoneless change detection ([b2008bc](https://github.com/IPS-LMU/octra/commit/b2008bc40cf78e49ab5286c1df8808c980b48abd))
+* **octra:** logging disabled leads to various errors ([321e8e3](https://github.com/IPS-LMU/octra/commit/321e8e3be4b8dd1c12b2d6a4774fdbafa2373ccf))
+* **octra:** missing emu web app url breaks app ([217aeec](https://github.com/IPS-LMU/octra/commit/217aeec11d8857655c17648dd24c11528726d239))
+* **octra:** OCTRA does not continue loading after logout ([629ac8e](https://github.com/IPS-LMU/octra/commit/629ac8e26d9bb86f7266812df5ddf4533a1257ec))
+* **octra:** octra dropzone shows invalid "Filenames are not equal" message ([41adf65](https://github.com/IPS-LMU/octra/commit/41adf6507ebe3e062d0a5057b019e5ba136ae5db))
+* **octra:** Parsing transcripts doesn't throw an error on octra-dropzone ([d739799](https://github.com/IPS-LMU/octra/commit/d73979947c98e55d0af228bc59895917d99b9069))
+* **octra:** PraatTableConverter loaded as plain text in URL mode ([d6d882a](https://github.com/IPS-LMU/octra/commit/d6d882a3fb49db6fca44c050c779d64a41a3978f))
+* **octra:** project list not scrollable on small displays ([bdab099](https://github.com/IPS-LMU/octra/commit/bdab09989f17decc9a91b6ac20451f89d4f69336))
+* **octra:** reg replace preview table exceeds width ([7e2f4d5](https://github.com/IPS-LMU/octra/commit/7e2f4d5058135af3496337ae2280eb64e6c10d29))
+* **octra:** segment index missing on saving in transcr-window ([b93c4a7](https://github.com/IPS-LMU/octra/commit/b93c4a70ba1485a52c43ff94a90ccd12af581971))
+* **octra:** shifted timestamps on reg replace modal ([b80e578](https://github.com/IPS-LMU/octra/commit/b80e578ca8d52b53c654fa6996894b2afb98b259))
+* **octra:** shortcuts with modifiers do not work ([6225605](https://github.com/IPS-LMU/octra/commit/6225605cf923506f961a4e187bfb9dc12e46ec9d))
+* **octra:** some changes not detected properly ([ab2d930](https://github.com/IPS-LMU/octra/commit/ab2d930c9c7d136cef9c3a98106e66436786c6b7))
+* **octra:** table on overview modal scrolls to the end after leaving the text editor ([6752f62](https://github.com/IPS-LMU/octra/commit/6752f62bfc534bb39ae698824df7f35b05015d97))
+* **octra:** uppercase file extensions not allowed ([e768339](https://github.com/IPS-LMU/octra/commit/e768339f6d37483d3cd9d559543c016df1a6b9c5))
+* **octra:** URL mode audio not loading on non-wave files ([7776b43](https://github.com/IPS-LMU/octra/commit/7776b436f1df6af44b0a0a3a030c6be5eb8c3e33))
+* **octra:** worng translation for search & replace shortcut ([228be8b](https://github.com/IPS-LMU/octra/commit/228be8b7d45276ce8d11332280b51292e2926ee2))
+* **web-media:** missing clone() function for AudioInfo ([fcd71a9](https://github.com/IPS-LMU/octra/commit/fcd71a96000bea556b98b390d56670a83a3579d0))
+
+
+### Features
+
+* **ngx-components:** asr options support for reactive forms ([5cd6e88](https://github.com/IPS-LMU/octra/commit/5cd6e88ec73776162eec92e87bba2a927b2b538e))
+* **ngx-components:** asr-options with more attributes and better font size compatibility ([4952b54](https://github.com/IPS-LMU/octra/commit/4952b54fb6719257a84817e72134bdf674b2f180))
+* **ngx-components:** filter languages in relation to selected provider ([cfe72e5](https://github.com/IPS-LMU/octra/commit/cfe72e594637aa65f000c1d33e993453745faeda))
+* **ngx-components:** improved bugreport modal ([1daa102](https://github.com/IPS-LMU/octra/commit/1daa1023a49f0dda6ab0e8629d0ef47ed455b61c))
+* **ngx-components:** show "powered by OCTRA-Backend" URL ([38613c5](https://github.com/IPS-LMU/octra/commit/38613c5730f7d2af81e45515587e0ebd6e6704bc))
+* **ngx-octra-components:** new ConsoleLoggingService ([fe1775e](https://github.com/IPS-LMU/octra/commit/fe1775e2c8df5cb84b9327714546b0dbbaf774c1))
+* **octra): feat(octra:** phonetic annotation with the Emu-webApp as 4th editor ([c93f1be](https://github.com/IPS-LMU/octra/commit/c93f1be66e08f55948ff7ccd26e49dbf3c0db825))
+* **octra:** auto save for online mode every 5 minutes ([c6da444](https://github.com/IPS-LMU/octra/commit/c6da444fb957110ca43a954718f78744faf6a5d9))
+* **octra:** continue paused tasks later ([276b9f4](https://github.com/IPS-LMU/octra/commit/276b9f46620983cf5e26e7431fb9a1d7cd560b1f))
+* **octra:** ctrl/cmd + f opens search and replace modal ([1e5fe42](https://github.com/IPS-LMU/octra/commit/1e5fe4277d4be5ab15da583acc31fc2dffd6b827))
+* **octra:** integration of Emu-webApp 1.5.4 and style changes ([1d1888c](https://github.com/IPS-LMU/octra/commit/1d1888cdb3fa06e5f735364011c3abf23a7b4236))
+* **octra:** new editor - Matrix-Editor ([4715bfb](https://github.com/IPS-LMU/octra/commit/4715bfbe91dd37336446efc6f917b97748427cc2))
+* **octra:** new tool: search & replace ([739eac2](https://github.com/IPS-LMU/octra/commit/739eac2d2f5df23c1e2069a6d264e7ac0252a783))
+* **octra:** new URL mode parameter "auto_playback" (boolean) ([57f9cea](https://github.com/IPS-LMU/octra/commit/57f9cead25b48b54adc0a052a076f0ceb2f335cf))
+* **octra:** new URL mode query parameter "audio_type" ([20ee83a](https://github.com/IPS-LMU/octra/commit/20ee83a64e372c2de30039d117312467615521cd))
+* **octra:** octra automatically notifies users on new updates ([05e7beb](https://github.com/IPS-LMU/octra/commit/05e7bebebce20ba64733c598f0a040f3ff86f971))
+* **octra:** octra can now be installed as Google Chrome app on PC or Mac ([0f80388](https://github.com/IPS-LMU/octra/commit/0f80388ac64f370c23040baac90b70089ab8b978))
+* **octra:** on URL mode and short audio save button is visible in detail editor ([266f51c](https://github.com/IPS-LMU/octra/commit/266f51cbddb2bd3d4e8a05d957307ca3fafe99a6))
+* **octra:** prevent users to login during maintenance ([b324fc0](https://github.com/IPS-LMU/octra/commit/b324fc00b010d166c8c0cc6c3d8628a995380d0b))
+* **octra:** removed allowed_browsers from appconfig.json ([39d2059](https://github.com/IPS-LMU/octra/commit/39d20599956745769f53212f00d8e69a91993f67))
+* **octra:** sending messages to parent window on changes in URL mode ([2cc9a9a](https://github.com/IPS-LMU/octra/commit/2cc9a9a9050037a1d3dba23d1804c8debccd11e6))
+* **octra:** separate search and replace mode for RegReplace Modal ([05bd7e6](https://github.com/IPS-LMU/octra/commit/05bd7e6cefc2f07c04ae7022e3c6af41fef95619))
+* **octra:** show introduction on login page on mobile first, login sections second ([0ca6a00](https://github.com/IPS-LMU/octra/commit/0ca6a002672c1629ab91134381abb5fd1776147f))
+* **octra:** split asr-options into provider and language components ([0670fcb](https://github.com/IPS-LMU/octra/commit/0670fcb002c33747f9b97391a0f8c09140bf570d))
+* **octra:** URL mode supports guidelines_url, project_config_url, functions_url and locale ([dce320f](https://github.com/IPS-LMU/octra/commit/dce320f1d3ccc4deee2c00ee70feebfaabbfe8b9))
+* **utilities:** add removeProperties function ([f0ef154](https://github.com/IPS-LMU/octra/commit/f0ef1545dd6e1450a4e1bb6d48f0827ea293d76e))
+* **web-media:** TsWorker now supports Observable ([be5198c](https://github.com/IPS-LMU/octra/commit/be5198c4ee435b1f34da418018493ead7a3a9848))
+
+
+### Performance Improvements
+
+* **octra:** cloning transcripts not needed anymore ([fde1f8a](https://github.com/IPS-LMU/octra/commit/fde1f8af03cffd58c1c9425ea7ea0ec86dafcd29))
+
+
+### BREAKING CHANGES
+
+* **octra:** The Linear-Editor is dicontinued and removed from the set of supported editors
+* **web-media:** TsWorker was moved from @octra/utilities to @octra/web-media
+
+
+
 # [2.0.0](https://github.com/IPS-LMU/octra/compare/octra-1.4.4...octra-2.0.0) (2025-02-19)
 
 ### Bug Fixes

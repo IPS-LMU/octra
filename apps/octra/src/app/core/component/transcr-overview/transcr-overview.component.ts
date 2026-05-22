@@ -409,7 +409,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
     this.audio?.audioManager?.stopPlayback().catch((err) => {
       console.error(err);
     });
-    this.shortcutService.disableGroup(this.viewerShortcuts.name);
+    this.shortcutService.unregisterShortcutGroup(this.viewerShortcuts.name);
   }
 
   init(level: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>) {

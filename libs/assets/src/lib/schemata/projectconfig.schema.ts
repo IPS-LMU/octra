@@ -42,7 +42,7 @@ export const OctraProjectConfigJSONSchema: JSONSchema4 = {
     interfaces: {
       items: {
         type: 'string',
-        enum: ['Dictaphone Editor', 'Linear Editor', '2D-Editor', "EMU"],
+        enum: ['Dictaphone Editor', 'Linear Editor', '2D-Editor', "EMU", "Matrix-Editor"],
       },
       type: 'array',
       description:

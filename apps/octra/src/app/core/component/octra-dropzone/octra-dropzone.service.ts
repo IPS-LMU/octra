@@ -374,12 +374,9 @@ export class OctraDropzoneService {
 
   private setAnnotation = async (fileProgress: FileProgress, converter: Converter, importResult?: ImportResult) => {
     if (this._oaudiofile !== undefined && importResult !== undefined && importResult.annotjson !== undefined && !importResult.error) {
-      const audioName = this._oaudiofile.name.replace(/\.[^.]+$/g, '');
-
-      const regexStr = `${escapeRegex(audioName)}${converter.extensions
-        .map((a) => `((?:${escapeRegex(a)})|(?:${escapeRegex(a.toLowerCase())}))`)
-        .join('|')}$`;
-      if (new RegExp(regexStr).exec(fileProgress.file.fullname.toLowerCase()) === null) {
+      const audioName = FileInfo.extractFileName(this._oaudiofile.name).name;
+      const transcriptName = FileInfo.extractFileName(fileProgress.file.fullname).name;
+      if (transcriptName !== audioName) {
         fileProgress.warning = 'File names are not the same.';
       }
       this._oannotation = importResult.annotjson;

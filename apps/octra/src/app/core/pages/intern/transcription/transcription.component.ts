@@ -42,7 +42,6 @@ import { AuthenticationStoreService } from '../../../store/authentication';
 import { AnnotationActions } from '../../../store/login-mode/annotation/annotation.actions';
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 
-
 declare const a: any;
 @Component({
   selector: 'octra-transcription',
@@ -452,8 +451,8 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     this.subscribe(this.navbarServ.interfacechange, async (editor) => {
       const runningProcesses = this.asrStoreService.queue?.statistics.running ?? 0;
 
-      if (runningProcesses === 0 || editor.meta.supportsASR) {
-        this.changeEditor(editor.meta.name).catch((error) => {
+      if (runningProcesses === 0 || editor.editor.meta.supportsASR) {
+        this.changeEditor(editor.editor.meta.name, editor.context).catch((error) => {
           console.error(error);
         });
       } else {
@@ -461,7 +460,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
           title: this.translocoService.translate('modals.switch editor.title'),
           message: this.translocoService.translate('modals.switch editor.body', {
             runningProcesses,
-            editorName: editor.meta.label,
+            editorName: editor.editor.meta.label,
           }),
           choices: [
             {
@@ -481,7 +480,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
         const answer = await ref.result;
         if (answer === 'abort') {
           this.asrStoreService.stopProcessing();
-          this.changeEditor(editor.meta.name).catch((error) => {
+          this.changeEditor(editor.editor.meta.name, editor.context).catch((error) => {
             console.error(error);
           });
         }
@@ -580,7 +579,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     }
   }
 
-  changeEditor(name: string, emitUIActions = true): Promise<void> {
+  changeEditor(name: string, context?: any, emitUIActions = true): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.subscriptionManager.removeByTag('unsupported level');
       this.editorloaded = false;
@@ -595,15 +594,26 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
 
       for (const editorComponent of editorComponents) {
         if (name === editorComponent.meta.name) {
-          this.appStorage.interface = name;
-          this.interface = name;
           comp = editorComponent;
           break;
         }
       }
 
+      if (!comp && editorComponents.length > 0) {
+        // fallback to 2D-Editor
+        comp = editorComponents.find((a) => a.meta.name === '2D-Editor');
+
+        if (!comp) {
+          // fallback to first editor
+          comp = editorComponents[0];
+        }
+      }
+
       this.navbarServ.currentEditor = comp;
       if (comp) {
+        this.appStorage.interface = name;
+        this.interface = name;
+
         if (this.appLoadeditor !== undefined) {
           this.subscribe(timer(20), () => {
             const viewContainerRef = this.appLoadeditor.viewContainerRef;
@@ -623,6 +633,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
                   this.cd.markForCheck();
                   this.cd.detectChanges();
 
+                  (this._currentEditor.instance as OCTRAEditor).applyContext(context);
                   resolve();
                 },
                 error: (a) => {
@@ -658,7 +669,7 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
                 {
                   next: async (anno) => {
                     if (currentLevelindex !== anno?.selectedLevelIndex) {
-                      await this.changeEditor(this.interface!, false);
+                      await this.changeEditor(this.interface!, undefined, false);
                       this.cd.markForCheck();
                       this.cd.detectChanges();
                     }

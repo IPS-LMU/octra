@@ -140,10 +140,7 @@ export class OverviewModalComponent extends OctraModal implements OnInit, OnDest
     return super.close();
   }
 
-  onSegmentInOverviewClicked(segment: {
-    levelID: number,
-    itemID: number,
-  }) {
+  onSegmentInOverviewClicked(segment: { levelID: number; itemID: number }) {
     this.annotationStoreService.openSegment(segment.levelID, segment.itemID);
     this.close();
   }

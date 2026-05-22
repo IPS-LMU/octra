@@ -174,7 +174,7 @@ export class ApplicationActions {
   );
 
   public static setAudioSettings = createAction(
-    `[${context}] Set volume`,
+    `[${context}] Set audio settings`,
     props<{
       volume: number;
       speed: number;

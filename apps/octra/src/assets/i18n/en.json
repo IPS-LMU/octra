@@ -263,9 +263,9 @@
   },
   "interfaces": {
     "2D editor": "2D-Editor",
-    "TRN editor": "TRN-Editor",
-    "linear editor": "Linear Editor",
-    "simple editor": "Dictaphone Editor"
+    "Matrix-Editor": "Matrix-Editor",
+    "linear editor": "Linear-Editor",
+    "simple editor": "Dictaphone-Editor"
   },
   "login": {
     "api not available": "The server is currently unavailable. Please try again later. If this error message is still visible after 15 minutes, please send an e-mail to {{email_link}}.",
@@ -334,15 +334,12 @@
       "step4": "Click on the \"RELOAD\" button below."
     },
     "overview": {
-      "check transcription": "Switch to TRN-Editor and check your transcript."
+      "check transcription": "Switch to Matrix-Editor and check your transcript."
     },
     "shortcuts": {
       "2D-Editor": "Shortcuts of the 2D-Editor",
       "2D-Editor audio": "Shortcuts for audio playback on the multi-line signal display",
       "2D-Editor viewer": "Shortcuts for the multi-line signal display",
-      "TRN-Editor": "Shortcuts of the TRN-Editor",
-      "TRN-Editor table": "Shortcuts for the table",
-      "TRN-Editor texteditor": "Shortcuts of the Texteditor",
       "audioplayer": "Audioplayer shortcuts",
       "close_save": "Save & close window",
       "delete boundaries": "Delete selected boundaries and join transcription units",
@@ -391,7 +388,10 @@
       "transcription window": "Transcription window",
       "undo": "Undo last action",
       "zoom in": "Zoom in",
-      "zoom out": "Zoom out"
+      "zoom out": "Zoom out",
+      "Matrix-Editor": "Matrix Editor",
+      "move to previous unit": "Switch to previous unit",
+      "move to next unit": "Switch to next unit"
     },
     "supported": {
       "audio files": "Audio files",
@@ -591,7 +591,7 @@
     "intelligibility of the speaker": "Intelligibility of the speaker",
     "overview": "The next table shows an overview of the transcription units:"
   },
-  "trn-editor": {
+  "matrix-editor": {
     "context menu": {
       "merge selected lines": "Merge selected segments (ignore speaker labels)",
       "remove selected lines completely": "Remove selected segments completely (remove transcript & merge)",

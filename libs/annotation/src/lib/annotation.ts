@@ -665,11 +665,7 @@ export class OctraAnnotationItemLevel extends OctraAnnotationLevel<OItemLevel, O
   }
 
   clone() {
-    return new OctraAnnotationItemLevel(
-      this.id,
-      this.name,
-      this.items.map((a) => a.clone()),
-    );
+    return new OctraAnnotationItemLevel(this.id, this.name, [...this.items.map((a) => a.clone())]);
   }
 
   override duplicate(id: number, itemIDCounter: number): OctraAnnotationItemLevel {

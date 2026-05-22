@@ -33,7 +33,7 @@ import {
 import { OctraGuidelines } from '@octra/assets';
 import { AudioSelection, SampleUnit } from '@octra/media';
 import { AudioViewerComponent, AudioViewerShortcutEvent, OctraComponentsModule } from '@octra/ngx-components';
-import { AudioChunk, AudioManager, AudioResource, Shortcut, ShortcutGroup } from '@octra/web-media';
+import { AudioChunk, AudioManager, AudioResource, Shortcut } from '@octra/web-media';
 import { HotkeysEvent } from 'hotkeys-js';
 import { timer } from 'rxjs';
 import { AudioNavigationComponent } from '../../../core/component/audio-navigation';
@@ -272,53 +272,6 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
     await this.doDirectionAction('down');
   };
 
-  private audioShortcuts: ShortcutGroup = {
-    name: '',
-    enabled: true,
-    items: [
-      {
-        name: 'play_pause',
-        keys: {
-          mac: 'TAB',
-          pc: 'TAB',
-        },
-        title: 'play pause',
-        focusonly: false,
-        callback: this.onAudioPlayPause,
-      },
-      {
-        name: 'stop',
-        keys: {
-          mac: 'ESC',
-          pc: 'ESC',
-        },
-        title: 'stop playback',
-        focusonly: false,
-        callback: this.onStopAudio,
-      },
-      {
-        name: 'step_backward',
-        keys: {
-          mac: 'SHIFT + BACKSPACE',
-          pc: 'SHIFT + BACKSPACE',
-        },
-        title: 'step backward',
-        focusonly: false,
-        callback: this.onStepBackward,
-      },
-      {
-        name: 'step_backwardtime',
-        keys: {
-          mac: 'SHIFT + TAB',
-          pc: 'SHIFT + TAB',
-        },
-        title: 'step backward time',
-        focusonly: false,
-        callback: this.onStepBackwardTime,
-      },
-    ],
-  };
-
   public transcript = '';
 
   constructor() {
@@ -448,11 +401,6 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
         '';
     }
 
-    /*
-    const shortcutGroup =
-      this.shortcutsService.getShortcutGroup('2D-Editor viewer');
-    shortcutGroup!.enabled = false;
-     */
     this.updateNeighbours();
     this.isShortAudiofile = this.audio.audioManager.resource.info.duration.seconds <= 35;
 
@@ -900,6 +848,8 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
   }
 
   afterSpeedChange(event: { new_value: number; timestamp: number }) {
+    this.appStorage.audioSpeed = event.new_value;
+
     const segment = {
       start: -1,
       length: -1,
@@ -920,33 +870,30 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
 
     let selection = undefined;
     if (
-      this.magnifier.av.drawnSelection!.start.samples >= segment.start &&
-      this.magnifier.av.drawnSelection!.end.samples <= segment.start + segment.length
+      this.magnifier.av.drawnSelection &&
+      this.magnifier.av.drawnSelection.start.samples >= segment.start &&
+      this.magnifier.av.drawnSelection.end.samples <= segment.start + segment.length
     ) {
       selection = {
-        start: this.magnifier.av.drawnSelection!.start.samples,
-        length: this.magnifier.av.drawnSelection!.duration.samples,
+        start: this.magnifier.av.drawnSelection.start.samples,
+        length: this.magnifier.av.drawnSelection.duration.samples,
       };
+
+      this.uiService.addElementFromEvent(
+        'slider',
+        event,
+        event.timestamp,
+        this.audioManager.playPosition,
+        this.editor.textSelection,
+        selection,
+        segment,
+        'audio_speed',
+      );
     }
-
-    this.uiService.addElementFromEvent(
-      'slider',
-      event,
-      event.timestamp,
-      this.audioManager.playPosition,
-      this.editor.textSelection,
-      selection,
-      segment,
-      'audio_speed',
-    );
-  }
-
-  onVolumeChange(event: { old_value: number; new_value: number; timestamp: number }) {
-    this.audiochunk.volume = event.new_value;
-    this.appStorage.audioVolume = event.new_value;
   }
 
   afterVolumeChange(event: { new_value: number; timestamp: number }) {
+    this.appStorage.audioVolume = event.new_value;
     const segment = {
       start: -1,
       length: -1,

@@ -300,7 +300,7 @@ export class AnnotationStateReducers {
       })),
       on(AnnotationActions.changeCurrentLevelItems.do, (state: AnnotationState, { items, mode }) => {
         if (this.mode === mode) {
-          const currentLevel = state.transcript.currentLevel;
+          const currentLevel = state.transcript.clone().currentLevel;
 
           if (currentLevel) {
             for (const item of items) {

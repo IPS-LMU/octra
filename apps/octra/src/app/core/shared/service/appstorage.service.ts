@@ -1,17 +1,10 @@
 import { EventEmitter, inject, Injectable } from '@angular/core';
 import { Actions } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
-import {
-  OctraAnnotationAnyLevel,
-  OctraAnnotationSegment,
-} from '@octra/annotation';
+import { OctraAnnotationAnyLevel, OctraAnnotationSegment } from '@octra/annotation';
 import { ProjectDto, TaskDto } from '@octra/api-types';
 import { ConsoleEntry, ConsoleGroupEntry } from '@octra/ngx-components';
-import {
-  getBaseHrefURL,
-  SubscriptionManager,
-  waitTillResultRetrieved,
-} from '@octra/utilities';
+import { getBaseHrefURL, SubscriptionManager, waitTillResultRetrieved } from '@octra/utilities';
 import { SessionStorageService } from 'ngx-webstorage';
 import { asapScheduler, Observable, Subject, Subscription } from 'rxjs';
 import { environment } from '../../../../environments/environment';
@@ -22,10 +15,7 @@ import { AuthenticationActions } from '../../store/authentication';
 import { IDBActions } from '../../store/idb/idb.actions';
 import { LoginModeActions } from '../../store/login-mode';
 import * as fromAnnotation from '../../store/login-mode/annotation';
-import {
-  AnnotationSessionState,
-  AnnotationState,
-} from '../../store/login-mode/annotation';
+import { AnnotationSessionState, AnnotationState } from '../../store/login-mode/annotation';
 import { AnnotationActions } from '../../store/login-mode/annotation/annotation.actions';
 
 @Injectable({
@@ -410,19 +400,12 @@ export class AppStorageService {
     });
   }
 
-  public changeAnnotationLevel(
-    tiernum: number,
-    level: OctraAnnotationAnyLevel<OctraAnnotationSegment>,
-  ): Promise<void> {
+  public changeAnnotationLevel(tiernum: number, level: OctraAnnotationAnyLevel<OctraAnnotationSegment>): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (this.annotationLevels !== undefined) {
         if (level !== undefined) {
           if (this.annotationLevels.length > tiernum) {
-            waitTillResultRetrieved<Actions, Action, void>(
-              this.actions,
-              IDBActions.saveAnnotation.success,
-              IDBActions.saveAnnotation.fail,
-            )
+            waitTillResultRetrieved<Actions, Action, void>(this.actions, IDBActions.saveAnnotation.success, IDBActions.saveAnnotation.fail)
               .then(() => {
                 resolve();
               })
@@ -494,16 +477,18 @@ export class AppStorageService {
     }
   }
 
-  public disableUndoRedo() {
+  public disableUndoRedo(clearHistory = true) {
+    if (clearHistory) {
+      this.clearHistory();
+    }
     this._undoRedoDisabled = true;
-    this.clearHistory();
   }
 
-  public enableUndoRedo() {
-    if (this._undoRedoDisabled) {
+  public enableUndoRedo(clearHistory = true) {
+    if (this._undoRedoDisabled && clearHistory) {
       this.clearHistory();
-      this._undoRedoDisabled = false;
     }
+    this._undoRedoDisabled = false;
   }
 
   public redo() {
@@ -527,11 +512,7 @@ export class AppStorageService {
   public clearWholeSession(): Promise<void> {
     this.store.dispatch(IDBActions.clearAllData.do());
 
-    return waitTillResultRetrieved<Actions, Action, void>(
-      this.actions,
-      IDBActions.clearAllData.success,
-      IDBActions.clearAllData.fail,
-    );
+    return waitTillResultRetrieved<Actions, Action, void>(this.actions, IDBActions.clearAllData.success, IDBActions.clearAllData.fail);
   }
 
   public abortReAuthentication() {

@@ -1,5 +1,10 @@
+:host {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
 .red {
-  background-color: #ff899d;
+  background-color: #fac6d0;
 }
 
 .segment-number {
@@ -17,7 +22,8 @@
   cursor: pointer;
 }
 
-.segment-transcript {
+.segment-transcript p {
+  margin: 0 !important;
 }
 
 .found-errors {
@@ -56,8 +62,8 @@
 }
 
 .bg-danger {
-  background-color: #ffd4dc !important;
-  border: 1px solid #fc9dac !important;
+  background-color: #ffe5eb !important;
+  border: 1px solid #fbb8c3 !important;
   color: black !important;
 }
 
@@ -68,8 +74,8 @@
 }
 
 .bg-success {
-  background-color: #9ad09a !important;
-  border: 1px solid #51a451 !important;
+  background-color: #d3f3d3 !important;
+  border: 1px solid #a1d5a1 !important;
   color: black !important;
 }
 
@@ -77,4 +83,10 @@
   background-color: yellow !important;
   border: 1px solid #ffdd00 !important;
   color: black;
+}
+
+#transcription-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }

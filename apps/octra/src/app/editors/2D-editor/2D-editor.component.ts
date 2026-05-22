@@ -8,7 +8,7 @@ import { AnnotationLevelType, ASRQueueItemType, getSegmentBySamplePosition, Octr
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
 import {
   AudioViewerComponent,
-  AudioviewerConfig,
+  AudioViewerConfig,
   AudioViewerShortcutEvent,
   CurrentLevelChangeEvent,
   NgbModalWrapper,
@@ -81,10 +81,10 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   };
 
   public audioManager!: AudioManager;
-  public audioChunkLines!: any;
+  public audioChunkLines!: AudioChunk;
   public audioChunkWindow!: AudioChunk;
   public audioChunkMagnifier!: AudioChunk;
-  public miniMagnifierSettings!: AudioviewerConfig;
+  public miniMagnifierSettings!: AudioViewerConfig;
   private mousestate = 'initiliazied';
   private intervalID = undefined;
   private factor = 8;
@@ -305,7 +305,7 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
   constructor() {
     super();
     this.initialized = new EventEmitter<void>();
-    this.miniMagnifierSettings = new AudioviewerConfig();
+    this.miniMagnifierSettings = new AudioViewerConfig();
     this.subscribe(this.modalService.onModalAction, {
       next: this.onModalAction,
     });
@@ -576,12 +576,12 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
     }
   }
 
-  onWindowAction = ({ action, segmentIndex }: { action: string; segmentIndex: number }) => {
+  onWindowAction = async ({ action, segmentIndex }: { action: string; segmentIndex: number }) => {
     if (action === 'close') {
       this.viewer.enableShortcuts();
       this.shortcutsEnabled = true;
       this.selectedIndex = segmentIndex;
-      this.viewer.selectSegment(this.selectedIndex);
+      await this.viewer.scrollToUnit(this.annotationStoreService.currentLevel.items[this.selectedIndex].id);
     } else if (action === 'overview') {
       this.shortcutsEnabled = false;
       this.openModal.emit('overview');
@@ -654,6 +654,20 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
         this.appStorage.undo();
       } else if ($event.shortcutName === 'redo') {
         this.appStorage.redo();
+      }
+    }
+  }
+
+  override applyContext(context?: any) {
+    if (context?.command) {
+      if (context.command === 'open unit') {
+        this.openSegment({
+          levelID: context.levelID,
+          itemID: context.itemID,
+        });
+        this.viewer.scrollToUnit(context.itemID).catch((e) => {
+          console.error(e);
+        });
       }
     }
   }

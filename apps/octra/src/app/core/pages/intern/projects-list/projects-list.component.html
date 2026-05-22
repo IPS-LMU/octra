@@ -7,8 +7,7 @@
           'projects-list.other user logged in'
             | transloco
               : {
-                  username: (authStoreService.otherUserLoggedIn$ | async)
-                    ?.username,
+                  username: (authStoreService.otherUserLoggedIn$ | async)?.username,
                 }
         "
       ></div>
@@ -21,17 +20,12 @@
                 | transloco
                   : {
                       project: previousProject?.name,
-                      resumeTranscription:
-                        'projects-list.resume transcription' | transloco,
+                      resumeTranscription: 'projects-list.resume transcription' | transloco,
                     }
             "
           ></span>
           <p>
-            <a
-              class="link"
-              (click)="annotationStoreService.resumeTaskManually()"
-              >{{ 'projects-list.resume transcription' | transloco }}</a
-            >
+            <a class="link" (click)="annotationStoreService.resumeTaskManually()">{{ 'projects-list.resume transcription' | transloco }}</a>
           </p>
         </div>
       }
@@ -50,19 +44,11 @@
           </div>
           <div class="col align-items-center">
             {{ 'projects-list.resuming feature' | transloco }}
-            <a
-              href="https://clarin.phonetik.uni-muenchen.de/apps/octra/manuals/octra/the-modes.html#resuming-paused-tasks"
-              target="_blank"
-              >{{ 'p.further information' | transloco }}</a
-            >
+            <a [href]="AppInfo.manualURL" target="_blank">{{ 'p.further information' | transloco }}</a>
           </div>
         </div>
 
-        <div
-          class="text-end link"
-          style="font-size: 0.8rem"
-          (click)="openCreateProjectRequestModal()"
-        >
+        <div class="text-end link" style="font-size: 0.8rem" (click)="openCreateProjectRequestModal()">
           {{ 'projects-list.project creation wanted' | transloco }}
         </div>
         <div class="list-group">
@@ -82,18 +68,11 @@
           </div>
           <div class="table-wrapper">
             @if (shownProjects.length > 0) {
-              <div
-                ngbAccordion
-                #accordion="ngbAccordion"
-                [closeOthers]="true"
-                [destroyOnHide]="true"
-              >
+              <div ngbAccordion #accordion="ngbAccordion" [closeOthers]="true" [destroyOnHide]="true">
                 @for (project of shownProjects; track project) {
                   <div [ngbAccordionItem]="project.id" #acc="ngbAccordionItem">
                     <div ngbAccordionHeader class="list-group-item">
-                      <div
-                        class="row g-3 align-items-center justify-items-center justify-content-center"
-                      >
+                      <div class="row g-3 align-items-center justify-items-center justify-content-center">
                         <div class="col-auto project-name">
                           <i
                             class="bi ms-2 pointer"
@@ -103,43 +82,24 @@
                             }"
                             ngbAccordionToggle
                             [ngStyle]="{
-                              visibility: project.canExpand
-                                ? 'visible'
-                                : 'hidden',
+                              visibility: project.canExpand ? 'visible' : 'hidden',
                             }"
                           ></i>
                         </div>
                         <div class="col">
-                          <div
-                            class="row align-items-center justify-items-center justify-content-center"
-                          >
-                            @if (
-                              (authStoreService.me$ | async)?.systemRole
-                                ?.label === 'administrator' || istProjectAdmin
-                            ) {
+                          <div class="row align-items-center justify-items-center justify-content-center">
+                            @if ((authStoreService.me$ | async)?.systemRole?.label === 'administrator' || istProjectAdmin) {
                               <div class="col-auto project-name">
                                 @if (project.active) {
-                                  <i
-                                    class="bi bi-check-circle"
-                                    style="color: green"
-                                  ></i>
+                                  <i class="bi bi-check-circle" style="color: green"></i>
                                 }
                                 @if (!project.active) {
-                                  <i
-                                    class="bi bi-dash-circle"
-                                    style="color: red"
-                                  ></i>
+                                  <i class="bi bi-dash-circle" style="color: red"></i>
                                 }
                               </div>
                             }
-                            <div
-                              class="col align-items-center justify-items-center justify-content-center"
-                            >
-                              <span class="project-name"
-                                >{{ project.name }} ({{
-                                  project.shortname
-                                }})</span
-                              >
+                            <div class="col align-items-center justify-items-center justify-content-center">
+                              <span class="project-name">{{ project.name }} ({{ project.shortname }})</span>
 
                               <div class="row">
                                 <div class="col text-muted project-description">
@@ -148,10 +108,7 @@
                               </div>
                               <div class="row">
                                 <div class="col mb-2">
-                                  <span
-                                    class="rounded-pill text-white property-pill me-1"
-                                    style="background-color: purple"
-                                  >
+                                  <span class="rounded-pill text-white property-pill me-1" style="background-color: purple">
                                     <i class="bi bi-list-ol"></i>
                                     {{ 'g.free tasks' | transloco }}:
                                     {{ project.freeTasks }}
@@ -168,18 +125,14 @@
                                   }
 
                                   @if (project.enddate) {
-                                    <span
-                                      class="rounded-pill text-white property-pill me-1 bg-info"
-                                    >
+                                    <span class="rounded-pill text-white property-pill me-1 bg-info">
                                       <i class="bi bi-calendar-day"></i>
                                       {{ 'p.available until' | transloco }}:
                                       {{
                                         project.enddate
                                           | luxonShortDateTime
                                             : {
-                                                locale: (
-                                                  authStoreService.me$ | async
-                                                )?.locale,
+                                                locale: (authStoreService.me$ | async)?.locale,
                                               }
                                       }}
                                     </span>
@@ -187,9 +140,7 @@
                                 </div>
                               </div>
                             </div>
-                            <div
-                              class="col-md-3 align-items-center justify-items-center justify-content-center"
-                            >
+                            <div class="col-md-3 align-items-center justify-items-center justify-content-center">
                               @if (project.freeTasks > 0) {
                                 <button
                                   class="btn btn-primary btn-sm w-100"
@@ -210,10 +161,7 @@
                       <div ngbAccordionBody>
                         <ng-template>
                           <div class="border bg-light-subtle">
-                            <octra-my-tasks
-                              [project]="project"
-                              (continueTask)="pausedTaskContinueClick($event)"
-                            ></octra-my-tasks>
+                            <octra-my-tasks [project]="project" (continueTask)="pausedTaskContinueClick($event)"></octra-my-tasks>
                           </div>
                         </ng-template>
                       </div>
@@ -222,20 +170,22 @@
                 }
               </div>
             } @else {
-              <div class="text-center p-5" [innerHTML]="'projects-list.no free tasks' | transloco : {
-                email: '<a href=\'mailto:'+ email +'\'>'+email+'</a>'
-              }">
-              </div>
+              <div
+                class="text-center p-5"
+                [innerHTML]="
+                  'projects-list.no free tasks'
+                    | transloco
+                      : {
+                          email: '<a href=\'mailto:' + email + '\'>' + email + '</a>',
+                        }
+                "
+              ></div>
             }
           </div>
         </div>
       } @else {
         <div class="text-center mt-5">
-          <div
-            class="spinner-border"
-            role="status"
-            style="width: 6rem; height: 6rem; color: lightgrey"
-          >
+          <div class="spinner-border" role="status" style="width: 6rem; height: 6rem; color: lightgrey">
             <span class="visually-hidden">Loading...</span>
           </div>
         </div>

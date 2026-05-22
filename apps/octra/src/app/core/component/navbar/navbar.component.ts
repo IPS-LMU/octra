@@ -123,10 +123,6 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
     return this.appStorage.snapshot.authentication.me?.systemRole.label === AccountRole.administrator;
   }
 
-  public get AppInfo(): any {
-    return AppInfo;
-  }
-
   public get uiService(): UserInteractionsService {
     return this.navbarServ.uiService;
   }
@@ -365,4 +361,6 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
     super.ngOnDestroy();
     this.navbarServ.isCollapsed = true;
   }
+
+  protected readonly AppInfo = AppInfo;
 }

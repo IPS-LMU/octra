@@ -12,9 +12,9 @@ export class AppInfo {
 
   public static readonly themes: string[] = ['default', 'shortAudioFiles'];
   static readonly manualURL =
-    'https://clarin.phonetik.uni-muenchen.de/apps/octra/manuals/octra/';
+    'https://clarin.phonetik.uni-muenchen.de/apps/octra/manuals/octra/2.1/';
 
-  static readonly maxAudioFileSize = 3000; // MB
+  static readonly maxAudioFileSize = 1900; // MB
   static readonly maxEMUAudioFileSize = 50; // MB
 
   public static readonly queryParamsHandling: NavigationExtras = {
@@ -23,7 +23,7 @@ export class AppInfo {
   };
 
   public static BUILD = {
-    version: '2.0.0',
+    version: '2.1.0',
     hash: '2893u092i349i23904',
     timestamp: new Date().toISOString(),
   };

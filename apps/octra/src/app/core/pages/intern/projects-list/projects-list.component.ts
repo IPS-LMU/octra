@@ -19,6 +19,7 @@ import { AnnotationActions } from '../../../store/login-mode/annotation/annotati
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 import { MyTasksComponent } from './my-tasks/my-tasks.component';
 import { ProjectRequestModalComponent } from './project-request-modal/project-request-modal.component';
+import { AppInfo } from '../../../../app.info';
 
 class PreparedProjectDto extends ProjectDto {
   collapsed = true;
@@ -195,4 +196,6 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   pausedTaskContinueClick($event: { project: ProjectDto; task: TaskDto }) {
     this.annotationStoreService.resumeTaskManually($event.project, $event.task);
   }
+
+  protected readonly AppInfo = AppInfo;
 }

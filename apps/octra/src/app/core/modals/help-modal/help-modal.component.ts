@@ -2,6 +2,7 @@ import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { OctraModal } from '../types';
+import { AppInfo } from '../../../app.info';
 
 @Component({
   selector: 'octra-help-modal',
@@ -28,4 +29,6 @@ export class HelpModalComponent extends OctraModal {
 
     this.activeModal = activeModal;
   }
+
+  protected readonly AppInfo = AppInfo;
 }

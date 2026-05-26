@@ -24,6 +24,7 @@ export interface DropzoneStatistics {
 export class OctraDropzoneService {
   private modService = inject(OctraModalService);
   private store = inject<Store<RootState>>(Store);
+  somethingChanged = new EventEmitter<void>();
 
   get oannotation(): OAnnotJSON | undefined {
     return this._oannotation;
@@ -119,6 +120,7 @@ export class OctraDropzoneService {
       this._files.push(progressFile);
       this.updateStatistics();
     }
+    this.somethingChanged.emit();
   }
 
   async remove(id: number) {
@@ -129,6 +131,7 @@ export class OctraDropzoneService {
       this.stopFileProcessing(fileProgress);
       await this.checkForValidFiles();
     }
+    this.somethingChanged.emit();
   }
 
   private readFile(progressFile: FileProgress): Observable<void> {
@@ -195,18 +198,21 @@ export class OctraDropzoneService {
       readFile<ArrayBuffer>(progressFile.file.file!, 'arraybuffer').pipe(
         map((a) => {
           progressFile.progress = a.progress * 0.5;
+          this.somethingChanged.emit();
           return a;
         }),
       ),
     ]).pipe(
       exhaustMap(([reading]) => {
         // completed
+        this.somethingChanged.emit();
         if (progressFile.file.size <= AppInfo.maxAudioFileSize * 1024 * 1024) {
-          return forkJoin([this.decodeArrayBuffer(reading.result!, progressFile)]).pipe(
-            map(([result]) => {
+          return this.decodeArrayBuffer(reading.result!, progressFile).pipe(
+            map((result) => {
               // audio decoding completed
               this._audioManager = result.audioManager;
 
+              progressFile.progress = 0.5 + result.progress * 0.5;
               if (result.audioManager && result.progress === 1) {
                 // finished, get result
                 if (!(this._audioManager === undefined)) {
@@ -225,12 +231,14 @@ export class OctraDropzoneService {
                 progressFile.status = 'valid';
                 this.checkForValidFiles().catch(console.error);
               }
+              this.somethingChanged.emit();
             }),
           );
         } else {
           progressFile.status = 'invalid';
           progressFile.error = `The file size is bigger than ${AppInfo.maxAudioFileSize} MB.`;
           this.updateStatistics();
+          this.somethingChanged.emit();
           return throwError(() => new Error(`The file size is bigger than ${AppInfo.maxAudioFileSize} MB.`));
         }
       }),
@@ -242,6 +250,7 @@ export class OctraDropzoneService {
       readFile<string>(progressFile.file.file!, 'text', 'utf-8').pipe(
         map((a) => {
           progressFile.progress = a.progress;
+          this.somethingChanged.emit();
           return a;
         }),
       ),
@@ -370,6 +379,7 @@ export class OctraDropzoneService {
       }
     }
     this.updateStatistics();
+    this.somethingChanged.emit();
   }
 
   private setAnnotation = async (fileProgress: FileProgress, converter: Converter, importResult?: ImportResult) => {

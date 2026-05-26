@@ -94,7 +94,7 @@ export class OctraDropzoneComponent extends DefaultComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.subscribe(this.octraDropzoneService.filesChange, {
+    this.subscribe(this.octraDropzoneService.somethingChanged, {
       next: () => {
         this.cd.markForCheck();
       },

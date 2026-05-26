@@ -1,5 +1,6 @@
 import { AsyncPipe, NgClass, NgStyle, UpperCasePipe } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -18,7 +19,7 @@ import { AccountRole, ProjectDto } from '@octra/api-types';
 import { ConsoleEntry, ConsoleGroupEntry, ConsoleLoggingService, ConsoleType, OctraComponentsModule } from '@octra/ngx-components';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { TimespanPipe } from '@octra/ngx-utilities';
-import { merge } from 'rxjs';
+import { debounceTime, merge, Subject } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { AppInfo } from '../../../app.info';
 import { editorComponents } from '../../../editors/components';
@@ -40,7 +41,6 @@ import { AnnotationStoreService } from '../../store/login-mode/annotation/annota
 import { AsrOptionsComponent } from '../asr-options/asr-options.component';
 import { DefaultComponent } from '../default.component';
 import { NavbarService } from './navbar.service';
-import { isNumber } from '@octra/utilities';
 
 @Component({
   selector: 'octra-navigation',
@@ -63,6 +63,7 @@ import { isNumber } from '@octra/utilities';
     OctraComponentsModule,
     AsrOptionsComponent,
     NgbDropdownItem,
+    FormsModule,
   ],
 })
 export class NavigationComponent extends DefaultComponent implements OnInit, OnDestroy {
@@ -84,6 +85,7 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
   protected asrStoreService = inject(AsrStoreService);
   protected asrSettings?: ASRStateSettings;
 
+  secondsPerLine = 5;
   modalexport?: NgbModalRef;
   modalStatistics?: NgbModalRef;
 
@@ -141,6 +143,8 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
 
   @ViewChild('canvasContent') canvasContent?: TemplateRef<any>;
 
+  private secondsSliderChange: Subject<number>;
+
   public get errorsFound(): boolean {
     let beginCheck = false;
     return (
@@ -186,6 +190,14 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
         this.openEnd();
         this.cd.markForCheck();
       },
+    });
+
+    this.subscribe(this.appStorage.settingschange, (event) => {
+      switch (event.key) {
+        case 'secondsPerLine':
+          this.secondsPerLine = event.value;
+          break;
+      }
     });
 
     this.subscribe(this.asrStoreService.asrOptions$, {
@@ -295,9 +307,25 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
     }
   }
 
-  public changeSecondsPerLine(seconds: string) {
-    this.appStorage.secondsPerLine = isNumber(seconds) ? Number(seconds) : 5;
-    this.cd.markForCheck();
+  public changeSecondsPerLine(seconds: number) {
+    if (!this.secondsSliderChange) {
+      this.secondsSliderChange = new Subject<number>();
+
+      this.subscribe(this.secondsSliderChange.pipe(debounceTime(250)), {
+        next: (value) => {
+          console.log('debounce!');
+          this.appStorage.secondsPerLine = value;
+
+          this.secondsSliderChange.unsubscribe();
+          this.secondsSliderChange = undefined;
+          this.cd.markForCheck();
+        },
+      });
+    } else {
+      this.secondsSliderChange.next(seconds);
+      this.secondsPerLine = seconds;
+      this.cd.markForCheck();
+    }
   }
 
   openExportModal() {
@@ -341,9 +369,10 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
 
   openEnd() {
     this.appStoreService.setShortcutsEnabled(false);
+    this.secondsPerLine = this.appStorage.secondsPerLine;
     const ref = this.offcanvasService.open(this.canvasContent, {
       position: 'end',
-      panelClass: "options-panel"
+      panelClass: 'options-panel',
     });
     this.subscribe(
       ref.dismissed,

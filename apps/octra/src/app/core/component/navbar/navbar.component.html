@@ -471,13 +471,13 @@
                     [min]="5"
                     [max]="60"
                     [step]="1"
-                    [value]="appStorage.secondsPerLine"
                     #lineDurationSlider
                     name="line-duration"
-                    (change)="changeSecondsPerLine(lineDurationSlider.value)"
+                    [ngModel]="appStorage.secondsPerLine"
+                    (ngModelChange)="changeSecondsPerLine($event)"
                   />
                   <div class="text-center fw-bold">
-                    {{appStorage.secondsPerLine}}s
+                    {{secondsPerLine}}s
                   </div>
                 </div>
                 <br /><br />

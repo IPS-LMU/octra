@@ -2,15 +2,11 @@
   <div class="row">
     <div class="col-12" style="text-align: center">
       @if (
-        settingsService.appSettings.octra.maintenanceNotification !==
-          undefined &&
-        settingsService.appSettings.octra.maintenanceNotification.active ===
-          'active'
+        settingsService.appSettings.octra.maintenanceNotification !== undefined &&
+        settingsService.appSettings.octra.maintenanceNotification.active === 'active'
       ) {
         <octra-maint-banner
-          [serverURL]="
-            settingsService.appSettings.octra.maintenanceNotification.apiURL
-          "
+          [serverURL]="settingsService.appSettings.octra.maintenanceNotification.apiURL"
           [language]="appStorage.language"
         ></octra-maint-banner>
       }
@@ -22,9 +18,7 @@
         <div class="alert mb-0 py-1" style="font-size: 0.8rem">
           <i class="bi bi-info-circle"></i>
           {{ 'login.old version.notice' | transloco }}
-          <a [href]="settingsService.appSettings.octra.oldVersion?.url">{{
-            'login.old version.click here' | transloco
-          }}</a>
+          <a [href]="settingsService.appSettings.octra.oldVersion?.url">{{ 'login.old version.click here' | transloco }}</a>
         </div>
       </div>
     </div>
@@ -33,35 +27,19 @@
   @if (compatibleBrowser !== false) {
     <div class="row" id="loginrow">
       <div class="col-md-6">
-        <div
-          class="card login-card d-flex flex-column flex-fill h-100"
-          #onlinemode
-        >
+        <div class="card login-card d-flex flex-column flex-fill h-100" #onlinemode>
           <div class="card-body">
             <section class="d-flex flex-column flex-fill h-100">
               <h4>{{ 'login.online mode' | transloco }}</h4>
               <p style="text-align: center">
                 {{ 'login.online mode description' | transloco }}
               </p>
-              @if (
-                !apc.octra.login?.enabled || !apc.api?.url || !apc.api?.appToken
-              ) {
-                <div
-                  id="login-disabled"
-                  style="
-                    display: table-cell;
-                    height: 100%;
-                    align-content: center;
-                  "
-                >
+              @if (!apc.octra.login?.enabled || !apc.api?.url || !apc.api?.appToken) {
+                <div id="login-disabled" style="display: table-cell; height: 100%; align-content: center">
                   <i class="bi bi-wifi-off fs-1"></i><br />
                   {{ 'login.online mode disabled' | transloco }}
                 </div>
-              } @else if (
-                (authStoreService.serverOnline$ | async) === undefined
-                  ? true
-                  : (authStoreService.serverOnline$ | async)
-              ) {
+              } @else if ((authStoreService.serverOnline$ | async) === undefined ? true : (authStoreService.serverOnline$ | async)) {
                 <div class="form-horizontal">
                   <octra-authentication-component
                     [showTitle]="false"
@@ -73,12 +51,8 @@
                   ></octra-authentication-component>
                 </div>
               } @else {
-                <div
-                  class="text-center justify-content-center d-flex flex-column flex-fill h-100 p-3 opacity-75"
-                >
-                  <i
-                    class="bi bi-exclamation-triangle-fill text-warning fs-1"
-                  ></i>
+                <div class="text-center justify-content-center d-flex flex-column flex-fill h-100 p-3 opacity-75">
+                  <i class="bi bi-exclamation-triangle-fill text-warning fs-1"></i>
                   <div
                     [innerHTML]="
                       'login.api not available'
@@ -97,19 +71,8 @@
       </div>
       <div class="col-md-6">
         <div class="card login-card position-relative" #localmode>
-          <p
-            style="
-              position: absolute;
-              top: 0;
-              right: 0;
-              text-align: right;
-              margin-top: 10px;
-              margin-right: 10px;
-            "
-          >
-            <a (click)="startDemo()" class="link pointer">{{
-              'login.demo' | transloco
-            }}</a>
+          <p style="position: absolute; top: 0; right: 0; text-align: right; margin-top: 10px; margin-right: 10px">
+            <a (click)="startDemo()" class="link pointer">{{ 'login.demo' | transloco }}</a>
           </p>
           <div class="card-body">
             <section>
@@ -120,20 +83,12 @@
               <div>
                 @if (appStorage.sessionfile !== undefined) {
                   <div
-                    [innerHTML]="
-                      'login.old file found'
-                        | transloco
-                          : { file_label: getDropzoneFileString(sessionfile) }
-                    "
+                    [innerHTML]="'login.old file found' | transloco: { file_label: getDropzoneFileString(sessionfile) }"
                     class="alert alert-warning"
                   ></div>
                 }
                 <div style="margin-top: 40px">
-                  <octra-dropzone
-                    #dropzone
-                    [height]="'147px'"
-                    [oldFiles]="sessionfile ? [sessionfile] : []"
-                  ></octra-dropzone>
+                  <octra-dropzone #dropzone [height]="'147px'" [oldFiles]="sessionfile ? [sessionfile] : []"></octra-dropzone>
                 </div>
                 @if (dropzone.statistics && dropzone.statistics.new === 0) {
                   <button
@@ -151,7 +106,9 @@
                   >
                     {{ 'transcription.start' | transloco }}
                   </button>
-                } @else {
+                }
+
+                @if (dropzone.statistics.valid > 0) {
                   <button
                     (click)="onOfflineSubmit(true)"
                     [disabled]="
@@ -181,18 +138,11 @@
     <div class="row">
       <div class="col-md-4">
         <a href="http://www.en.phonetik.uni-muenchen.de/" target="_blank">
-          <img
-            alt="IPS LMU Munich"
-            class="logo"
-            src="./assets/img/ipsx60.png"
-          />
+          <img alt="IPS LMU Munich" class="logo" src="./assets/img/ipsx60.png" />
         </a>
       </div>
       <div class="col-md-4">
-        <a
-          href="https://www.bas.uni-muenchen.de/Bas/BasHomeeng.html"
-          target="_blank"
-        >
+        <a href="https://www.bas.uni-muenchen.de/Bas/BasHomeeng.html" target="_blank">
           <img alt="BAS" class="logo" src="./assets/img/bas.png" />
         </a>
       </div>
@@ -208,53 +158,33 @@
   <div class="container-md p-2">
     <hr class="d-none d-md-block" />
     <div class="text-center mb-3 p-0 p-md-3" style="background-color: #279440">
-      <img
-        src="assets/img/socialmedia/Octra2_thumbnail_github2x.webp"
-        alt="octra logo"
-        class="img-fluid"
-        style="max-height: 200px"
-      />
+      <img src="assets/img/socialmedia/Octra2_thumbnail_github2x.webp" alt="octra logo" class="img-fluid" style="max-height: 200px" />
     </div>
     <p style="text-align: justify">
-      OCTRA is a free, open-source web-application for the orthographic
-      transcription of audio files. It supports three different editors for
-      different needs. You can switch between these editors, they share the same
-      transcript. Your proceedings are saved automatically to your browser. If
-      your web browser or computer crashes just reopen your web browser and
-      continue your work. <a [routerLink]="['/features']">See features</a>
+      OCTRA is a free, open-source web-application for the orthographic transcription of audio files. It supports three different editors for
+      different needs. You can switch between these editors, they share the same transcript. Your proceedings are saved automatically to your browser.
+      If your web browser or computer crashes just reopen your web browser and continue your work. <a [routerLink]="['/features']">See features</a>
     </p>
     <p>Overall OCTRA supports following features:</p>
     <ul>
       <li>
         Three editors
         <ul>
+          <li>Dictaphone-Editor: A simple editor without a signal display. It consists of an audio player and a text-editor.</li>
           <li>
-            Dictaphone-Editor: A simple editor without a signal display. It
-            consists of an audio player and a text-editor.
+            Linear-Editor: A classic editor with two signal displays and a text editor. The top signal display shows an audio signal of the whole
+            audio file. After you select a part of the audio signal the bottom display shows a zoomed version of the selected part. You can transcribe
+            the selected audio sequence with a text-editor.
           </li>
           <li>
-            Linear-Editor: A classic editor with two signal displays and a text
-            editor. The top signal display shows an audio signal of the whole
-            audio file. After you select a part of the audio signal the bottom
-            display shows a zoomed version of the selected part. You can
-            transcribe the selected audio sequence with a text-editor.
-          </li>
-          <li>
-            2D-Editor: A multiline signal display shows the whole audio signal.
-            You can scroll through the lines, add segment boundaries and much
-            more. Using the ENTER key you can open a transcription window that
-            shows the selected audio signal and a text-editor.
+            2D-Editor: A multiline signal display shows the whole audio signal. You can scroll through the lines, add segment boundaries and much
+            more. Using the ENTER key you can open a transcription window that shows the selected audio signal and a text-editor.
           </li>
         </ul>
       </li>
       <li>Four modes: Online Mode, Local Mode, URL Mode and Demo Mode</li>
-      <li>
-        Support for Audio formats other than WAVE: MP3, Ogg Vorbis, FLAC, M4A
-      </li>
-      <li>
-        Import &amp; Export of various annotation file formats like TextGrid,
-        ELAN, SRT and AnnotJSON
-      </li>
+      <li>Support for Audio formats other than WAVE: MP3, Ogg Vorbis, FLAC, M4A</li>
+      <li>Import &amp; Export of various annotation file formats like TextGrid, ELAN, SRT and AnnotJSON</li>
       <li>Automatic speech recognition and alignment</li>
       <li>Auto-Saving</li>
       <li>Inline validation using transcription guidelines</li>

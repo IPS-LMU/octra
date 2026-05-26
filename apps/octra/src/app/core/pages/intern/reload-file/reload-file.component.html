@@ -19,24 +19,7 @@
         {{ 'transcription.stop' | transloco }}</span
       >
     </button>
-    @if (dropzone.statistics.new > 0) {
-      <button
-        (click)="newTranscription()"
-        [disabled]="
-          dropzone.files.length === 0 ||
-          !dropzone.statistics ||
-          dropzone.statistics.invalid > 0 ||
-          dropzone.statistics.progress > 0 ||
-          dropzone.statistics.waiting > 0
-        "
-        class="btn btn-danger"
-      >
-        <i class="bi bi-file-fill"></i>
-        <span class="d-none d-lg-inline">
-          {{ 'transcription.new' | transloco }}</span
-        >
-      </button>
-    } @else {
+    @if (dropzone.statistics.new === 0 && dropzone.statistics.invalid === 0) {
       <button
         (click)="onOfflineSubmit()"
         [disabled]="
@@ -52,6 +35,25 @@
         <i class="bi bi-pencil-fill"></i>
         <span class="d-none d-lg-inline">
           {{ 'transcription.start' | transloco }}</span
+        >
+      </button>
+    }
+
+    @if (dropzone.statistics.valid > 0) {
+      <button
+        (click)="newTranscription()"
+        [disabled]="
+          dropzone.files.length === 0 ||
+          !dropzone.statistics ||
+          dropzone.statistics.invalid > 0 ||
+          dropzone.statistics.progress > 0 ||
+          dropzone.statistics.waiting > 0
+        "
+        class="btn btn-danger"
+      >
+        <i class="bi bi-file-fill"></i>
+        <span class="d-none d-lg-inline">
+          {{ 'transcription.new' | transloco }}</span
         >
       </button>
     }

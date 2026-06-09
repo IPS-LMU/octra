@@ -214,12 +214,11 @@ export function last<T>(array: T[] | undefined) {
  */
 export function joinURL(...args: string[]) {
   return args
-    .map((a) => {
-      const httpsArr = /(https?:\/\/)/g.exec(a);
+    .map((a, i) => {
+      const prefixRegex = i === 0 ? /^((?:https?:\/\/)|(?:\/{1,2}))/g : /^(:https?:\/\/)/g;
+      const httpsArr = prefixRegex.exec(a);
       const https = httpsArr ? httpsArr[1] : '';
-
-      const result = https + a.replace(/https?:\/\//g, '').replace(/(^\/+)|(\/$)/g, '');
-      return result;
+      return https + a.replace(prefixRegex, '').replace(/(^\/+)|(\/$)/g, '');
     })
     .filter((a) => a !== null && a !== undefined && a !== '')
     .join('/');

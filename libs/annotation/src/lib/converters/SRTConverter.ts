@@ -511,7 +511,7 @@ class SRTImporter {
                 );
                 parsedLevel.items[i - 1] = this.cleanUpMultipleSpeakersInTranscript(parsedLevel.items[i - 1]);
                 parsedLevel.items.splice(i, 2);
-                i-=2;
+                i -= 2;
               } else if (itemDetails.text !== '') {
                 if (nextItemDetails.speaker === itemDetails.speaker) {
                   // combine right with current item
@@ -519,7 +519,7 @@ class SRTImporter {
                   item.sampleDur = nextItem!.sampleStart + nextItem!.sampleDur - item.sampleStart;
                   parsedLevel.items.splice(i + 1, 1);
                   parsedLevel.items[i] = this.cleanUpMultipleSpeakersInTranscript(item);
-                  i-=2;
+                  i -= 2;
                 }
               }
             }
@@ -578,8 +578,19 @@ class SRTImporter {
       this.options.speakerIdentifierPattern && this.options.speakerIdentifierPattern !== ''
         ? this.options.speakerIdentifierPattern
         : '\\[SPEAKER_[0-9]+] *: *';
-    item.replaceFirstLabelWithoutName('Speaker', (value) => value.replace(new RegExp(`(?!^) *${speakerRegex}`), ' '));
+    item.replaceFirstLabelWithoutName('Speaker', (value) => this.removeAllButFirst(value, new RegExp(speakerRegex, 'g')));
     return item;
+  }
+
+  private removeAllButFirst(str: string, pattern: RegExp) {
+    let seen = false;
+    return str.replace(pattern, (match) => {
+      if (!seen) {
+        seen = true;
+        return match;
+      }
+      return '';
+    });
   }
 
   private reduceBoundaries(parsedLevel: OSegmentLevel<OSegment>, threshold: number) {

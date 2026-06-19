@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.1.2](https://github.com/IPS-LMU/octra/compare/utilities-2.1.1...utilities-2.1.2) (2026-06-19)
+
+
+### Bug Fixes
+
+* **utilities:** joinURL() doesn't join relative paths correctly ([31bc295](https://github.com/IPS-LMU/octra/commit/31bc295f45fd01e5614aa27255fd5984ad47ff85))
+
+
+
 ## [2.1.1](https://github.com/IPS-LMU/octra/compare/utilities-2.1.0...utilities-2.1.1) (2026-04-13)
 
 

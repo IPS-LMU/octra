@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.0.1](https://github.com/IPS-LMU/octra/compare/media-1.0.0...media-1.0.1) (2026-06-19)
+
+
+### Bug Fixes
+
+* **media:** invalid index.mjs export ([22d491d](https://github.com/IPS-LMU/octra/commit/22d491d0bb13732ba3fad5e15ad88f4433779505))
+
+
+
 # [1.0.0](https://github.com/IPS-LMU/octra/compare/media-0.1.1...media-1.0.0) (2025-01-13)
 
 ### Features

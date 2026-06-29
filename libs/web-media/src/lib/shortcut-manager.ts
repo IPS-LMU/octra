@@ -33,12 +33,7 @@ export interface Shortcut {
   };
   title: string;
   label?: string;
-  callback?: (
-    keyboardEvent: KeyboardEvent | undefined,
-    shortcut: Shortcut,
-    hotkeyEvent?: HotkeysEvent,
-    shortcutGroup?: ShortcutGroup,
-  ) => void;
+  callback?: (keyboardEvent: KeyboardEvent | undefined, shortcut: Shortcut, hotkeyEvent?: HotkeysEvent, shortcutGroup?: ShortcutGroup) => void;
   focusonly?: boolean;
 }
 
@@ -155,8 +150,14 @@ export class ShortcutManager {
   ];
 
   constructor() {
+    window.addEventListener('blur', this.onWindowBlur);
     this._shortcuts = [];
   }
+
+  private onWindowBlur = () => {
+    // reset pressed keys
+    this.resetPressedKeys();
+  };
 
   public shortcutsEnabled = true;
 
@@ -187,11 +188,7 @@ export class ShortcutManager {
     this._shortcuts = [];
   }
 
-  public checkKeyEvent(
-    event: KeyboardEvent,
-    timestamp: number,
-    checkPressKey = true,
-  ): ShortcutEvent | undefined {
+  public checkKeyEvent(event: KeyboardEvent, timestamp: number, checkPressKey = true): ShortcutEvent | undefined {
     if (this.shortcutsEnabled) {
       if (event.type === 'keydown') {
         // run shortcut check
@@ -252,9 +249,7 @@ export class ShortcutManager {
       }
     | undefined {
     for (const shortcutGroup of this._shortcuts) {
-      const elem = shortcutGroup.items.find(
-        (a) => a.keys[platform] === shortcut,
-      );
+      const elem = shortcutGroup.items.find((a) => a.keys[platform] === shortcut);
       if (elem !== undefined) {
         if (shortcutGroup.enabled) {
           return {
@@ -268,9 +263,7 @@ export class ShortcutManager {
     }
 
     // look for general shortcut
-    const generalShortcutElem = this.generalShortcuts.items.find(
-      (a) => a.keys[platform] === shortcut,
-    );
+    const generalShortcutElem = this.generalShortcuts.items.find((a) => a.keys[platform] === shortcut);
 
     if (generalShortcutElem !== undefined) {
       return {
@@ -293,10 +286,7 @@ export class ShortcutManager {
       if (BrowserInfo.platform === 'mac') {
         if (BrowserInfo.browser!.toLowerCase().indexOf('firefox') > -1) {
           // Firefox
-          if (
-            code === 224 &&
-            (event.code === 'MetaLeft' || event.code === 'MetaRight')
-          ) {
+          if (code === 224 && (event.code === 'MetaLeft' || event.code === 'MetaRight')) {
             return 'CMD';
           }
         }
@@ -364,9 +354,7 @@ export class ShortcutManager {
     }
 
     // if name == comboKey, only one special Key pressed
-    const keys = comboKey
-      .split(' + ')
-      .filter((a) => a !== undefined && a !== '');
+    const keys = comboKey.split(' + ').filter((a) => a !== undefined && a !== '');
     if (keys.find((a) => a === name) === undefined) {
       if (name === 'A') {
         const ok = 2;
@@ -438,9 +426,7 @@ export class ShortcutManager {
   }
 
   private isProtectedShortcut(shortcutCombination: string) {
-    return (
-      this.protectedShortcuts.findIndex((a) => a === shortcutCombination) > -1
-    );
+    return this.protectedShortcuts.findIndex((a) => a === shortcutCombination) > -1;
   }
 
   public disableShortcutGroup(name: string) {
@@ -449,5 +435,9 @@ export class ShortcutManager {
     if (group !== undefined) {
       group.enabled = false;
     }
+  }
+
+  destroy() {
+    window.removeEventListener('blur', this.onWindowBlur);
   }
 }

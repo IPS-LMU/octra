@@ -22,7 +22,17 @@ export class ShortcutService {
     shortcut: string;
   }>();
 
-  constructor() {}
+  constructor() {
+    window.addEventListener('blur', this.onWindowBlur);
+  }
+
+  private onWindowBlur = () => {
+    // reset pressed keys
+    hotkeys.ctrl = false;
+    hotkeys.cmd = false;
+    hotkeys.shift = false;
+    hotkeys.alt = false;
+  };
 
   registerGeneralShortcutGroup(shortcutGroup: ShortcutGroup) {
     if (!this._generalShortcuts.find((a) => a.name === shortcutGroup.name)) {
@@ -117,6 +127,7 @@ export class ShortcutService {
 
   destroy() {
     hotkeys.unbind();
+    window.removeEventListener('blur', this.onWindowBlur);
     this._groups = [];
   }
 

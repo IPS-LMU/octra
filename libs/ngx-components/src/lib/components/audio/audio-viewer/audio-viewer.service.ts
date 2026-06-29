@@ -1829,6 +1829,8 @@ export class AudioViewerService {
     this.konvaContainer?.removeEventListener('mousemove', this.onMouseMove);
     this.konvaContainer?.removeEventListener('mousedown', this.mouseChange);
     this.konvaContainer?.removeEventListener('mouseup', this.mouseChange);
+
+    this.shortcutsManager.destroy();
   }
 
   private onMouseEnter = () => {

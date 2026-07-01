@@ -10,6 +10,7 @@ import { AppStorageService } from './core/shared/service/appstorage.service';
 import { LoginMode } from './core/store';
 import { ApplicationStoreService } from './core/store/application/application-store.service';
 import { AnnotationStoreService } from './core/store/login-mode/annotation/annotation.store.service';
+import { joinURL } from '@octra/utilities';
 
 @Component({
   selector: 'octra-app',

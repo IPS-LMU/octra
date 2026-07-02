@@ -36,7 +36,7 @@ const defaultI18n: ASROptionsTranslations = {
   selector: 'octra-asr-provider-select',
   templateUrl: './asr-provider-select.component.html',
   styleUrls: ['./asr-provider-select.component.scss'],
-  imports: [NgbDropdown, FormsModule, NgbDropdownMenu, NgbDropdownToggle, NgbPopover, NgStyle, NgClass],
+  imports: [NgbDropdown, FormsModule, NgbDropdownMenu, NgbDropdownToggle, NgbPopover, NgStyle],
   providers: [
     {
       provide: NG_VALIDATORS,

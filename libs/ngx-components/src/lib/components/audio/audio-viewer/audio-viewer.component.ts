@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ElementRef,
@@ -44,6 +45,7 @@ export interface CurrentLevelChangeEvent {
   styleUrls: ['./audio-viewer.component.css'],
   providers: [AudioViewerService],
   encapsulation: ViewEncapsulation.ShadowDom,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
   av = inject(AudioViewerService);
@@ -100,6 +102,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       this.av.boundaryDragging.subscribe((event) => {
         if (event.status === 'stopped') {
           this.renderer.setStyle(this.konvaContainer?.nativeElement, 'cursor', 'auto');
+          this.cd.markForCheck();
         }
       }),
     );
@@ -332,6 +335,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
       } catch (e) {
         console.error(e);
       }
+      this.cd.markForCheck();
     } else {
       console.error(`AudioViewer: chunk is undefined.`);
     }
@@ -345,6 +349,7 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
         changes.filter((a) => a.affectedLevelID === this.av.currentLevel!.id),
         oldAnnotation,
       );
+      this.cd.markForCheck();
     }
   }
 
@@ -368,14 +373,17 @@ export class AudioViewerComponent implements OnInit, OnChanges, OnDestroy {
 
   public enableShortcuts() {
     this.av.shortcutsManager.registerShortcutGroup(this.settings.shortcuts);
+    this.cd.markForCheck();
   }
 
   public disableShortcuts() {
     this.av.shortcutsManager.clearShortcuts();
+    this.cd.markForCheck();
   }
 
   onSecondsPerLineChanged(secondsPerLine: number) {
     this.av.onSecondsPerLineChanged(secondsPerLine);
+    this.cd.markForCheck();
   }
 
   @HostListener('window:resize')

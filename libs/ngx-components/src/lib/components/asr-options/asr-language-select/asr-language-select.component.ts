@@ -1,4 +1,16 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  inject,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import {
   AbstractControl,
   ControlValueAccessor,
@@ -24,6 +36,7 @@ const defaultI18n: ASROptionsTranslations = {
   selector: 'octra-asr-language-select',
   templateUrl: './asr-language-select.component.html',
   styleUrls: ['./asr-language-select.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgbDropdown, FormsModule, NgbDropdownMenu, NgbDropdownItem, NgbDropdownToggle, NgStyle],
   providers: [
     {
@@ -119,6 +132,7 @@ export class OctraASRLanguageSelectComponent extends SubscriberComponent impleme
 
   setDisabledState?(isDisabled: boolean): void {
     this.disabled = isDisabled;
+    this.cd.markForCheck();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -176,6 +190,7 @@ export class OctraASRLanguageSelectComponent extends SubscriberComponent impleme
     } else {
       this.filtered = this.languages?.filter((a) => this.isLanguageSupportedByProvider(a)) ?? [];
     }
+    this.cd.markForCheck();
   }
 
   selectLanguage(language?: string, dropdown?: NgbDropdown) {
@@ -189,6 +204,7 @@ export class OctraASRLanguageSelectComponent extends SubscriberComponent impleme
     this.internValue = language ?? undefined;
     this.filterLanguages(this.internValue);
     this.onChange(language);
+    this.cd.markForCheck();
   }
 
   onLanguageDropdownOpenChange(opened: boolean) {
@@ -196,6 +212,7 @@ export class OctraASRLanguageSelectComponent extends SubscriberComponent impleme
       this.internValue = undefined;
       this.filtered = this.languages?.filter((a) => this.isLanguageSupportedByProvider(a)) ?? [];
     }
+    this.cd.markForCheck();
   }
 
   onInputKeyup(event: KeyboardEvent, value: string, dropdown?: NgbDropdown) {

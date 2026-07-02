@@ -1,16 +1,7 @@
-import {
-  Component,
-  inject,
-  Input,
-  OnChanges,
-  OnInit,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { NgbToast, NgbToastHeader } from '@ng-bootstrap/ng-bootstrap';
 import { SubscriberComponent } from '@octra/ngx-utilities';
-import { interval } from 'rxjs';
 import { VersionCheckerService } from '../version-checker.service';
 
 @Component({
@@ -18,14 +9,13 @@ import { VersionCheckerService } from '../version-checker.service';
   selector: 'octra-version-notification',
   templateUrl: './version-notification.component.html',
   styleUrls: ['./version-notification.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgbToastHeader, NgbToast],
 })
-export class VersionNotificationComponent
-  extends SubscriberComponent
-  implements OnInit, OnChanges
-{
+export class VersionNotificationComponent extends SubscriberComponent implements OnInit, OnChanges {
   protected readonly versionCheckerService = inject(VersionCheckerService);
   protected readonly sanitizer = inject(DomSanitizer);
+  protected cd = inject(ChangeDetectorRef);
 
   @Input() i18n = {
     'reload now': 'Reload now',
@@ -59,8 +49,6 @@ export class VersionNotificationComponent
 
   constructor() {
     super();
-    this.prepareI18n(this.i18n);
-    this.prepareIcons(this.icons);
   }
 
   prepareI18n(i18n: any) {
@@ -68,9 +56,7 @@ export class VersionNotificationComponent
       'reload now': i18n['reload now'],
       later: i18n['later'],
       'new update': {
-        header: this.sanitizer.bypassSecurityTrustHtml(
-          i18n['new update'].header,
-        ),
+        header: this.sanitizer.bypassSecurityTrustHtml(i18n['new update'].header),
         body: this.sanitizer.bypassSecurityTrustHtml(i18n['new update'].body),
       },
     };
@@ -84,6 +70,9 @@ export class VersionNotificationComponent
   }
 
   ngOnInit() {
+    this.prepareI18n(this.i18n);
+    this.prepareIcons(this.icons);
+    this.cd.markForCheck();
   }
 
   ngOnChanges(changes: SimpleChanges) {

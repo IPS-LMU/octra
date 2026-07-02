@@ -60,7 +60,9 @@ export class TsWorker {
       .replace(/(\/\*+[^**/]+\*+\/)|(\/\/.*)\n*/g, '')
       .replace(/(function)([^(]*)([^{\n]+)/g, '$3 => ');
 
-    if (eval(`${scriptString}`) === undefined) {
+    try {
+      new Function(`return (${scriptString})`);
+    } catch {
       throw new Error("Can't eval function.");
     }
 

@@ -1,7 +1,6 @@
 const yargs = require('yargs');
 const path = require('path');
 const fs = require('fs-extra');
-const process = require('node:child_process');
 const { exec } = require('node:child_process');
 const crypto = require('crypto');
 const { readFile, writeFile } = require('node:fs/promises');
@@ -154,7 +153,7 @@ const OCTRA = {
   },
 };
 
-yargs
+yargs(process.argv.slice(2))
   .version('1.0.0')
   .help()
   .alias('help', 'h')

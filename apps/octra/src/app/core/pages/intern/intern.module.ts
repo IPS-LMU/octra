@@ -10,10 +10,8 @@ import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import { AppSharedModule } from '../../../app.shared.module';
 import { TranscrWindowComponent } from '../../../editors/2D-editor/transcr-window';
 import { editorComponents } from '../../../editors/components';
-import { NewEditorComponent } from '../../../editors/new-editor/new-editor.component';
 import { PermutationsReplaceModalComponent } from '../../../editors/matrix-editor/modals/permutations-replace-modal/permutations-replace-modal.component';
-import { AuthenticationNeededComponent } from '../../alerts/authentication-needed/authentication-needed.component';
-import { ErrorOccurredComponent } from '../../alerts/error-occurred/error-occurred.component';
+import { NewEditorComponent } from '../../../editors/new-editor/new-editor.component';
 import { FastbarComponent } from '../../component';
 import { AudioNavigationComponent } from '../../component/audio-navigation';
 import { ContextMenuComponent } from '../../component/context-menu/context-menu.component';
@@ -32,8 +30,6 @@ import { ProjectRequestModalComponent } from './projects-list/project-request-mo
 import { ReloadFileComponent } from './reload-file';
 import { TranscriptionComponent } from './transcription';
 import { TranscriptionEndComponent } from './transcription-end';
-
-export const ALERTS: any[] = [AuthenticationNeededComponent];
 
 @NgModule({
   imports: [
@@ -67,14 +63,12 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
     InternComponent,
     TranscrWindowComponent,
     AuthComponent,
-    ErrorOccurredComponent,
     ContextMenuComponent,
     ProjectsListComponent,
     DynComponentDirective,
     PermutationsReplaceModalComponent,
     AuthSuccessPageComponent,
     ProjectRequestModalComponent,
-    ALERTS,
   ],
   exports: [
     AuthComponent,
@@ -91,12 +85,10 @@ export const ALERTS: any[] = [AuthenticationNeededComponent];
     InternComponent,
     TranscrWindowComponent,
     AuthComponent,
-    ErrorOccurredComponent,
     ContextMenuComponent,
     ProjectsListComponent,
     DynComponentDirective,
     PermutationsReplaceModalComponent,
-    ALERTS,
   ],
   bootstrap: [],
   providers: [],

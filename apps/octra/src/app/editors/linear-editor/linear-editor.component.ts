@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, inject, OnInit, ViewChild } from '@angular/core';
 import { contains } from '@octra/utilities';
 import { TranscrEditorComponent, TranscrEditorConfig } from '../../core/component';
 
@@ -31,6 +31,7 @@ import { OCTRAEditor, OctraEditorRequirements, SupportedOctraEditorMetaData } fr
   selector: 'octra-signal-gui',
   templateUrl: './linear-editor.component.html',
   styleUrls: ['./linear-editor.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [OctraComponentsModule, NgStyle, AudioNavigationComponent_1, TranscrEditorComponent_1, NgClass, TranslocoPipe],
 })
 export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterViewInit, OctraEditorRequirements {

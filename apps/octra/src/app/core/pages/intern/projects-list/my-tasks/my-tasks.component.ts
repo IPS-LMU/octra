@@ -1,13 +1,5 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
-import {
-  Component,
-  EventEmitter,
-  inject,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbPaginationModule, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { OAnnotJSON, TextConverter } from '@octra/annotation';
@@ -104,6 +96,7 @@ class PreparedTask extends TaskDto {
     NgbPaginationModule,
     NgTemplateOutlet,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MyTasksComponent extends DefaultComponent implements OnChanges {
   @Input() project?: ProjectDto;
@@ -125,6 +118,7 @@ export class MyTasksComponent extends DefaultComponent implements OnChanges {
   };
   private api: OctraAPIService = inject(OctraAPIService);
   private alertService: AlertService = inject(AlertService);
+  private cd = inject(ChangeDetectorRef);
   protected authSoreService: AuthenticationStoreService = inject(
     AuthenticationStoreService,
   );
@@ -149,15 +143,18 @@ export class MyTasksComponent extends DefaultComponent implements OnChanges {
         next: (result) => {
           this.tasks = result.list?.map((a) => new PreparedTask(this.api, a));
           this.pagination.collectionSize = result.maxCount;
+          this.cd.markForCheck();
         },
         error: (err) => {
           this.alert.showAlert(
             'danger',
             `${err?.error?.message ?? err?.message}`,
           );
+          this.cd.markForCheck();
         },
       },
     );
+    this.cd.markForCheck();
   }
 
   freeTask(task: PreparedTask) {
@@ -168,12 +165,14 @@ export class MyTasksComponent extends DefaultComponent implements OnChanges {
           'success',
           'Task marked as free for other transcribers.',
         );
+        this.cd.markForCheck();
       },
       error: (err) => {
         this.alertService.showAlert(
           'danger',
           err?.error?.message ?? err?.message,
         );
+        this.cd.markForCheck();
       },
     });
   }
@@ -183,9 +182,11 @@ export class MyTasksComponent extends DefaultComponent implements OnChanges {
       project: this.project!,
       task: removeProperties(task, ['api']),
     });
+    this.cd.markForCheck();
   }
 
   onPageChange(page: number) {
+    this.tasks = undefined;
     this.listMyPausedTasks();
   }
 }

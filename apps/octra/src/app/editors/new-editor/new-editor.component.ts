@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, inject, OnInit } from '@angular/core';
 import { AudioService, SettingsService } from '../../core/shared/service';
 import { AppStorageService } from '../../core/shared/service/appstorage.service';
 import { OCTRAEditor, OctraEditorRequirements, SupportedOctraEditorMetaData } from '../octra-editor';
@@ -8,11 +8,13 @@ import { AnnotationLevelType } from '@octra/annotation';
   selector: 'octra-new-editor',
   templateUrl: './new-editor.component.html',
   styleUrls: ['./new-editor.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewEditorComponent extends OCTRAEditor implements OnInit, OctraEditorRequirements {
   audio = inject(AudioService);
   settingsService = inject(SettingsService);
   appStorage = inject(AppStorageService);
+  cd = inject(ChangeDetectorRef);
 
   static override meta: SupportedOctraEditorMetaData = {
     name: 'NEW-Editor',

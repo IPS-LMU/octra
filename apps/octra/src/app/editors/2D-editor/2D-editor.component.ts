@@ -537,6 +537,11 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
             this.window = undefined;
           });
           this.subscriptionManager.removeByTag('windowActions');
+          this.subscribe(this.window.componentInstance.selectedUnitID, {
+            next: (id)=> {
+              this.viewer.scrollToUnit(id);
+            }
+          });
           this.subscribe(
             this.window.componentInstance.act,
             {

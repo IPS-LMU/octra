@@ -126,17 +126,16 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
 
   protected audioViewerHeight = 200;
 
-  @Output()
+  selectedUnitID = new EventEmitter<number>();
+
   get shortcuttriggered(): EventEmitter<AudioViewerShortcutEvent> {
     return this.magnifier.shortcut;
   }
 
-  @Output()
   get marker_insert(): EventEmitter<string> {
     return this.editor.markerInsert;
   }
 
-  @Output()
   get marker_click(): EventEmitter<string> {
     return this.editor.markerClick;
   }
@@ -665,6 +664,7 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
             next: () => {
               // resolve only after the audio viewer is ready
               this.subscriptionManager.removeByTag('oninitialized');
+              this.selectedUnitID.next(segment.id);
               this.subscribe(
                 this.magnifier.onInitialized,
                 {

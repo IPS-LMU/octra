@@ -581,7 +581,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       this.viewer.enableShortcuts();
       this.shortcutsEnabled = true;
       this.selectedIndex = segmentIndex;
-      await this.viewer.scrollToUnit(this.annotationStoreService.currentLevel.items[this.selectedIndex].id);
     } else if (action === 'overview') {
       this.shortcutsEnabled = false;
       this.openModal.emit('overview');

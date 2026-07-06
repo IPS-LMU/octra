@@ -291,6 +291,7 @@ class SRTImporter {
         return a;
       });
 
+      this.cleanup(levels, counterID);
       result.levels = levels;
       return {
         annotjson: result,
@@ -300,6 +301,35 @@ class SRTImporter {
       return {
         error: 'Input file is not compatible with SRT format.',
       };
+    }
+  }
+
+  private cleanup(levels: OSegmentLevel<OSegment>[], counterID: number) {
+    for (let i = 0; i < levels.length; i++) {
+      const level = levels[i];
+      const lastIndex = level.items.length - 1;
+
+      if (lastIndex > -1) {
+        const lastSegment = level.items[lastIndex];
+        const outerBoundary = lastSegment.sampleStart + lastSegment.sampleDur;
+
+        if (outerBoundary !== this.audiofile.duration) {
+          const diff = this.audiofile.duration - outerBoundary;
+          if (diff < 0) {
+            // move outer boundary to audio duration
+            lastSegment.sampleDur = this.audiofile.duration - lastSegment.sampleStart;
+          } else {
+            if (diff > (250 / 1000) * this.audiofile.sampleRate) {
+              // diff greater than 250ms => fill with empty segment,
+              const speakerLabel = lastSegment.labels.find((a) => a.name === 'Speaker');
+              level.items.push(new OSegment(counterID++, outerBoundary, diff, [new OLabel(level.name, ''), ...(speakerLabel ? [speakerLabel] : [])]));
+            } else {
+              // move outer boundary to audio duration
+              lastSegment.sampleDur = this.audiofile.duration - lastSegment.sampleStart;
+            }
+          }
+        }
+      }
     }
   }
 

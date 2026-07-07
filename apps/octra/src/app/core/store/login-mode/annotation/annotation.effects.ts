@@ -1635,7 +1635,7 @@ export class AnnotationEffects {
     this.actions$.pipe(
       ofType(AnnotationActions.redirectToProjects.do),
       exhaustMap((a) => {
-        this.routingService.navigate('redirect to projects after quit', ['/intern/projects'], AppInfo.queryParamsHandling);
+        this.routingService.navigate('redirect to projects', ['/intern/projects'], AppInfo.queryParamsHandling);
         return of(AnnotationActions.redirectToProjects.success());
       }),
     ),
@@ -1700,7 +1700,7 @@ export class AnnotationEffects {
     ),
   );
 
-  resumeTaskManually$ = createEffect(() =>
+  resumeTaskManuallySuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnotationActions.resumeTaskManually.success),
       withLatestFrom(this.store),
@@ -1736,6 +1736,17 @@ export class AnnotationEffects {
             mode: state.application.mode!,
           }),
         );
+      }),
+    ),
+  );
+
+  resumeTaskManuallyFail$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.resumeTaskManually.fail),
+      withLatestFrom(this.store),
+      exhaustMap(([action, state]) => {
+        this.alertService.showAlert('danger', 'You are not allowed to continue the task of another user.', true);
+        return of(AnnotationActions.redirectToProjects.do({ mode: action.mode }));
       }),
     ),
   );

@@ -68,6 +68,13 @@ export const reducer = createReducer(
     ...state,
     mode: LoginMode.ONLINE,
   })),
+  on(AnnotationActions.redirectToProjects.success, (state: ApplicationState) => ({
+    ...state,
+    loading: {
+      ...state.loading,
+      status: LoadingStatus.FINISHED,
+    },
+  })),
   on(ApplicationActions.addError, (state: ApplicationState, { error }) => ({
     ...state,
     loading: {

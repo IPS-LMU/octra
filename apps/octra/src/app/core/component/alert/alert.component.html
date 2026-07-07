@@ -1,9 +1,9 @@
 @for (toast of alertService.queue; track toast) {
   <ngb-toast
     [ngClass]="{
-      'bg-danger text-light': toast.type === 'danger',
-      'bg-success text-light': toast.type === 'success',
-      'bg-warning text-dark': toast.type === 'warning',
+      'bg-danger': toast.type === 'danger',
+      'bg-success': toast.type === 'success',
+      'bg-warning': toast.type === 'warning',
     }"
     (mouseenter)="toast.autohide = false"
     (mouseleave)="toast.autohide = true"

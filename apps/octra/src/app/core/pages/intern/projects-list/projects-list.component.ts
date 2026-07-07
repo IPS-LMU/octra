@@ -7,6 +7,8 @@ import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { AccountProjectRoleDto, ProjectDto, ProjectListDto, TaskDto } from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
+import { forkJoin, withLatestFrom } from 'rxjs';
+import { AppInfo } from '../../../../app.info';
 import { DefaultComponent } from '../../../component/default.component';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
 import { OctraModalService } from '../../../modals/octra-modal.service';
@@ -19,7 +21,6 @@ import { AnnotationActions } from '../../../store/login-mode/annotation/annotati
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 import { MyTasksComponent } from './my-tasks/my-tasks.component';
 import { ProjectRequestModalComponent } from './project-request-modal/project-request-modal.component';
-import { AppInfo } from '../../../../app.info';
 
 class PreparedProjectDto extends ProjectDto {
   collapsed = true;
@@ -101,13 +102,31 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     this.subscribe(authStoreService.sameUserWithOpenTask$, {
       next: (result) => {
         this.sameUserWithOpenTask = result;
-        if (result?.projectID) {
-          this.subscribe(this.api.getProject(result.projectID), {
-            next: (result) => {
-              this.previousProject = result;
-              this.cd.markForCheck();
+        if (result?.projectID && result?.taskID) {
+          this.subscribe(
+            forkJoin({
+              project: this.api.getProject(result.projectID),
+              task: this.api.getTask(result.projectID, result.taskID),
+            }).pipe(withLatestFrom(this.authStoreService.me$)),
+            {
+              next: ([{ project, task }, me]) => {
+                if (task.worker_username === me.username || task.assigned_worker_username === me.username) {
+                  this.previousProject = project;
+                } else {
+                  this.previousProject = undefined;
+                }
+
+                this.cd.markForCheck();
+              },
+              error: () => {
+                console.warn(
+                  `Another user was previously logged in. User is not allowed to continue task ${result.taskID} of project ${result.projectID}`,
+                );
+              },
             },
-          });
+          );
+        } else {
+          this.previousProject = undefined;
         }
         this.cd.markForCheck();
       },

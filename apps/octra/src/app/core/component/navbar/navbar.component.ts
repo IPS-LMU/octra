@@ -41,6 +41,10 @@ import { AnnotationStoreService } from '../../store/login-mode/annotation/annota
 import { AsrOptionsComponent } from '../asr-options/asr-options.component';
 import { DefaultComponent } from '../default.component';
 import { NavbarService } from './navbar.service';
+import {
+  TranscriptionStopModalAnswer,
+  TranscriptionStopModalComponent,
+} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 
 @Component({
   selector: 'octra-navigation',
@@ -352,7 +356,23 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
 
   logout(redirectToProjects = false) {
     if (this.appStorage.snapshot.application.mode === LoginMode.ONLINE && this.appStorage.snapshot.onlineMode.currentSession.currentProject) {
-      this.annotationStoreService.quit(true, !redirectToProjects, redirectToProjects);
+      if (this.appStorage.snapshot.onlineMode.audio.loaded && !redirectToProjects) {
+        // any interface opened
+        this.modalService
+          .openModal(TranscriptionStopModalComponent, TranscriptionStopModalComponent.options)
+          .then((answer: any) => {
+            if (answer === TranscriptionStopModalAnswer.QUIT) {
+              this.annotationStoreService.quit(true, false, false);
+            } else if (answer === TranscriptionStopModalAnswer.QUITRELEASE) {
+              this.annotationStoreService.quit(true, true, false);
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      } else {
+        this.annotationStoreService.quit(true, false, redirectToProjects);
+      }
     } else {
       this.appStorage.logout(true);
     }

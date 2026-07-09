@@ -449,6 +449,9 @@
           "label": "Cancel automatic processing & switch editor"
         }
       }
+    },
+    "free one task": {
+      "text": "Are you sure you want to release task <b>{{taskID}}</b>? Doing so will remove your progress on this task and, where applicable, make the task available to another user. This action cannot be undone."
     }
   },
   "p": {

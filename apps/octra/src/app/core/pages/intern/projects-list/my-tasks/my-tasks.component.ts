@@ -1,23 +1,16 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbPaginationModule, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { OAnnotJSON, TextConverter } from '@octra/annotation';
-import {
-  ProjectDto,
-  TaskDto,
-  TaskInputOutputDto,
-  TaskStatus,
-} from '@octra/api-types';
+import { ProjectDto, TaskDto, TaskInputOutputDto, TaskStatus } from '@octra/api-types';
 import { OAudiofile } from '@octra/media';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { removeProperties } from '@octra/utilities';
 import { DefaultComponent } from '../../../../component/default.component';
-import {
-  findCompatibleFileFromIO,
-  isValidAnnotation,
-  LuxonShortDateTimePipe,
-} from '../../../../shared';
+import { OctraModalService } from '../../../../modals/octra-modal.service';
+import { YesNoModalComponent } from '../../../../modals/yes-no-modal/yes-no-modal.component';
+import { findCompatibleFileFromIO, isValidAnnotation, LuxonShortDateTimePipe } from '../../../../shared';
 import { AlertService } from '../../../../shared/service';
 import { AuthenticationStoreService } from '../../../../store/authentication';
 
@@ -45,10 +38,7 @@ class PreparedTask extends TaskDto {
       return undefined;
     });
 
-    if (
-      audioFile?.metadata?.sampleRate &&
-      audioFile?.metadata?.duration?.seconds
-    ) {
+    if (audioFile?.metadata?.sampleRate && audioFile?.metadata?.duration?.seconds) {
       this.audio = {
         name: audioFile.filename,
         url: this.api.prepareFileURL(audioFile.url!),
@@ -74,11 +64,7 @@ class PreparedTask extends TaskDto {
 
       if (transcriptFile?.annotjson) {
         const textConverter = new TextConverter();
-        this.transcript = textConverter.export(
-          OAnnotJSON.deserialize(transcriptFile.annotjson)!,
-          oAudioFile,
-          0,
-        )?.file?.content;
+        this.transcript = textConverter.export(OAnnotJSON.deserialize(transcriptFile.annotjson)!, oAudioFile, 0)?.file?.content;
       }
     }
   }
@@ -88,15 +74,8 @@ class PreparedTask extends TaskDto {
   selector: 'octra-my-tasks',
   templateUrl: './my-tasks.component.html',
   styleUrls: ['./my-tasks.component.scss'],
-  imports: [
-    TranslocoPipe,
-    LuxonShortDateTimePipe,
-    AsyncPipe,
-    NgbPopover,
-    NgbPaginationModule,
-    NgTemplateOutlet,
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [TranslocoPipe, LuxonShortDateTimePipe, AsyncPipe, NgbPopover, NgbPaginationModule, NgTemplateOutlet],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MyTasksComponent extends DefaultComponent implements OnChanges {
   @Input() project?: ProjectDto;
@@ -119,10 +98,10 @@ export class MyTasksComponent extends DefaultComponent implements OnChanges {
   private api: OctraAPIService = inject(OctraAPIService);
   private alertService: AlertService = inject(AlertService);
   private cd = inject(ChangeDetectorRef);
-  protected authSoreService: AuthenticationStoreService = inject(
-    AuthenticationStoreService,
-  );
+  protected authSoreService: AuthenticationStoreService = inject(AuthenticationStoreService);
   private alert: AlertService = inject(AlertService);
+  private transloco = inject(TranslocoService);
+  private modalService = inject(OctraModalService);
 
   ngOnChanges(changes: SimpleChanges) {
     const project = changes['project'];
@@ -146,10 +125,7 @@ export class MyTasksComponent extends DefaultComponent implements OnChanges {
           this.cd.markForCheck();
         },
         error: (err) => {
-          this.alert.showAlert(
-            'danger',
-            `${err?.error?.message ?? err?.message}`,
-          );
+          this.alert.showAlert('danger', `${err?.error?.message ?? err?.message}`);
           this.cd.markForCheck();
         },
       },
@@ -157,24 +133,26 @@ export class MyTasksComponent extends DefaultComponent implements OnChanges {
     this.cd.markForCheck();
   }
 
-  freeTask(task: PreparedTask) {
-    this.subscribe(this.api.freeTask(this.project!.id, task.id), {
-      next: (task) => {
-        this.listMyPausedTasks();
-        this.alertService.showAlert(
-          'success',
-          'Task marked as free for other transcribers.',
-        );
-        this.cd.markForCheck();
-      },
-      error: (err) => {
-        this.alertService.showAlert(
-          'danger',
-          err?.error?.message ?? err?.message,
-        );
-        this.cd.markForCheck();
-      },
+  async freeTask(task: PreparedTask) {
+    const answer = await this.modalService.openModal(YesNoModalComponent, YesNoModalComponent.options, {
+      message: this.transloco.translate('modals.free one task.text', {
+        taskID: task.id,
+      }),
     });
+
+    if (answer === 'yes') {
+      this.subscribe(this.api.freeTask(this.project!.id, task.id), {
+        next: (task) => {
+          this.listMyPausedTasks();
+          this.alertService.showAlert('success', 'Task marked as free for other transcribers.');
+          this.cd.markForCheck();
+        },
+        error: (err) => {
+          this.alertService.showAlert('danger', err?.error?.message ?? err?.message);
+          this.cd.markForCheck();
+        },
+      });
+    }
   }
 
   continueTaskClick(task: PreparedTask) {

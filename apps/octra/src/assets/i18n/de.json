@@ -449,6 +449,9 @@
           "label": "Automatische Verarbeitung abbrechen & Editor wechseln"
         }
       }
+    },
+    "free one task": {
+      "text": "Bist Du sicher, dass Du die Aufgabe <b>{{taskID}}</b> freigeben möchtest? Damit wird dein Fortschritt für diese Aufgabe entfernt und die Aufgabe ggf. einem anderen Nutzer zur Verfügung gestellt. Diese Aktion kann nicht rückgängig gemacht werden."
     }
   },
   "p": {

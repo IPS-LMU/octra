@@ -1,6 +1,5 @@
 <div class="modal-content">
-  <div class="modal-body p-4">
-    {{ message }}
+  <div class="modal-body p-4" [innerHTML]="message">
   </div>
   <div class="modal-footer px-4">
     <button (click)="close('no')" class="btn btn-primary" type="button">

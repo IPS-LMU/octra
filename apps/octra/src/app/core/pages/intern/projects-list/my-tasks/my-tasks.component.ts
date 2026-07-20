@@ -76,6 +76,7 @@ class PreparedTask extends TaskDto {
   styleUrls: ['./my-tasks.component.scss'],
   imports: [TranslocoPipe, LuxonShortDateTimePipe, AsyncPipe, NgbPopover, NgbPaginationModule, NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
 })
 export class MyTasksComponent extends DefaultComponent implements OnChanges {
   @Input() project?: ProjectDto;

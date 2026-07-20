@@ -1,20 +1,8 @@
-import {
-  Component,
-  EventEmitter,
-  inject,
-  Input,
-  Output,
-  SecurityContext,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, Input, Output, SecurityContext } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import {
-  AccountLoginMethod,
-  AppPropertiesDtoAuthenticationsEnum,
-  LANGUAGES,
-  TIMEZONE_NAMES,
-} from '@octra/api-types';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { AccountLoginMethod, AppPropertiesDtoAuthenticationsEnum, LANGUAGES, TIMEZONE_NAMES } from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { DefaultComponent } from '../default.component';
 import { SignupComponent } from './signup/signup.component';
@@ -27,8 +15,8 @@ import { SignupComponent } from './signup/signup.component';
 })
 export class AuthenticationComponent extends DefaultComponent {
   protected api = inject(OctraAPIService);
-  private transloco = inject(TranslocoService);
   private sanitizer = inject(DomSanitizer);
+  private cd = inject(ChangeDetectorRef);
 
   @Output() submitClick = new EventEmitter<{
     type: AccountLoginMethod;
@@ -38,18 +26,13 @@ export class AuthenticationComponent extends DefaultComponent {
     };
   }>();
 
-  @Input() authentications?: AppPropertiesDtoAuthenticationsEnum[] = [
-    AccountLoginMethod.local,
-    AccountLoginMethod.shibboleth,
-  ];
+  @Input() authentications?: AppPropertiesDtoAuthenticationsEnum[] = [AccountLoginMethod.local, AccountLoginMethod.shibboleth];
   @Input() type?: AccountLoginMethod;
   @Input() showTitle = true;
   @Input() registrations?: boolean = false;
   @Input() passwordReset?: boolean = false;
   @Input() set octraBackendURL(value: string | undefined) {
-    this._octraBackendURL = value
-      ? this.sanitizer.sanitize(SecurityContext.URL, value)
-      : undefined;
+    this._octraBackendURL = value ? this.sanitizer.sanitize(SecurityContext.URL, value) : undefined;
   }
   protected _octraBackendURL?: SafeUrl | null;
 
@@ -77,6 +60,7 @@ export class AuthenticationComponent extends DefaultComponent {
       .subscribe({
         next: () => {
           this.passwordResetRequested = true;
+          this.cd.markForCheck();
         },
       });
   }
@@ -89,12 +73,11 @@ export class AuthenticationComponent extends DefaultComponent {
     this.showSignup = false;
     this.showForgetPassword = false;
     this.passwordResetRequested = false;
+    this.cd.markForCheck();
   }
 
   showSignUpForm() {
     this.showSignup = true;
+    this.cd.markForCheck();
   }
-
-  protected readonly TIMEZONE_NAMES = TIMEZONE_NAMES;
-  protected readonly LANGUAGES = LANGUAGES;
 }

@@ -1,14 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import {
-  AccountPersonGender,
-  COUNTRYSTATES,
-  LANGUAGES,
-  PolicyListItemDto,
-  TIMEZONE_NAMES,
-} from '@octra/api-types';
+import { AccountPersonGender, COUNTRYSTATES, LANGUAGES, PolicyListItemDto, TIMEZONE_NAMES } from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { DefaultComponent } from '../../default.component';
 
@@ -30,6 +24,7 @@ export class PreparedPolicyListItemDto extends PolicyListItemDto {
 export class SignupComponent extends DefaultComponent implements OnInit {
   private api = inject(OctraAPIService);
   private transloco = inject(TranslocoService);
+  private cd = inject(ChangeDetectorRef);
 
   protected readonly TIMEZONE_NAMES = TIMEZONE_NAMES;
   protected readonly LANGUAGES = LANGUAGES;
@@ -68,9 +63,8 @@ export class SignupComponent extends DefaultComponent implements OnInit {
       {
         next: (policies) => {
           this.signUpLoading = false;
-          this.signUpForm.policies = policies.map(
-            (a) => new PreparedPolicyListItemDto(a),
-          );
+          this.signUpForm.policies = policies.map((a) => new PreparedPolicyListItemDto(a));
+          this.cd.markForCheck();
         },
         error: (e) => {
           console.error(e);
@@ -78,6 +72,7 @@ export class SignupComponent extends DefaultComponent implements OnInit {
       },
       'signup',
     );
+    this.cd.markForCheck();
   }
 
   getTranslationPolicy(policy: PolicyListItemDto) {
@@ -85,11 +80,7 @@ export class SignupComponent extends DefaultComponent implements OnInit {
       let language = this.transloco.getActiveLang();
       language = language.replace(/-.*/g, '');
 
-      return (
-        policy.translations.find((a) => a.locale === language) ??
-        policy.translations.find((a) => a.locale === 'en') ??
-        policy.translations[0]
-      );
+      return policy.translations.find((a) => a.locale === language) ?? policy.translations.find((a) => a.locale === 'en') ?? policy.translations[0];
     }
     return undefined;
   }
@@ -118,12 +109,15 @@ export class SignupComponent extends DefaultComponent implements OnInit {
         error: (error: HttpErrorResponse) => {
           this.errorMessage = error?.error?.message ?? error.message;
           console.error(error?.error?.message ?? error.message);
+          this.cd.markForCheck();
         },
       });
+    this.cd.markForCheck();
   }
 
   clearForm() {
     this.signUpForm = this.initialState;
+    this.cd.markForCheck();
   }
 
   override ngOnDestroy() {

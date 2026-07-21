@@ -355,68 +355,36 @@ export class AudioCutter {
     selectedChannel?: number,
   ): Promise<IntArray> {
     return new Promise<IntArray>((resolve, reject) => {
-      let convertedData: IntArray;
-      let result: IntArray | undefined = undefined;
-
-      // one block contains one sample of each channel
-      // eg. blockAlign = 4 Byte => 2 * 8 Channel1 + 2 * 8 Channel2 = 32Bit = 4 Byte
-      const channels =
-        selectedChannel !== undefined ? 1 : this.audioInfo.channels;
-      const blockAlign = (this.audioInfo.bitrate / 8) * channels;
-
-      let start = sampleStart * blockAlign;
-      let dataChunkLength = sampleDur * blockAlign;
-      let startPos: number;
-
-      const divider = this.audioInfo.bitrate / 8;
-      if ([32, 16, 8].includes(this.audioInfo.bitrate)) {
-        dataChunkLength = Math.round(dataChunkLength / divider);
-        result = new this.formatConstructor(dataChunkLength);
-        convertedData = new this.formatConstructor(uint8Array.buffer as any);
-        start = Math.round(start / divider);
-        startPos = 44 / divider + Math.round(start);
+      if (![32, 16, 8].includes(this.audioInfo.bitrate)) {
+        reject('unsupported bitsPerSample');
+        return;
       }
 
-      if (result) {
-        // start and duration are the position in bytes after the header
-        const endPos = startPos! + Math.round(dataChunkLength);
+      const divider = this.audioInfo.bitrate / 8;
+      // sampleStart/sampleDur are frame indices spanning ALL channels, so the
+      // offset into the interleaved stream must always use the file's real
+      // channel count, regardless of how many channels are extracted.
+      const startPos = 44 / divider + sampleStart * this.audioInfo.channels;
+      const convertedData: IntArray = new this.formatConstructor(
+        uint8Array.buffer as any,
+      );
 
-        if (selectedChannel === undefined || this.audioInfo.channels === 1) {
-          result.set(convertedData!.slice(startPos!, endPos));
-          resolve(result);
-        } else {
-          // get data from selected channel only
-
-          const channelData: IntArray[] = [];
-          const dataStart = 44 / divider;
-
-          for (let i = 0; i < this.audioInfo.channels; i++) {
-            channelData.push(
-              new this.formatConstructor(
-                Math.round(dataStart + dataChunkLength),
-              ),
-            );
-          }
-
-          let pointer = 0;
-          for (let i = startPos!; i < endPos * this.audioInfo.channels; i++) {
-            try {
-              for (let j = 0; j < this.audioInfo.channels; j++) {
-                channelData[j][dataStart + pointer] =
-                  convertedData![dataStart + i + j];
-              }
-              i++;
-              pointer++;
-            } catch (e) {
-              reject(e);
-            }
-          }
-
-          result = channelData[selectedChannel];
-          resolve(result);
-        }
+      if (selectedChannel === undefined || this.audioInfo.channels === 1) {
+        const endPos = startPos + sampleDur * this.audioInfo.channels;
+        const result = new this.formatConstructor(
+          sampleDur * this.audioInfo.channels,
+        );
+        result.set(convertedData.slice(startPos, endPos));
+        resolve(result);
       } else {
-        reject('unsupported bitsPerSample');
+        const result = new this.formatConstructor(sampleDur);
+        for (let f = 0; f < sampleDur; f++) {
+          result[f] =
+            convertedData[
+              startPos + f * this.audioInfo.channels + selectedChannel
+            ];
+        }
+        resolve(result);
       }
     });
   }

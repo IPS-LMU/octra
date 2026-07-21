@@ -205,7 +205,7 @@ onmessage = (msg) => {
       if (job !== undefined) {
         job.changeStatus(TsWorkerStatus.RUNNING);
         if (job.resultType === 'PROMISE') {
-          this.run(this._queue[0])
+          this.run(job)
             .then((result: any) => {
               // remove job from job list
               this.removeJobByID(job.id);

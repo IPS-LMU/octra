@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.0.3](https://github.com/IPS-LMU/octra/compare/web-media-2.0.2...web-media-2.0.3) (2026-07-21)
+
+### Bug Fixes
+
+* **octra:** hotkeys do not work after meta keys released outside the window ([9bad8b6](https://github.com/IPS-LMU/octra/commit/9bad8b636603dd6404356559bccd37923e69bb80))
+* **web-media:** don't use eval if function string is valid ([0af1f30](https://github.com/IPS-LMU/octra/commit/0af1f3025a919be4a3f3a987c5caf5675c2eeb7c))
+* **web-media:** invalid audio decoding and cutting on stereo audio ([f496b60](https://github.com/IPS-LMU/octra/commit/f496b60f9296383fb3bb8b6873ce9c0fed4081e4))
+* **web-media:** tsworker may reference to wrong job ([66b5f21](https://github.com/IPS-LMU/octra/commit/66b5f21a2cd04b7375c87857a67f09f1962665f6))
+
 ## [2.0.2](https://github.com/IPS-LMU/octra/compare/web-media-2.0.1...web-media-2.0.2) (2026-06-19)
 
 

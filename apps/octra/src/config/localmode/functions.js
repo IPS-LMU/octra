@@ -4,10 +4,10 @@
  * @returns {{start: number, length: number, code: string}}
  */
 function validateAnnotation(annotation, guidelines) {
-  var result = [];
+  let result = [];
 
   //R06 Satzzeichen
-  var re = /[(.,!?;)]/g;
+  let re = /[(.,!?;)]/g;
   let match;
   while ((match = re.exec(annotation)) !== null) {
     result.push({
@@ -18,8 +18,8 @@ function validateAnnotation(annotation, guidelines) {
   }
 
   //M01
-  for (var i = 0; i < guidelines.markers.length; i++) {
-    var marker = guidelines.markers[i].code;
+  for (let i = 0; i < guidelines.markers.length; i++) {
+    const marker = guidelines.markers[i].code;
 
     re = new RegExp(
       '(' + escapeRegex(marker) + ')( *(' + escapeRegex(marker) + '))+',
@@ -46,7 +46,7 @@ function validateAnnotation(annotation, guidelines) {
  * @returns string
  */
 function tidyUpAnnotation(annotation, guidelines) {
-  var result = annotation;
+  let result = annotation;
 
   // replace all numbers of whitespaces to one
   result = result.replace(/\s+/g, ' ');
@@ -60,7 +60,7 @@ function tidyUpAnnotation(annotation, guidelines) {
  */
 function escapeRegex(regex_str) {
   //escape special chars in regex
-  return regex_str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+  return regex_str.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
 function sortValidationResult(result) {

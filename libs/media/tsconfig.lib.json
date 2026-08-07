@@ -5,5 +5,8 @@
     "declaration": true,
     "types": ["node", "vite/client"]
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "angularCompilerOptions": {
+    "strictTemplates": false
+  }
 }

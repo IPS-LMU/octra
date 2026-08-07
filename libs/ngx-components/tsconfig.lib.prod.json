@@ -5,6 +5,12 @@
     "strict": false
   },
   "angularCompilerOptions": {
-    "compilationMode": "partial"
+    "compilationMode": "partial",
+    "extendedDiagnostics": {
+      "checks": {
+        "nullishCoalescingNotNullable": "suppress",
+        "optionalChainNotNullable": "suppress"
+      }
+    }
   }
 }

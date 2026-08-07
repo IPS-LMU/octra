@@ -7,7 +7,7 @@
           'projects-list.other user logged in'
             | transloco
               : {
-                  username: (authStoreService.otherUserLoggedIn$ | async)?.username,
+                  username: $safeNavigationMigration((authStoreService.otherUserLoggedIn$ | async)?.username),
                 }
         "
       ></div>
@@ -19,7 +19,7 @@
               'projects-list.same user free task'
                 | transloco
                   : {
-                      project: previousProject?.name,
+                      project: $safeNavigationMigration(previousProject?.name),
                       resumeTranscription: 'projects-list.resume transcription' | transloco,
                     }
             "
@@ -132,7 +132,7 @@
                                         project.enddate
                                           | luxonShortDateTime
                                             : {
-                                                locale: (authStoreService.me$ | async)?.locale,
+                                                locale: $safeNavigationMigration((authStoreService.me$ | async)?.locale),
                                               }
                                       }}
                                     </span>

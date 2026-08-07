@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, SecurityContext } from '@angular/core';
+import { Component, inject, OnInit, SecurityContext, ChangeDetectionStrategy } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
@@ -12,6 +12,7 @@ import { OctraModal } from '../types';
   selector: 'octra-transcription-backup-end-modal',
   templateUrl: './transcription-backup-end-modal.component.html',
   styleUrls: ['./transcription-backup-end-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [TranslocoPipe],
 })
 export class TranscriptionBackupEndModalComponent

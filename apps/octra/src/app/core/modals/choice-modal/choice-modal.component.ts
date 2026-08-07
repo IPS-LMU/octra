@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 export interface ChoiceModalButtons {
@@ -13,6 +13,7 @@ export interface ChoiceModalButtons {
   templateUrl: './choice-modal.component.html',
   styleUrls: ['./choice-modal.component.css'],
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [],
 })
 export class ChoiceModalComponent {

@@ -35,7 +35,7 @@ export class BinaryByteReader {
     this.pos += 4;
   }
 
-  readAscii(size: number): String {
+  readAscii(size: number): string {
     let i;
     let txt = '';
     for (i = 0; i < size; i++) {

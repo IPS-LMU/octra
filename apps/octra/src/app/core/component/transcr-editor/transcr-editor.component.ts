@@ -161,7 +161,7 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
   };
 
   public htmlValue = '';
-  private initialized: boolean = false;
+  private initialized = false;
 
   constructor() {
     super();
@@ -552,7 +552,7 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
   /**
    * set focus to the very last position of the editors text
    */
-  public focus = (atEnd: boolean = true, later: boolean = false) => {
+  public focus = (atEnd = true, later = false) => {
     return new Promise<void>((resolve, reject) => {
       const func = () => {
         try {
@@ -753,7 +753,7 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
       marker.name,
       marker.description,
       () => {
-        let content = '';
+        let content: string;
         const platform = BrowserInfo.platform;
         if (marker.icon === undefined || marker.icon === '' || (marker.icon.indexOf('.png') < 0 && marker.icon.indexOf('.jpg') < 0)) {
           // text only or utf8 symbol
@@ -840,9 +840,7 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
 
   createHighlightingButton(): IControlType<IJodit, IToolbarButton> {
     const getContent = () => {
-      let content = '';
-
-      content = this.highlightingEnabled
+      const content = this.highlightingEnabled
         ? `<img src="assets/img/components/transcr-editor/highlightingEnabled.jpg"
          class="btn-icon highlight-button me-1" style="height:15px;"/>`
         : `<img src="assets/img/components/transcr-editor/highlightingDisbled.jpg"
@@ -1231,7 +1229,7 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
       'boundary',
       boundaryDescr,
       () => {
-        let content = '';
+        let content: string;
         // create boudary button
         const boundaryLabel = this.langService.translate('special_markers.boundary.insert', { type: '' });
         if (!this.easymode) {

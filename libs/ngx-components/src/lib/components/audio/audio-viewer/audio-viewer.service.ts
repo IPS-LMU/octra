@@ -1098,7 +1098,7 @@ export class AudioViewerService {
   };
 
   updateAllSegments(clearAll = false) {
-    let y = 0;
+    const y = 0;
     const segCanvasElements = this.layers?.overlay.find('.segments');
     if (clearAll) {
       segCanvasElements?.forEach((a) => a.destroy());
@@ -3550,7 +3550,7 @@ export class AudioViewerService {
     ) {
       if (sceneSegment && this.currentLevel.type === AnnotationLevelType.SEGMENT) {
         for (let j = 0; j <= lineInterval.to - lineInterval.from; j++) {
-          let localY = j * (this.settings.lineheight + this.settings.margin.top);
+          const localY = j * (this.settings.lineheight + this.settings.margin.top);
 
           if (this.innerWidth !== undefined) {
             const startSecond = j * this.secondsPerLine;

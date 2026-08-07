@@ -1,6 +1,6 @@
 import { CdkDrag, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { NgStyle } from '@angular/common';
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -39,6 +39,7 @@ export interface ColumnFormat {
   templateUrl: './table-configurator.component.html',
   styleUrls: ['./table-configurator.component.scss'],
   providers: [],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     NgbDropdown,
     NgbDropdownToggle,
@@ -438,7 +439,7 @@ export class TableConfiguratorComponent implements OnInit {
     this.tableConfiguratorAddColumn();
   }
 
-  tableConfiguratorAddColumn(position = -1, type: string = '') {
+  tableConfiguratorAddColumn(position = -1, type = '') {
     let colDef: ColumnDefinition;
 
     if (type === '') {
@@ -752,7 +753,7 @@ export class TableConfiguratorComponent implements OnInit {
 
   private getLevelNumber(): number {
     if (
-      !this.currentLevelID !== undefined &&
+      this.currentLevelID !== undefined &&
       this.annotation?.levels !== undefined
     ) {
       const result = this.annotation.levels.findIndex((a) => {

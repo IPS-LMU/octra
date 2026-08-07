@@ -5,6 +5,7 @@ import {
   OnInit,
   SecurityContext,
   ViewEncapsulation,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -25,6 +26,7 @@ import { OctraModal } from '../types';
   templateUrl: './transcription-guidelines-modal.component.html',
   styleUrls: ['./transcription-guidelines-modal.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [NgClass, NgbCollapse, TranslocoPipe],
 })
 export class TranscriptionGuidelinesModalComponent

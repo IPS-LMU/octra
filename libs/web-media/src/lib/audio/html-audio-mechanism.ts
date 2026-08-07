@@ -1,20 +1,20 @@
 import { AudioSelection, PlayBackStatus, SampleUnit } from '@octra/media';
-import {
-  AudioDecoder,
-  AudioFormat,
-  AudioInfo,
-  AudioManager,
-  AudioResource,
-  getAudioInfo,
-  MusicMetadataFormat,
-  WavFormat,
-} from '@octra/web-media';
+import { getAudioInfo } from '../functions';
 import { concat, map, Observable, Subject, Subscription, timer } from 'rxjs';
 import { SourceType } from '../types';
 import {
   AudioMechanism,
   AudioMechanismPrepareOptions,
 } from './audio-mechanism';
+import {
+  AudioDecoder,
+  AudioFormat,
+  AudioInfo,
+  AudioManager,
+  AudioResource,
+  MusicMetadataFormat,
+  WavFormat,
+} from './index';
 
 export class HtmlAudioMechanism extends AudioMechanism {
   private _audio?: HTMLAudioElement;
@@ -271,7 +271,9 @@ export class HtmlAudioMechanism extends AudioMechanism {
         .catch((e) => {
           subj.error(e);
         });
-    } catch (e) {}
+    } catch (e) {
+      // ignored: async errors are reported via subj.error() in the .catch() above
+    }
   }
 
   override decodeAudio(resource: AudioResource) {

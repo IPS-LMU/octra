@@ -5,6 +5,7 @@ import {
   OnChanges,
   Output,
   SimpleChanges,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 import { ToolconfigGroupComponent } from './toolconfig-group/toolconfig-group.component';
@@ -13,6 +14,7 @@ import { ToolconfigGroupComponent } from './toolconfig-group/toolconfig-group.co
   selector: 'octra-form-configurator',
   templateUrl: './tool-configurator.component.html',
   styleUrls: ['./tool-configurator.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [ToolconfigGroupComponent],
 })
 export class ToolConfiguratorComponent

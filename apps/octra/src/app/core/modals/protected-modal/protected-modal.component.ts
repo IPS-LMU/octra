@@ -1,4 +1,4 @@
-import { Component, inject, SecurityContext } from '@angular/core';
+import { Component, inject, SecurityContext, ChangeDetectionStrategy } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { OctraModal } from '../types';
@@ -6,6 +6,7 @@ import { OctraModal } from '../types';
 @Component({
   selector: 'octra-protected-modal',
   templateUrl: './protected-modal.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./protected-modal.component.scss'],
 })
 export class ProtectedModalComponent extends OctraModal {

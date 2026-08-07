@@ -1,8 +1,9 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { SubscriptionManager } from '@octra/utilities';
 import { Observable, Observer, Subscription } from 'rxjs';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: '',
 })
 export class SubscriberComponent implements OnDestroy {

@@ -41,7 +41,7 @@ export class DecisionTreeExpression<
       )
     );
 
-    let result = checkedConditions.filter((a) => a.length > 0).flat();
+    const result = checkedConditions.filter((a) => a.length > 0).flat();
     this._possibleSelections = [];
 
     if (result.length > 0) {

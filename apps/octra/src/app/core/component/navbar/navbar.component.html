@@ -139,7 +139,7 @@
               class="nav-item dropdown"
               [ngStyle]="{
                 display:
-                  !appStorage.loggedIn || appStorage.onlineSession?.currentProject === undefined || !appStorage.audioLoaded ? 'none' : 'inherit',
+                  !appStorage.loggedIn || $safeNavigationMigration(appStorage.onlineSession?.currentProject) === undefined || !appStorage.audioLoaded ? 'none' : 'inherit',
               }"
               ngbDropdown
               placement="bottom-left"
@@ -226,7 +226,7 @@
           <!--
                   infoDropdown
                   -->
-          @if (appStorage.loggedIn && appStorage.audioLoaded && audio.audioManager !== undefined && audio.audioManager?.resource !== undefined) {
+          @if (appStorage.loggedIn && appStorage.audioLoaded && audio.audioManager !== undefined && $safeNavigationMigration(audio.audioManager?.resource) !== undefined) {
             <li class="nav-item dropdown" ngbDropdown [container]="'body'" display="dynamic" placement="bottom-end">
               <a ngbDropdownToggle type="button" class="nav-link">
                 <i class="bi bi-info-circle-fill navbar-icon"></i>
@@ -252,7 +252,7 @@
                         <span>{{ 'g.free jobs' | transloco }}:</span>
                       </td>
                       <td>
-                        <span>{{ getFreeAnnotationTasks(appStorage.onlineSession?.currentProject) }}</span>
+                        <span>{{ getFreeAnnotationTasks($safeNavigationMigration(appStorage.onlineSession?.currentProject)) }}</span>
                       </td>
                     </tr>
                   }
@@ -487,7 +487,7 @@
                   [options]="asrStoreService.asrOptions$ | async"
                   (optionsChange)="asrStoreService.setASRSettings($event)"
                   [languageSettings]="asrStoreService.languageSettings$ | async"
-                  [manualURL]="api.appProperties?.support?.manual_url"
+                  [manualURL]="$safeNavigationMigration(api.appProperties?.support?.manual_url)"
                   [mausLanguages]="asrStoreService.mausLanguages$ | async"
                   [asrLanguages]="asrStoreService.asrLanguages$ | async"
                   [showAccessCode]="true"
@@ -536,7 +536,7 @@
                   appStorage.snapshot.application.appConfiguration?.octraBackend?.enabled &&
                   appStorage.snapshot.application.appConfiguration?.octraBackend?.url
                 ) {
-                  <a class="dropdown-item" [href]="appStorage.snapshot.application.appConfiguration?.octraBackend?.url" target="_blank">
+                  <a class="dropdown-item" [href]="$safeNavigationMigration(appStorage.snapshot.application.appConfiguration?.octraBackend?.url)" target="_blank">
                     <i class="bi bi-tools"></i>
                     {{ 'p.manage account' | transloco }}
                   </a>

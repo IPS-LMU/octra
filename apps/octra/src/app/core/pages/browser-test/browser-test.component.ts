@@ -1,5 +1,5 @@
 import { NgStyle } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { BrowserInfo } from '@octra/web-media';
 import { CompatibilityService } from '../../shared/service/compatibility.service';
@@ -8,6 +8,7 @@ import { CompatibilityService } from '../../shared/service/compatibility.service
   selector: 'octra-browser-test',
   templateUrl: './browser-test.component.html',
   styleUrls: ['./browser-test.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [NgStyle, RouterLink],
 })
 export class BrowserTestComponent {

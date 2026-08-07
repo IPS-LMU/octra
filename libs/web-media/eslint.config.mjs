@@ -19,4 +19,12 @@ export default [
       parser: await import('jsonc-eslint-parser'),
     },
   },
+  {
+    files: ['**/*.ts'],
+    rules: {
+      // Newly enabled by the typescript-eslint recommended set pulled in via this v22 migration; not configured before.
+      '@typescript-eslint/no-empty-function': 'off',
+      '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
+    },
+  },
 ];

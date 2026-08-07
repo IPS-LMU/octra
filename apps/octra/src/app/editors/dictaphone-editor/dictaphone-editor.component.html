@@ -20,7 +20,7 @@
   [audiochunk]="audiochunk"
   [segments]="segments"
   [easymode]="appStorage.easyMode"
-  [markers]="annotationStoreService.guidelines?.markers"
+  [markers]="$safeNavigationMigration(annotationStoreService.guidelines?.markers)"
   [validationEnabled]="
     (appStorage.useMode !== 'url' ||
       (routingService.staticQueryParams.functions_url !== undefined &&

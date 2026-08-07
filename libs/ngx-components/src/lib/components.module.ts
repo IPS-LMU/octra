@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import {
   provideHttpClient,
   withInterceptorsFromDi,
+  withXhr
 } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -26,6 +27,6 @@ import { AudioplayerComponent } from './components/audio/audioplayer';
     OctraASRLanguageSelectComponent,
     OctraProviderSelectComponent,
   ],
-  providers: [provideHttpClient(withInterceptorsFromDi())],
+  providers: [provideHttpClient(withXhr(), withInterceptorsFromDi())],
 })
 export class OctraComponentsModule {}

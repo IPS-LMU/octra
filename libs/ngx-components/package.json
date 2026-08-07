@@ -25,12 +25,15 @@
     "@octra/web-media": "^2.0.0",
     "@octra/ngx-utilities": "^1.0.2",
     "@ng-bootstrap/ng-bootstrap": ">18.0.0",
-    "animate.css": "^4.1.1",
     "konva": ">=9.x <= 10.x",
-    "rxjs": ">=7.5.0"
+    "rxjs": ">=7.5.0",
+    "@octra/api-types": "^0.4.0",
+    "@octra/ngx-octra-api": "^0.4.2",
+    "ngx-jodit": "^3.2.2",
+    "@jsverse/transloco": "^8.2.1",
+    "@angular/service-worker": "22.0.8",
+    "@angular/platform-browser": "22.0.8"
   },
-  "dependencies": {
-    "tslib": "^2.3.0"
-  },
+  "dependencies": {},
   "sideEffects": false
 }

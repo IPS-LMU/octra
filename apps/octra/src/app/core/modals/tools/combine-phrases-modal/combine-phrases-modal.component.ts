@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, inject, OnDestroy, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
@@ -22,6 +22,7 @@ import { OctraModal } from '../../types';
   templateUrl: './combine-phrases-modal.component.html',
   styleUrls: ['./combine-phrases-modal.component.scss'],
   imports: [FormsModule, NgbTooltip, TranslocoPipe, OctraUtilitiesModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   encapsulation: ViewEncapsulation.None,
 })
 export class CombinePhrasesModalComponent

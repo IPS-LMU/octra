@@ -1,5 +1,5 @@
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { ApplicationConfig, importProvidersFrom, isDevMode, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { ApplicationConfig, importProvidersFrom, isDevMode, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { provideRouter, withEnabledBlockingInitialNavigation } from '@angular/router';
 import { provideServiceWorker } from '@angular/service-worker';
@@ -46,6 +46,7 @@ import * as fromUser from './core/store/user/user.reducer';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideZonelessChangeDetection(),
     provideRouter(APP_ROUTES),
     importProvidersFrom(
       AppSharedModule,
@@ -101,7 +102,7 @@ export const appConfig: ApplicationConfig = {
     SettingsService,
     CompatibilityService,
     MultiThreadingService,
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withXhr(), withInterceptorsFromDi()),
     provideNgxWebstorage(
       withNgxWebstorageConfig({
         separator: '.',

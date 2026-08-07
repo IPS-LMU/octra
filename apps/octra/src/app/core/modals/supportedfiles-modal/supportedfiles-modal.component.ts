@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import {
   NgbActiveModal,
@@ -16,6 +16,7 @@ import { OctraModal } from '../types';
   selector: 'octra-supportedfiles-modal',
   templateUrl: './supportedfiles-modal.component.html',
   styleUrls: ['./supportedfiles-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [NgbPopover, NgbTooltip, TranslocoPipe, OctraUtilitiesModule],
 })
 export class SupportedFilesModalComponent extends OctraModal {

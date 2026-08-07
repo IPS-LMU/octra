@@ -147,7 +147,7 @@
                           <i class="bi bi-person-check"></i>
                         </td>
                         <td>
-                          <a [href]="provider?.termsURL" target="_blank">Terms &amp; Conditions</a>
+                          <a [href]="$safeNavigationMigration(provider?.termsURL)" target="_blank">Terms &amp; Conditions</a>
                         </td>
                       </tr>
                       <tr>
@@ -155,7 +155,7 @@
                           <i class="bi bi-globe-americas"></i>
                         </td>
                         <td>
-                          <a [href]="provider?.homepageURL" target="_blank">Homepage</a>
+                          <a [href]="$safeNavigationMigration(provider?.homepageURL)" target="_blank">Homepage</a>
                         </td>
                       </tr>
                     </tbody>

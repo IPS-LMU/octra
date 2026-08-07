@@ -1,5 +1,5 @@
 import { AsyncPipe, NgClass, NgStyle, UpperCasePipe } from '@angular/common';
-import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit, TemplateRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RouterLink, RouterLinkActive } from '@angular/router';
@@ -50,6 +50,7 @@ import {
   selector: 'octra-navigation',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     NgbPopover,
     NgbCollapse,

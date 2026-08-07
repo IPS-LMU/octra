@@ -6,8 +6,8 @@
         'maintenance.banner'
           | transloco
             : {
-                start: parsedNotification?.begin,
-                end: parsedNotification?.end,
+                start: $safeNavigationMigration(parsedNotification?.begin),
+                end: $safeNavigationMigration(parsedNotification?.end),
               }
       "
     ></p>

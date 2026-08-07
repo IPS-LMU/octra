@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbDropdown, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
@@ -19,6 +19,7 @@ const defaultI18n: ASROptionsTranslations = {
   selector: 'octra-asr-options',
   templateUrl: './asr-options.component.html',
   styleUrls: ['./asr-options.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [FormsModule, NgClass, OctraASRLanguageSelectComponent, TranslocoPipe, OctraProviderSelectComponent],
 })
 export class AsrOptionsComponent extends SubscriberComponent implements OnChanges {

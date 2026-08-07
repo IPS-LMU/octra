@@ -1,5 +1,5 @@
 import { AsyncPipe, NgClass } from '@angular/common';
-import { AfterViewInit, Component, EventEmitter, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, inject, OnDestroy, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { TranscrOverviewComponent } from '../../component/transcr-overview/transcr-overview.component';
@@ -15,6 +15,7 @@ import { OctraModal } from '../types';
   selector: 'octra-overview-modal',
   templateUrl: './overview-modal.component.html',
   styleUrls: ['./overview-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [NgClass, TranscrOverviewComponent, TranscriptionFeedbackComponent, AsyncPipe, TranslocoPipe],
 })
 export class OverviewModalComponent extends OctraModal implements OnInit, OnDestroy, AfterViewInit {

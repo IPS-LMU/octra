@@ -1,5 +1,5 @@
 import { NgClass, NgStyle } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { SubscriberComponent } from '@octra/ngx-utilities';
@@ -11,6 +11,7 @@ import { ConfigurationControlGroup } from '../tool-configurator.component';
   selector: 'octra-toolconfig-group',
   templateUrl: './toolconfig-group.component.html',
   styleUrls: ['./toolconfig-group.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     QuestionMarkComponent,
     NgStyle,

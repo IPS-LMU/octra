@@ -8,6 +8,7 @@ import {
   Input,
   Output,
   ViewChild,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbDropdownItem, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
@@ -19,6 +20,7 @@ import { DefaultComponent } from '../../component/default.component';
   selector: 'octra-naming-drag-and-drop',
   templateUrl: './naming-drag-and-drop.component.html',
   styleUrls: ['./naming-drag-and-drop.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     NgbDropdownModule,
     TranslocoPipe,

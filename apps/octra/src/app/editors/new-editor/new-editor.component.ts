@@ -37,7 +37,7 @@ export class NewEditorComponent extends OCTRAEditor implements OnInit, OctraEdit
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   disableAllShortcuts() {}
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+   
   openSegment(segment: { itemID: number; levelID: number }) {
     // only needed if an segment can be opened. For audio files smaller than 35 sec
   }

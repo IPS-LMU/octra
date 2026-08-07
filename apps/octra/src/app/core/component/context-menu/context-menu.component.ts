@@ -1,10 +1,11 @@
 import { NgStyle } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'octra-context-menu',
   templateUrl: './context-menu.component.html',
   styleUrls: ['./context-menu.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [NgStyle],
 })
 export class ContextMenuComponent {

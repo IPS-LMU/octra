@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DefaultComponent } from '../../../component/default.component';
 import { ApplicationStoreService } from '../../../store/application/application-store.service';
@@ -7,6 +7,7 @@ import { ApplicationStoreService } from '../../../store/application/application-
   selector: 'octra-re-authentication-page',
   templateUrl: './auth-success.page.component.html',
   styleUrls: ['./auth-success.page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [TranslocoPipe],
 })
 export class AuthSuccessPageComponent

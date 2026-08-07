@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { navigateTo } from '@octra/ngx-utilities';
@@ -12,6 +12,7 @@ import { AnnotationStoreService } from '../../../store/login-mode/annotation/ann
   selector: 'octra-transcription-submitted',
   templateUrl: './transcription-end.component.html',
   styleUrls: ['./transcription-end.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [TranslocoPipe],
 })
 export class TranscriptionEndComponent

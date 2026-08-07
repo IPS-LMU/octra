@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { AccountPersonGender, COUNTRYSTATES, LANGUAGES, PolicyListItemDto, TIMEZONE_NAMES } from '@octra/api-types';
@@ -19,6 +19,7 @@ export class PreparedPolicyListItemDto extends PolicyListItemDto {
   selector: 'octra-signup',
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [FormsModule, TranslocoPipe],
 })
 export class SignupComponent extends DefaultComponent implements OnInit {

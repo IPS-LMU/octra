@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { OctraModal } from '../types';
@@ -7,6 +7,7 @@ import { OctraModal } from '../types';
   selector: 'octra-waiting-modal',
   templateUrl: './waiting-modal.component.html',
   styleUrls: ['./waiting-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [TranslocoPipe],
 })
 export class WaitingModalComponent extends OctraModal {

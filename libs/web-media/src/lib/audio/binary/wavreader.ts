@@ -11,7 +11,7 @@ import { WavFileFormat } from './wavformat';
 export class WavReader {
   private br: BinaryByteReader;
   private format: PCMAudioFormat | null = null;
-  private totalLength: number = 0;
+  private totalLength = 0;
   private dataChunkLength: number | null = null;
 
   constructor(data: ArrayBuffer) {
@@ -48,7 +48,7 @@ export class WavReader {
     this.readHeader();
     const s = this.navigateToChunk('fmt ');
     if (!s) {
-      let errMsg = 'WAV file does not contain a fmt chunk';
+      const errMsg = 'WAV file does not contain a fmt chunk';
       throw new Error(errMsg);
     }
     this.format = this.parseFmtChunk();
@@ -81,16 +81,16 @@ export class WavReader {
     this.br.pos = 0;
     let ab: AudioBuffer | null = null;
     this.readHeader();
-    let s = this.navigateToChunk('fmt ');
+    const s = this.navigateToChunk('fmt ');
     if (!s) {
-      let errMsg = 'WAV file does not contain a fmt chunk';
+      const errMsg = 'WAV file does not contain a fmt chunk';
       throw new Error(errMsg);
     }
     this.format = this.parseFmtChunk();
     this.dataChunkLength = this.navigateToChunk('data');
-    let chsArr = this.readData();
-    let sr = this.format?.sampleRate;
-    let nChs = this.format?.channelCount;
+    const chsArr = this.readData();
+    const sr = this.format?.sampleRate;
+    const nChs = this.format?.channelCount;
     if (sr && chsArr && nChs && nChs > 0 && nChs == chsArr?.length) {
       ab = new AudioBuffer({
         length: chsArr[0].length,

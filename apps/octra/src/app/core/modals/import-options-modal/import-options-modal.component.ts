@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { Converter } from '@octra/annotation';
@@ -10,6 +10,7 @@ import { OctraModal } from '../types';
   selector: 'octra-import-options-modal',
   templateUrl: './import-options-modal.component.html',
   styleUrls: ['./import-options-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [OctraFormGeneratorModule, TranslocoPipe],
 })
 export class ImportOptionsModalComponent extends OctraModal implements OnInit {

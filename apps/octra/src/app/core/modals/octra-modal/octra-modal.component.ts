@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { hasProperty } from '@octra/utilities';
 import { AppInfo } from '../../../app.info';
 import { DefaultComponent } from '../../component/default.component';
@@ -13,6 +13,7 @@ import { YesNoModalComponent } from '../yes-no-modal/yes-no-modal.component';
 @Component({
   selector: 'octra-modal',
   templateUrl: './octra-modal.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./octra-modal.component.scss'],
 })
 export class OctraModalComponent extends DefaultComponent {

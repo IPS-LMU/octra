@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { navigateTo } from '@octra/ngx-utilities';
@@ -17,6 +17,7 @@ import { AnnotationStoreService } from '../../../store/login-mode/annotation/ann
   selector: 'octra-reload-file',
   templateUrl: './reload-file.component.html',
   styleUrls: ['./reload-file.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [OctraDropzoneComponent, TranslocoPipe, OctraDropzoneComponent],
 })
 export class ReloadFileComponent {

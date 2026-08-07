@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { interval } from 'rxjs';
@@ -9,6 +9,7 @@ import { NavbarService } from '../../../component/navbar/navbar.service';
   selector: 'octra-auth',
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [TranslocoPipe],
 })
 export class AuthComponent extends DefaultComponent implements OnInit {

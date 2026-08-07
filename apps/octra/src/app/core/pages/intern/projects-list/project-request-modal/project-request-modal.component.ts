@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import {
   DomSanitizer,
   SafeHtml,
@@ -14,6 +14,7 @@ import { ApplicationStoreService } from '../../../../store/application/applicati
   selector: 'octra-project-request-modal',
   templateUrl: './project-request-modal.component.html',
   styleUrls: ['./project-request-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [TranslocoPipe],
 })
 export class ProjectRequestModalComponent extends SubscriberComponent {

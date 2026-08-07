@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { AnnotationLevelType } from '@octra/annotation';
 import { DefaultComponent } from '../default.component';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -7,6 +7,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
   selector: 'octra-unsupported-level-placeholder',
   templateUrl: './unsupported-level-placeholder.component.html',
   styleUrls: ['./unsupported-level-placeholder.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [TranslocoPipe],
 })
 export class UnsupportedLevelPlaceholderComponent extends DefaultComponent {

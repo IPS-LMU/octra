@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { getBaseHrefURL, joinURL } from '@octra/utilities';
@@ -11,6 +11,7 @@ import { IDBService } from '../../shared/service/idb.service';
   selector: 'octra-help-tools',
   templateUrl: './help-tools.component.html',
   styleUrls: ['./help-tools.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [RouterLink],
 })
 export class HelpToolsComponent extends DefaultComponent {

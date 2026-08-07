@@ -261,7 +261,7 @@
                     'signup.data policy'
                       | transloco
                         : {
-                            dataPolicyURL: getTranslationPolicy(policy)?.url,
+                            dataPolicyURL: $safeNavigationMigration(getTranslationPolicy(policy)?.url),
                           }
                   "
                 >
@@ -276,7 +276,7 @@
                       | transloco
                         : {
                             termsConditionsURL:
-                              getTranslationPolicy(policy)?.url,
+                              $safeNavigationMigration(getTranslationPolicy(policy)?.url),
                           }
                   "
                 >

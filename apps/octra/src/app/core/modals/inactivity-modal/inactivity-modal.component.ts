@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { SettingsService } from '../../shared/service';
@@ -9,6 +9,7 @@ import { OctraModal } from '../types';
   selector: 'octra-activity-timeout-modal',
   templateUrl: './inactivity-modal.component.html',
   styleUrls: ['./inactivity-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [TranslocoPipe],
 })
 export class InactivityModalComponent extends OctraModal {

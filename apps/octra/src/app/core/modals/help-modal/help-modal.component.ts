@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { OctraModal } from '../types';
@@ -8,6 +8,7 @@ import { AppInfo } from '../../../app.info';
   selector: 'octra-help-modal',
   templateUrl: './help-modal.component.html',
   styleUrls: ['./help-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [TranslocoPipe],
 })
 export class HelpModalComponent extends OctraModal {

@@ -1,7 +1,8 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: '',
 })
 export class DefaultComponent

@@ -18,7 +18,7 @@ export class AlertService {
   public showAlert(
     type: AlertType,
     data: string | any,
-    unique: boolean = true,
+    unique = true,
     duration?: number,
   ): Promise<{
     id: number;

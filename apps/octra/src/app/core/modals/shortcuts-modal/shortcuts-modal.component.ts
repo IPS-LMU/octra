@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, ChangeDetectionStrategy } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { BrowserInfo } from '@octra/web-media';
@@ -11,6 +11,7 @@ import { OctraModal } from '../types';
   selector: 'octra-shortcuts-modal',
   templateUrl: './shortcuts-modal.component.html',
   styleUrls: ['./shortcuts-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [ShortcutComponent, TranslocoPipe],
 })
 export class ShortcutsModalComponent extends OctraModal {

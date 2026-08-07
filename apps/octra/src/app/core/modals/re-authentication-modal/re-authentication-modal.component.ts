@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { Action } from '@ngrx/store';
@@ -16,6 +16,7 @@ import { AuthenticationStoreService } from '../../store/authentication';
   selector: 'octra-re-authentication-modal',
   templateUrl: './re-authentication-modal.component.html',
   styleUrls: ['./re-authentication-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [AuthenticationComponent, TranslocoPipe],
 })
 export class ReAuthenticationModalComponent

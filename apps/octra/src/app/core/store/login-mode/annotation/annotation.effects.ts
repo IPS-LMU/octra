@@ -325,12 +325,6 @@ export class AnnotationEffects {
               const src = state.application.mode === LoginMode.ONLINE ? this.apiService.prepareFileURL(a.audioFile!.url!) : a.audioFile!.url!;
               // extract filename
 
-              filename = filename.substring(0, filename.lastIndexOf('.'));
-
-              if (filename.indexOf('src=') > -1) {
-                filename = filename.substring(filename.indexOf('src=') + 4);
-              }
-
               this.audio.loadAudio(src, a.audioFile).subscribe({
                 next: (progress) => {
                   if (progress < 1) {
@@ -2241,7 +2235,7 @@ export class AnnotationEffects {
       exhaustMap(([action, state]: [any, RootState]) => {
         const modeState = getModeState(state)!;
         const aType = this.routingService.staticQueryParams.annotationExportType;
-        let converter: Converter | undefined = undefined;
+        let converter: Converter | undefined;
 
         if (!aType || aType === 'AnnotJSON') {
           converter = new AnnotJSONConverter();

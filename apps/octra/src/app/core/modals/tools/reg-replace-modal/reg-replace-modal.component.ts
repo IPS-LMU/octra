@@ -10,6 +10,7 @@ import {
   Renderer2,
   ViewChild,
   ViewEncapsulation,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -28,6 +29,7 @@ import { OctraModal } from '../../types';
   templateUrl: './reg-replace-modal.component.html',
   styleUrls: ['./reg-replace-modal.component.scss'],
   imports: [FormsModule, TranslocoPipe, OctraUtilitiesModule, NgbNavOutlet, NgbNavItem, NgbNavContent, NgbNavLinkButton, NgbNav, NgClass],
+  changeDetection: ChangeDetectionStrategy.Eager,
   encapsulation: ViewEncapsulation.None,
 })
 export class RegReplaceModalComponent extends OctraModal implements OnDestroy, OnInit, AfterViewInit {
@@ -124,9 +126,6 @@ export class RegReplaceModalComponent extends OctraModal implements OnDestroy, O
               matches: [],
             });
             const result = last(this.state.results);
-
-            for (const item of level.items) {
-            }
 
             for (let i = 0; i < level.items.length; i++) {
               const item = level.items[i];

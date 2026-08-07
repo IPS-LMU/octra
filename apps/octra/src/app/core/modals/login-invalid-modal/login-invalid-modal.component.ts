@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { OctraModal } from '../types';
@@ -7,6 +7,7 @@ import { OctraModal } from '../types';
   selector: 'octra-login-invalid-modal',
   templateUrl: './login-invalid-modal.component.html',
   styleUrls: ['./login-invalid-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [TranslocoPipe],
 })
 export class LoginInvalidModalComponent extends OctraModal {

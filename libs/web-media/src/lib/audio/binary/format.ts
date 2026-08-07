@@ -14,7 +14,7 @@ export class AudioFormat {
 }
 
 export class PCMAudioFormat extends AudioFormat {
-  encodingFloat: boolean = false;
+  encodingFloat = false;
   sampleSize: number;
   sampleSizeInBits: number;
   constructor(

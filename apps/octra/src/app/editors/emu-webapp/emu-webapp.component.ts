@@ -241,7 +241,7 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   disableAllShortcuts() {}
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+   
   openSegment(item: { levelID: number; itemID: number }) {
     // only needed if an segment can be opened. For audio files smaller than 35 sec
   }

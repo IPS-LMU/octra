@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { DefaultComponent } from '../../component/default.component';
 import { SettingsService, UserInteractionsService } from '../../shared/service';
@@ -8,6 +8,7 @@ import { SettingsService, UserInteractionsService } from '../../shared/service';
   templateUrl: './intern.component.html',
   styleUrls: ['./intern.component.scss'],
   providers: [UserInteractionsService],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [RouterOutlet],
 })
 export class InternComponent extends DefaultComponent {

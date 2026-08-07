@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import {
   NgbDropdown,
@@ -12,6 +12,7 @@ import { Subject, Subscription } from 'rxjs';
   selector: 'octra-permutations-replace',
   templateUrl: './permutations-replace-modal.component.html',
   styleUrls: ['./permutations-replace-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [NgbDropdown, NgbDropdownToggle, NgbDropdownMenu, TranslocoPipe],
 })
 export class PermutationsReplaceModalComponent implements OnDestroy {

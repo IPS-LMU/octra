@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { HelpModalComponent } from '../../modals/help-modal/help-modal.component';
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
@@ -9,6 +9,7 @@ import { AnnotationStoreService } from '../../store/login-mode/annotation/annota
 @Component({
   selector: 'octra-fastbar',
   templateUrl: './taskbar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./taskbar.component.scss'],
 })
 export class FastbarComponent {

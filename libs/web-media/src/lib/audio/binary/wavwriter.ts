@@ -17,7 +17,7 @@ export enum SampleSize {
 export class WavWriter {
   static readonly DEFAULT_SAMPLE_SIZE: SampleSize = SampleSize.INT16;
   private readonly sampleSizeInBytes: number = WavWriter.DEFAULT_SAMPLE_SIZE.valueOf() / 8;
-  private encodingFloat: boolean = false;
+  private encodingFloat = false;
   private sampleSize = WavWriter.DEFAULT_SAMPLE_SIZE;
   private sampleSizeInBits = this.sampleSize.valueOf();
   private bw: BinaryByteWriter;
@@ -202,7 +202,7 @@ export class WavWriter {
     let headerCnts = 3; //Wave,fmt and data
 
     let fmtChunkSize = 16;
-    let factChunkSize = 4;
+    const factChunkSize = 4;
     if (this.encodingFloat) {
       fmtChunkSize = 18;
       headerCnts++; // fact

@@ -5,6 +5,7 @@ import {
   Input,
   Output,
   ViewChild,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
@@ -21,6 +22,7 @@ export class PreparedItem {
   selector: 'octra-toolconfig-array-adder',
   templateUrl: './toolconfig-array-adder.component.html',
   styleUrls: ['./toolconfig-array-adder.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [FormsModule, NgbPopover, NgClass],
 })
 export class ToolConfigArrayAdderComponent extends SubscriberComponent {

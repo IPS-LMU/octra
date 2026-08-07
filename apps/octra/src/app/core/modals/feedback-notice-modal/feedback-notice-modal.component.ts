@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { AppStorageService } from '../../shared/service/appstorage.service';
@@ -7,6 +7,7 @@ import { AppStorageService } from '../../shared/service/appstorage.service';
   selector: 'octra-feedback-notice-modal',
   templateUrl: './feedback-notice-modal.component.html',
   styleUrls: ['./feedback-notice-modal.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [TranslocoPipe],
 })
 export class FeedbackNoticeModalComponent implements OnInit {

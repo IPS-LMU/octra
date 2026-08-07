@@ -1,4 +1,4 @@
-import { Component, inject, SecurityContext } from '@angular/core';
+import { Component, inject, SecurityContext, ChangeDetectionStrategy } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
@@ -14,6 +14,7 @@ export enum ModalEndAnswer {
   selector: 'octra-transcription-demo-end-modal',
   templateUrl: './transcription-demo-end-modal.component.html',
   styleUrls: ['./transcription-demo-end-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [TranslocoPipe],
 })
 export class TranscriptionDemoEndModalComponent extends OctraModal {

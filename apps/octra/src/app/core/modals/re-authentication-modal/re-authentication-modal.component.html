@@ -34,8 +34,8 @@
         <octra-authentication-component
           [type]="type"
           (submitClick)="onSubmit($event)"
-          [authentications]="apiService.appProperties?.authentications"
-          [passwordReset]="apiService.appProperties?.reset_password"
+          [authentications]="$safeNavigationMigration(apiService.appProperties?.authentications)"
+          [passwordReset]="$safeNavigationMigration(apiService.appProperties?.reset_password)"
           [registrations]="false"
         ></octra-authentication-component>
       </div>

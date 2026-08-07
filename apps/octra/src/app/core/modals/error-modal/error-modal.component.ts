@@ -1,4 +1,4 @@
-import { Component, inject, TemplateRef, ViewChild } from '@angular/core';
+import { Component, inject, TemplateRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { OctraModal } from '../types';
@@ -7,6 +7,7 @@ import { OctraModal } from '../types';
   selector: 'octra-error-modal',
   templateUrl: './error-modal.component.html',
   styleUrls: ['./error-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [TranslocoPipe],
 })
 export class ErrorModalComponent extends OctraModal {

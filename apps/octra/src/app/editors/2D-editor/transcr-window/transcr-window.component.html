@@ -140,9 +140,9 @@
         [audiochunk]="audiochunk"
         [easymode]="easyMode"
         [height]="100"
-        [markers]="annotationStoreService.guidelines?.markers!"
+        [markers]="$safeNavigationMigration(annotationStoreService.guidelines?.markers)!"
         [validationEnabled]="validationEnabled"
-        [font]="(appStoreService.options$ | async)?.editorFont"
+        [font]="$safeNavigationMigration((appStoreService.options$ | async)?.editorFont)"
         (fontChange)="onFontChange($event)"
         (selectionchanged)="onSelectionChange($event)"
       ></octra-transcr-editor>
@@ -151,7 +151,7 @@
   <div class="modal-footer">
     <div class="window-nav-bottom">
       <div class="row g-1">
-        @if (neighbours?.left !== undefined) {
+        @if ($safeNavigationMigration(neighbours?.left) !== undefined) {
           <div class="col-md d-flex">
             <button
               class="btn btn-info w-100 rounded-0"

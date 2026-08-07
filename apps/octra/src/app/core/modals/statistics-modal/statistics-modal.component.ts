@@ -1,5 +1,5 @@
 import { AsyncPipe, DatePipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { NavbarService } from '../../component/navbar/navbar.service';
@@ -13,6 +13,7 @@ import { OctraModal } from '../types';
   selector: 'octra-statistics-modal',
   templateUrl: './statistics-modal.component.html',
   styleUrls: ['./statistics-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [AsyncPipe, DatePipe, TranslocoPipe],
 })
 export class StatisticsModalComponent extends OctraModal {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { OctraComponentsModule } from '@octra/ngx-components';
 import { OctraUtilitiesModule } from '@octra/ngx-utilities';
@@ -7,6 +7,7 @@ import { OctraUtilitiesModule } from '@octra/ngx-utilities';
   imports: [RouterOutlet, OctraUtilitiesModule, OctraComponentsModule],
   selector: 'app-root',
   templateUrl: './app.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app.component.scss',
 })
 export class AppComponent {

@@ -20,7 +20,7 @@
         </h3>
         @if (guidelines?.meta?.pdf?.url) {
           <a
-            [href]="guidelines?.meta?.pdf?.url"
+            [href]="$safeNavigationMigration(guidelines?.meta?.pdf?.url)"
             target="_blank"
             class="btn btn-sm btn-danger"
             style="border: 1px solid red"
@@ -56,7 +56,7 @@
     </div>
     @if (
       shownGuidelines === undefined ||
-      shownGuidelines?.instructions === undefined ||
+      $safeNavigationMigration(shownGuidelines?.instructions) === undefined ||
       shownGuidelines!.instructions.length === 0
     ) {
       <div class="bg-warning">
@@ -113,16 +113,16 @@
                                 ) {
                                   <div class="card card-example">
                                     @if (
-                                      settService.projectsettings
-                                        ?.guidelines === undefined ||
+                                      $safeNavigationMigration(settService.projectsettings
+                                        ?.guidelines) === undefined ||
                                       settService.projectsettings?.guidelines
                                         ?.showExampleHeader
                                     ) {
                                       <div class="card-header example">
                                         {{ 'g.example' | transloco }}
                                         @if (
-                                          settService.projectsettings
-                                            ?.guidelines !== undefined &&
+                                          $safeNavigationMigration(settService.projectsettings
+                                            ?.guidelines) !== undefined &&
                                           settService.projectsettings
                                             ?.guidelines?.showExampleNumbers
                                         ) {

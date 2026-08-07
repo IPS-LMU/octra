@@ -7,6 +7,7 @@ import {
   OnDestroy,
   SimpleChanges,
   ViewChild,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -19,6 +20,7 @@ import { AnnotationStoreService } from '../../store/login-mode/annotation/annota
   selector: 'octra-transcription-feedback',
   templateUrl: './transcription-feedback.component.html',
   styleUrls: ['./transcription-feedback.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [FormsModule, AsyncPipe, TranslocoPipe],
 })
 export class TranscriptionFeedbackComponent implements OnChanges, OnDestroy {

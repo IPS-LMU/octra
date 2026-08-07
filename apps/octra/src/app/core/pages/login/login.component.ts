@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -26,6 +26,7 @@ import { LoginService } from './login.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   providers: [LoginService],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MaintenanceBannerComponent,
     AuthenticationComponent,

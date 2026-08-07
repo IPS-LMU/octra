@@ -7,6 +7,7 @@ import {
   inject,
   SecurityContext,
   ViewChild,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 
@@ -14,6 +15,7 @@ import { DomSanitizer } from '@angular/platform-browser';
   selector: 'octra-validation-popover',
   templateUrl: './validation-popover.component.html',
   styleUrls: ['./validation-popover.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [NgClass],
 })
 export class ValidationPopoverComponent {

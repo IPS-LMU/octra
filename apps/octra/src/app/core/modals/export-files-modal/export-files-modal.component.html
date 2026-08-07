@@ -108,7 +108,7 @@
                 <td colspan="4" style="padding-left: 20px">
                   @if (
                     !converter.multitiers &&
-                    annotationStoreService.transcript?.levels !== undefined &&
+                    $safeNavigationMigration(annotationStoreService.transcript?.levels) !== undefined &&
                     annotationStoreService.transcript!.levels.length > 1
                   ) {
                     <div class="tier-selection" style="margin-bottom: 10px">

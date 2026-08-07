@@ -114,7 +114,7 @@ export class UserInteractionsService {
       : undefined;
 
     let name = '';
-    let context: any = undefined;
+    let context: any;
 
     if (!targetName) {
       if (event && event.target) {
@@ -131,7 +131,7 @@ export class UserInteractionsService {
     } else {
       name = targetName;
     }
-    let elem: StatisticElem | undefined = undefined;
+    let elem: StatisticElem | undefined;
     if (contains(type, 'key') || contains(type, 'shortcut')) {
       elem = new KeyStatisticElem(
         type,
@@ -237,16 +237,14 @@ export class UserInteractionsService {
   public fromAnyArray(array: any[]) {
     // BUG all events are considered as MouseStatisticEvent!
     for (const elem of array) {
-      let newElem = undefined;
+      let newElem: any = MouseStatisticElem.fromAny(elem);
 
-      newElem = MouseStatisticElem.fromAny(elem);
       if (newElem !== undefined) {
         newElem = StatisticElem.fromAny(elem);
       }
 
       if (newElem) {
         this.elements.push(newElem);
-        newElem = {};
       }
     }
   }

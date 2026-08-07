@@ -4,6 +4,7 @@ import {
   inject,
   OnDestroy,
   ViewChild,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -17,6 +18,7 @@ import { OctraModal } from '../types';
   selector: 'octra-about-modal',
   templateUrl: './about-modal.component.html',
   styleUrls: ['./about-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [TranslocoPipe],
 })
 export class AboutModalComponent extends OctraModal implements OnDestroy {

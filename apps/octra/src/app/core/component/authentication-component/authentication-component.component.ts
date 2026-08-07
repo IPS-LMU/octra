@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, inject, Input, Output, SecurityContext } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, Input, Output, SecurityContext, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -11,6 +11,7 @@ import { SignupComponent } from './signup/signup.component';
   selector: 'octra-authentication-component',
   templateUrl: './authentication-component.component.html',
   styleUrls: ['./authentication-component.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [FormsModule, SignupComponent, TranslocoPipe],
 })
 export class AuthenticationComponent extends DefaultComponent {

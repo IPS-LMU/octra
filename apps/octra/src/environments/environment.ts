@@ -7,6 +7,7 @@ export const environment = {
   production: false,
   dev_version: true,
   useCookies: false,
+  simulateASR: false,
   debugging: {
     enabled: true,
     logging: {

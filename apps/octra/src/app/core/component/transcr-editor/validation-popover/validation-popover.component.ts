@@ -54,7 +54,6 @@ export class ValidationPopoverComponent {
   public set description(value: string) {
     this._description = value;
     this.cd.markForCheck();
-    this.cd.detectChanges();
   }
 
   public get height() {
@@ -68,7 +67,6 @@ export class ValidationPopoverComponent {
     }
     this.visible = true;
     this.cd.markForCheck();
-    this.cd.detectChanges();
   }
 
   public hide() {
@@ -77,7 +75,6 @@ export class ValidationPopoverComponent {
     }
     this.visible = false;
     this.cd.markForCheck();
-    this.cd.detectChanges();
   }
 
   @HostListener('mouseleave')

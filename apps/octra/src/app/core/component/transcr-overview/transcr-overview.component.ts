@@ -603,7 +603,6 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
     }
 
     this.cd.markForCheck();
-    this.cd.detectChanges();
     this.statusChange.emit({ status: 'updated' });
   }
 

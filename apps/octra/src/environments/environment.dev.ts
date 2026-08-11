@@ -3,10 +3,11 @@ export const environment = {
   dev_version: true,
   beta_version: false,
   useCookies: false,
+  simulateASR: true,
   debugging: {
     enabled: true,
     logging: {
-      console: true,
+      console: false,
       actions: true,
       routes: true,
     },

@@ -424,7 +424,6 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
       this.joditOptions.extraButtons!.push(this.createFontSelectionButton() as any);
 
       this.cd.markForCheck();
-      this.cd.detectChanges();
 
       const validationError = this.renderer.createElement('div');
       validationError.setAttribute('class', 'card error-card');
@@ -649,7 +648,7 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
     }
 
     if (obj['transcript'] !== undefined && obj['transcript'].currentValue !== undefined && !obj['transcript'].firstChange) {
-      //await this.setTranscript(obj['transcript'].currentValue);
+      await this.setTranscript(obj['transcript'].currentValue);
     }
 
     if (obj['segments'] !== undefined && obj['segments'].currentValue !== undefined && !obj['segments'].firstChange) {
@@ -667,7 +666,6 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
     this.subscriptionManager.destroy();
     this.initialize();
     this.cd.markForCheck();
-    this.cd.detectChanges();
   }
 
   /**
@@ -1258,7 +1256,7 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
     );
   }
 
-  private async setTranscript(rawText: string) {
+  public async setTranscript(rawText: string) {
     if (this.joditComponent?.jodit) {
       this._rawText = this.tidyUpRaw(rawText);
 
@@ -1276,12 +1274,6 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
         },
         'initialization',
       );
-
-      this.asr = {
-        status: 'inactive',
-        result: '',
-        error: '',
-      };
     }
   }
 

@@ -44,7 +44,6 @@ export class PromptModalComponent extends OctraModal {
 
   public override close() {
     this.cd.markForCheck();
-    this.cd.detectChanges();
     return super.close();
   }
 }

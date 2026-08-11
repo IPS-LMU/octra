@@ -147,7 +147,6 @@ export class AudioNavigationComponent extends DefaultComponent implements OnChan
         this._isReady = false;
       }
       this.cd.markForCheck();
-      this.cd.detectChanges();
     }
   }
 
@@ -200,7 +199,7 @@ export class AudioNavigationComponent extends DefaultComponent implements OnChan
         console.error('button not found');
         break;
     }
-    this.cd.detectChanges();
+    this.cd.markForCheck();
   }
 
   private initialize() {
@@ -216,7 +215,6 @@ export class AudioNavigationComponent extends DefaultComponent implements OnChan
         next: (status: PlayBackStatus) => {
           this._isAudioPlaying = status === PlayBackStatus.PLAYING;
           this.cd.markForCheck();
-          this.cd.detectChanges();
         },
         error: (error) => {
           console.error(error);

@@ -505,7 +505,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
       subscr.unsubscribe();
       this.initialized.emit();
       this.cd.markForCheck();
-      this.cd.detectChanges();
     });
   }
 
@@ -531,8 +530,9 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
           this.window = this.modalService.openModalRef<TranscrWindowComponent>(TranscrWindowComponent, TranscrWindowComponent.options, {
             audiochunk: this.audioChunkWindow,
             easyMode: this.appStorage.easyMode,
-            segmentIndex: this.selectedIndex,
+            segmentIndex: this.selectedIndex
           });
+          this.window.componentInstance.init();
           this.window.result.then(() => {
             this.window = undefined;
           });
@@ -566,7 +566,6 @@ export class TwoDEditorComponent extends OCTRAEditor implements OnInit, AfterVie
             TwoDEditorComponent.editorname,
           );
           this.cd.markForCheck();
-          this.cd.detectChanges();
         } else {
           // tslint:disable-next-line:max-line-length
           this.alertService

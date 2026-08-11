@@ -308,7 +308,6 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
     if (this.isLevelTypeSupported(level.type)) {
       this.annotationStoreService.setLevelIndex(tiernum);
       this.cd.markForCheck();
-      this.cd.detectChanges();
     }
   }
 

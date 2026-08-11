@@ -3,6 +3,7 @@ export const environment = {
   dev_version: true,
   beta_version: false,
   useCookies: true,
+  simulateASR: false,
   debugging: {
     enabled: true,
     logging: {

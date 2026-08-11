@@ -4,36 +4,18 @@ import { TranslocoService } from '@jsverse/transloco';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { AccountLoginMethod } from '@octra/api-types';
+import { getBaseHrefURL, joinURL } from '@octra/utilities';
 import { AudioCutter, FileInfo, readFileContents } from '@octra/web-media';
-import {
-  catchError,
-  exhaustMap,
-  from,
-  mergeMap,
-  Observable,
-  of,
-  take,
-  tap,
-  throwError,
-  withLatestFrom,
-} from 'rxjs';
+import { catchError, exhaustMap, from, map, mergeMap, Observable, of, take, tap, throwError, timer, withLatestFrom } from 'rxjs';
 import X2JS from 'x2js';
+import { environment } from '../../../../environments/environment';
 import { ASRSettings, ProjectSettings, ServiceProvider } from '../../obj';
-import {
-  AlertService,
-  AudioService,
-  UserInteractionsService,
-} from '../../shared/service';
+import { AlertService, AudioService, UserInteractionsService } from '../../shared/service';
 import { AuthenticationActions } from '../authentication';
 import { LoginMode, RootState } from '../index';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { ASRActions } from './asr.actions';
-import {
-  ASRProcessStatus,
-  ASRQueueItemType,
-  ASRStateQueue,
-  ASRStateQueueItem,
-} from './index';
+import { ASRProcessStatus, ASRQueueItemType, ASRStateQueue, ASRStateQueueItem } from './index';
 
 @Injectable({
   providedIn: 'root',
@@ -62,8 +44,7 @@ export class AsrEffects {
           );
         }
 
-        const asrSettings =
-          state?.application?.appConfiguration?.octra.plugins?.asr;
+        const asrSettings = state?.application?.appConfiguration?.octra.plugins?.asr;
 
         if (!asrSettings) {
           return of(
@@ -73,10 +54,7 @@ export class AsrEffects {
           );
         }
 
-        if (
-          !state.asr.settings?.selectedServiceProvider ||
-          !state.asr.settings?.selectedASRLanguage
-        ) {
+        if (!state.asr.settings?.selectedServiceProvider || !state.asr.settings?.selectedASRLanguage) {
           return of(
             ASRActions.addToQueue.fail({
               error: `missing asr info or language`,
@@ -125,9 +103,7 @@ export class AsrEffects {
           );
         }
 
-        const index = state.asr.queue.items.findIndex(
-          (a) => a.id === action.id,
-        );
+        const index = state.asr.queue.items.findIndex((a) => a.id === action.id);
 
         if (index > -1) {
           return of(
@@ -176,12 +152,7 @@ export class AsrEffects {
                   item,
                 }),
               );
-            } else if (
-              ![
-                ASRActions.processQueueItem.do.type,
-                ASRActions.startProcessing.do.type,
-              ].includes(action.type as any)
-            ) {
+            } else if (![ASRActions.processQueueItem.do.type, ASRActions.startProcessing.do.type].includes(action.type as any)) {
               if (queue.statistics.running === 0) {
                 // no free item after continuation and nothing running
                 return of(
@@ -216,12 +187,8 @@ export class AsrEffects {
             ASRActions.cutAndUploadQueueItem.do({
               item,
               options: {
-                asr:
-                  item.type === ASRQueueItemType.ASR ||
-                  item.type === ASRQueueItemType.ASRMAUS,
-                wordAlignment:
-                  item.type === ASRQueueItemType.ASRMAUS ||
-                  item.type === ASRQueueItemType.MAUS,
+                asr: item.type === ASRQueueItemType.ASR || item.type === ASRQueueItemType.ASRMAUS,
+                wordAlignment: item.type === ASRQueueItemType.ASRMAUS || item.type === ASRQueueItemType.MAUS,
               },
             }),
           );
@@ -252,9 +219,7 @@ export class AsrEffects {
         const cutter = new AudioCutter(audioManager.resource.info);
 
         const channelDataFactor =
-          (audioManager.resource.info.audioBufferInfo?.sampleRate ??
-            audioManager.resource.info.sampleRate) /
-          audioManager.resource.info.sampleRate;
+          (audioManager.resource.info.audioBufferInfo?.sampleRate ?? audioManager.resource.info.sampleRate) / audioManager.resource.info.sampleRate;
 
         return from(
           cutter.cutAudioFileFromChannelData(
@@ -263,12 +228,8 @@ export class AsrEffects {
             audioManager.channel!,
             {
               number: 1,
-              sampleStart: Math.ceil(
-                action.item.time.sampleStart * channelDataFactor,
-              ),
-              sampleDur: Math.ceil(
-                action.item.time.sampleLength * channelDataFactor,
-              ),
+              sampleStart: Math.ceil(action.item.time.sampleStart * channelDataFactor),
+              sampleDur: Math.ceil(action.item.time.sampleLength * channelDataFactor),
             },
           ),
         ).pipe(
@@ -288,35 +249,19 @@ export class AsrEffects {
 
             // 2. upload
             if (item.status !== ASRProcessStatus.STOPPED) {
-              const fileBlob = new File(
-                [file.uint8Array] as any,
-                file.fileName,
-                {
-                  type: 'audio/wav',
-                },
-              );
-              const serviceRequirementsError = this.fitsServiceRequirements(
-                fileBlob,
-                action.item,
-              );
+              const fileBlob = new File([file.uint8Array] as any, file.fileName, {
+                type: 'audio/wav',
+              });
+              const serviceRequirementsError = this.fitsServiceRequirements(fileBlob, action.item);
 
               if (serviceRequirementsError === '') {
                 const filesForUpload: File[] = [fileBlob];
 
                 if (action.item.transcriptInput) {
-                  filesForUpload.push(
-                    new File(
-                      [action.item.transcriptInput],
-                      `OCTRA_ASRqueueItem_${action.item.id}.txt`,
-                      { type: 'text/plain' },
-                    ),
-                  );
+                  filesForUpload.push(new File([action.item.transcriptInput], `OCTRA_ASRqueueItem_${action.item.id}.txt`, { type: 'text/plain' }));
                 }
 
-                return this.uploadFiles(
-                  filesForUpload,
-                  action.item.selectedASRService,
-                ).pipe(
+                return this.uploadFiles(filesForUpload, action.item.selectedASRService).pipe(
                   exhaustMap(([audioURL, transcriptURL]) => {
                     return of(
                       ASRActions.cutAndUploadQueueItem.success({
@@ -405,17 +350,10 @@ export class AsrEffects {
       ofType(ASRActions.runASROnItem.do),
       withLatestFrom(this.store),
       mergeMap(([{ outFormat, item, options, audioURL }, state]) => {
-        return this.transcribeSignalWithASR(
-          outFormat,
-          item,
-          audioURL,
-          state.application.appConfiguration!.octra.plugins!.asr!,
-        ).pipe(
+        return this.transcribeSignalWithASR(outFormat, item, audioURL, state.application.appConfiguration!.octra.plugins!.asr!).pipe(
           withLatestFrom(this.store),
           exhaustMap(([result, state2]) => {
-            const item2 = state2.asr.queue?.items?.find(
-              (a) => a.time === item.time,
-            );
+            const item2 = state2.asr.queue?.items?.find((a) => a.time === item.time);
 
             if (item2) {
               if (item2.status !== ASRProcessStatus.STOPPED) {
@@ -445,12 +383,7 @@ export class AsrEffects {
               error,
               ASRActions.runASROnItem.fail({
                 item,
-                error:
-                  error instanceof Error
-                    ? error.message
-                    : error instanceof HttpErrorResponse
-                      ? (error.error?.message ?? error.message)
-                      : error,
+                error: error instanceof Error ? error.message : error instanceof HttpErrorResponse ? (error.error?.message ?? error.message) : error,
                 newStatus: ASRProcessStatus.FAILED,
               }),
             );
@@ -513,14 +446,10 @@ export class AsrEffects {
         ).pipe(
           exhaustMap((result) => {
             if (item.status !== ASRProcessStatus.STOPPED) {
-              return from(
-                readFileContents<string>(result.file, 'text', 'utf-8'),
-              ).pipe(
+              return from(readFileContents<string>(result.file, 'text', 'utf-8')).pipe(
                 withLatestFrom(this.store),
                 exhaustMap(([contents, state2]) => {
-                  const item2 = state2.asr.queue?.items?.find(
-                    (a) => a.time === item.time,
-                  );
+                  const item2 = state2.asr.queue?.items?.find((a) => a.time === item.time);
 
                   if (item2) {
                     if (item2.status !== ASRProcessStatus.STOPPED) {
@@ -555,12 +484,7 @@ export class AsrEffects {
               error,
               ASRActions.runWordAlignmentOnItem.fail({
                 item,
-                error:
-                  error instanceof Error
-                    ? error.message
-                    : error instanceof HttpErrorResponse
-                      ? (error.error?.message ?? error.message)
-                      : error,
+                error: error instanceof Error ? error.message : error instanceof HttpErrorResponse ? (error.error?.message ?? error.message) : error,
                 newStatus: ASRProcessStatus.FAILED,
               }),
             ),
@@ -600,16 +524,10 @@ export class AsrEffects {
       ),
       withLatestFrom(this.store),
       mergeMap(([action, state]) => {
-        const item =
-          state.asr.queue!.items.find((a) => a.id === action.item.id) ??
-          action.item;
+        const item = state.asr.queue!.items.find((a) => a.id === action.item.id) ?? action.item;
 
         if (item) {
-          if (
-            [ASRProcessStatus.FINISHED, ASRProcessStatus.FAILED].includes(
-              item.status,
-            )
-          ) {
+          if ([ASRProcessStatus.FINISHED, ASRProcessStatus.FAILED].includes(item.status)) {
             this.store.dispatch(
               ASRActions.removeItemFromQueue.do({
                 id: item.id,
@@ -623,14 +541,9 @@ export class AsrEffects {
               timeInterval: item.time,
               progress: item.progress,
               itemType: item.type,
-              result:
-                item.status === ASRProcessStatus.FINISHED
-                  ? item.result
-                  : undefined,
+              result: item.status === ASRProcessStatus.FINISHED ? item.result : undefined,
               isBlockedBy:
-                item.status !== ASRProcessStatus.STOPPED &&
-                item.status !== ASRProcessStatus.FINISHED &&
-                item.status !== ASRProcessStatus.FAILED
+                item.status !== ASRProcessStatus.STOPPED && item.status !== ASRProcessStatus.FINISHED && item.status !== ASRProcessStatus.FAILED
                   ? item.type
                   : undefined,
             }),
@@ -650,20 +563,11 @@ export class AsrEffects {
   onProcessingFail$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(
-          ASRActions.runASROnItem.fail,
-          ASRActions.runWordAlignmentOnItem.fail,
-        ),
+        ofType(ASRActions.runASROnItem.fail, ASRActions.runWordAlignmentOnItem.fail),
         withLatestFrom(this.store),
         tap(([action, state]) => {
-          if (
-            action.newStatus === ASRProcessStatus.NOAUTH &&
-            state.asr.queue!.status !== ASRProcessStatus.NOQUOTA
-          ) {
-            if (
-              state.application.mode === LoginMode.ONLINE &&
-              state.authentication.type === AccountLoginMethod.shibboleth
-            ) {
+          if (action.newStatus === ASRProcessStatus.NOAUTH && state.asr.queue!.status !== ASRProcessStatus.NOQUOTA) {
+            if (state.application.mode === LoginMode.ONLINE && state.authentication.type === AccountLoginMethod.shibboleth) {
               this.store.dispatch(
                 AuthenticationActions.needReAuthentication.do({
                   forceAuthentication: AccountLoginMethod.shibboleth,
@@ -671,11 +575,7 @@ export class AsrEffects {
                   forceLogout: false,
                 }),
               );
-              this.alertService.showAlert(
-                'danger',
-                this.langService.translate('asr.no auth'),
-                true,
-              );
+              this.alertService.showAlert('danger', this.langService.translate('asr.no auth'), true);
             } else {
               this.store.dispatch(
                 AuthenticationActions.needReAuthentication.do({
@@ -700,15 +600,8 @@ export class AsrEffects {
               },
               'automation',
             );
-          } else if (
-            action.newStatus === ASRProcessStatus.NOQUOTA &&
-            state.asr.queue!.status !== ASRProcessStatus.NOQUOTA
-          ) {
-            this.alertService.showAlert(
-              'danger',
-              this.langService.translate('asr.no quota'),
-              true,
-            );
+          } else if (action.newStatus === ASRProcessStatus.NOQUOTA && state.asr.queue!.status !== ASRProcessStatus.NOQUOTA) {
+            this.alertService.showAlert('danger', this.langService.translate('asr.no quota'), true);
 
             this.uiService.addElementFromEvent(
               action.item.type.toLowerCase(),
@@ -741,11 +634,7 @@ export class AsrEffects {
         tap(([action, state]) => {
           if (state.asr.queue) {
             for (const item of state.asr.queue.items) {
-              if (
-                item.status === ASRProcessStatus.FAILED ||
-                item.status === ASRProcessStatus.NOAUTH ||
-                item.status === ASRProcessStatus.NOQUOTA
-              ) {
+              if (item.status === ASRProcessStatus.FAILED || item.status === ASRProcessStatus.NOAUTH || item.status === ASRProcessStatus.NOQUOTA) {
                 this.store.dispatch(
                   ASRActions.processQueueItem.fail({
                     item,
@@ -788,9 +677,7 @@ export class AsrEffects {
         withLatestFrom(this.store),
         tap(([action, state]) => {
           const item = state.asr.queue?.items?.find(
-            (a) =>
-              a.time.sampleLength === action.time.sampleLength &&
-              a.time.sampleStart === action.time.sampleStart,
+            (a) => a.time.sampleLength === action.time.sampleLength && a.time.sampleStart === action.time.sampleStart,
           );
 
           if (item) {
@@ -800,14 +687,9 @@ export class AsrEffects {
                 timeInterval: item.time,
                 progress: item.progress,
                 itemType: item.type,
-                result:
-                  item.status === ASRProcessStatus.FINISHED
-                    ? item.result
-                    : undefined,
+                result: item.status === ASRProcessStatus.FINISHED ? item.result : undefined,
                 isBlockedBy:
-                  item.status !== ASRProcessStatus.STOPPED &&
-                  item.status !== ASRProcessStatus.FINISHED &&
-                  item.status !== ASRProcessStatus.FAILED
+                  item.status !== ASRProcessStatus.STOPPED && item.status !== ASRProcessStatus.FINISHED && item.status !== ASRProcessStatus.FAILED
                     ? item.type
                     : undefined,
               }),
@@ -825,11 +707,9 @@ export class AsrEffects {
       exhaustMap(([action, state]) => {
         const settings = state.application.appConfiguration;
         const isShibbolethUser =
-          state.application.mode === LoginMode.ONLINE &&
-          state.authentication.type === AccountLoginMethod.shibboleth;
+          environment.simulateASR || (state.application.mode === LoginMode.ONLINE && state.authentication.type === AccountLoginMethod.shibboleth);
         const localASRSettingsComplete =
-          settings?.octra.plugins?.asr?.shibbolethURL !== undefined &&
-          settings.octra.plugins?.asr?.shibbolethURL !== '';
+          settings?.octra.plugins?.asr?.shibbolethURL !== undefined && settings.octra.plugins?.asr?.shibbolethURL !== '';
         const asrSettingsComplete =
           settings?.octra.plugins?.asr?.enabled === true &&
           settings.octra.plugins.asr.calls.length === 2 &&
@@ -840,21 +720,15 @@ export class AsrEffects {
           ASRActions.enableASR.do({
             isEnabled:
               asrSettingsComplete &&
-              (((action.task.tool_configuration?.value as ProjectSettings)
-                ?.octra?.asrEnabled === true &&
-                isShibbolethUser) ||
-                ((action.task.tool_configuration?.value as ProjectSettings)
-                  ?.octra?.asrEnabled === true &&
-                  localASRSettingsComplete)),
+              (((action.task.tool_configuration?.value as ProjectSettings)?.octra?.asrEnabled === true && isShibbolethUser) ||
+                ((action.task.tool_configuration?.value as ProjectSettings)?.octra?.asrEnabled === true && localASRSettingsComplete)),
           }),
         );
       }),
     ),
   );
 
-  private getFirstFreeItem(
-    queue: ASRStateQueue,
-  ): ASRStateQueueItem | undefined {
+  private getFirstFreeItem(queue: ASRStateQueue): ASRStateQueueItem | undefined {
     return queue.items.find((a) => {
       return a.status === ASRProcessStatus.IDLE;
     });
@@ -863,10 +737,7 @@ export class AsrEffects {
   private fitsServiceRequirements(file: File, item: ASRStateQueueItem): string {
     if (item.selectedASRService) {
       if (item.selectedASRService.maxSignalDuration && item.sampleRate) {
-        if (
-          item.time.sampleLength / item.sampleRate >
-          item.selectedASRService.maxSignalDuration
-        ) {
+        if (item.time.sampleLength / item.sampleRate > item.selectedASRService.maxSignalDuration) {
           return '[Error] max duration exceeded';
         }
       }
@@ -890,14 +761,7 @@ export class AsrEffects {
     text: string;
     url: string;
   }> {
-    return this.callASR(
-      item.selectedASRLanguage,
-      item.selectedASRService,
-      audioURL,
-      outFormat,
-      asrSettings,
-      item.accessCode,
-    );
+    return this.callASR(item.selectedASRLanguage, item.selectedASRService, audioURL, outFormat, asrSettings, item.accessCode);
   }
 
   private callASR(
@@ -919,8 +783,18 @@ export class AsrEffects {
       .replace('{{language}}', language)
       .replace('{{outFormat}}', outFormat);
 
-    if (accessCode && accessCode !== '' && service.provider === "Google") {
+    if (accessCode && accessCode !== '' && service.provider === 'Google') {
       asrUrl += `&ACCESSCODE=${accessCode}`;
+    }
+
+    if (environment.simulateASR) {
+      return timer(Math.round(Math.random() * 5000)).pipe(
+        map(() => ({
+          file: new File(['some simulated text'], 'any file.txt', { type: 'text/plain' }),
+          text: 'some simulated text',
+          url: joinURL(getBaseHrefURL(), 'any file.txt'),
+        })),
+      );
     }
 
     return this.http
@@ -943,42 +817,39 @@ export class AsrEffects {
       );
   }
 
-  private extractResultData = (
-    result: string,
-  ): Promise<{ file: File; text: string; url: string }> => {
-    return new Promise<{ file: File; text: string; url: string }>(
-      (resolve, reject) => {
-        // convert result to json
-        const x2js = new X2JS();
-        let json: any = x2js.xml2js(result);
-        json = json.WebServiceResponseLink;
+  private extractResultData = (result: string): Promise<{ file: File; text: string; url: string }> => {
+    return new Promise<{ file: File; text: string; url: string }>((resolve, reject) => {
+      // convert result to json
+      const x2js = new X2JS();
+      let json: any = x2js.xml2js(result);
+      json = json.WebServiceResponseLink;
 
-        if (json.success === 'true') {
-          const file = FileInfo.fromURL(json.downloadLink, 'text/plain');
-          file
-            .updateContentFromURL(this.http)
-            .then((text: any) => {
-              // add messages to protocol
-              resolve({
-                file: file.file!,
-                text,
-                url: json.downloadLink,
-              });
-            })
-            .catch((error: any) => {
-              reject(error);
+      if (json.success === 'true') {
+        const file = FileInfo.fromURL(json.downloadLink, 'text/plain');
+        file
+          .updateContentFromURL(this.http)
+          .then((text: any) => {
+            // add messages to protocol
+            resolve({
+              file: file.file!,
+              text,
+              url: json.downloadLink,
             });
-        } else {
-          reject(new Error(this.extractErrorMessage(json.output)));
-        }
-      },
-    );
+          })
+          .catch((error: any) => {
+            reject(error);
+          });
+      } else {
+        reject(new Error(this.extractErrorMessage(json.output)));
+      }
+    });
   };
 
-  private uploadFiles(
-    files: File[],
-    selectedLanguage: ServiceProvider,
-  ): Observable<string[]> {
+  private uploadFiles(files: File[], selectedLanguage: ServiceProvider): Observable<string[]> {
+    if (environment.simulateASR) {
+      return timer(Math.round(Math.random() * 5000)).pipe(map((a) => files.map((b) => joinURL(getBaseHrefURL(), `${b.name}`))));
+    }
+
     const formData = new FormData();
 
     for (let i = 0; i < files.length; i++) {
@@ -1052,17 +923,9 @@ export class AsrEffects {
       );
   }
 
-  handleShibbolethError(
-    item: ASRStateQueueItem,
-    error: HttpErrorResponse,
-    errorAction: Action,
-  ): Observable<Action> {
+  handleShibbolethError(item: ASRStateQueueItem, error: HttpErrorResponse, errorAction: Action): Observable<Action> {
     const errorMessage =
-      error instanceof Error
-        ? error.message
-        : error instanceof HttpErrorResponse
-          ? (error.error?.message ?? error.message)
-          : error;
+      error instanceof Error ? error.message : error instanceof HttpErrorResponse ? (error.error?.message ?? error.message) : error;
     console.error(errorMessage);
 
     if (errorMessage.indexOf('quota') > -1) {

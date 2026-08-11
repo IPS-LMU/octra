@@ -418,7 +418,6 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     this.subscribe(this.actions.pipe(ofType(AnnotationActions.overviewModal.send)), {
       next: () => {
         this.cd.markForCheck();
-        this.cd.detectChanges();
         this.onSendNowClick();
       },
     });
@@ -426,7 +425,6 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     this.subscribe(this.actions.pipe(ofType(AnnotationActions.overviewModal.close)), {
       next: () => {
         this.cd.markForCheck();
-        this.cd.detectChanges();
       },
     });
 
@@ -564,7 +562,6 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
     }
 
     this.cd.markForCheck();
-    this.cd.detectChanges();
     this.appStorage.saveCurrentPageAsLastPage();
   }
 
@@ -584,7 +581,6 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
       this.subscriptionManager.removeByTag('unsupported level');
       this.editorloaded = false;
       this.cd.markForCheck();
-      this.cd.detectChanges();
       let comp: any;
 
       if (name === undefined || name === '') {
@@ -623,7 +619,6 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
               this._currentEditor = viewContainerRef.createComponent<OCTRAEditor>(comp);
 
               this.cd.markForCheck();
-              this.cd.detectChanges();
 
               const id = this.subscribe(this._currentEditor.instance.initialized, {
                 next: () => {
@@ -631,7 +626,6 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
                   this.subscriptionManager.removeById(id);
 
                   this.cd.markForCheck();
-                  this.cd.detectChanges();
 
                   (this._currentEditor.instance as OCTRAEditor).applyContext(context);
                   resolve();
@@ -671,7 +665,6 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
                     if (currentLevelindex !== anno?.selectedLevelIndex) {
                       await this.changeEditor(this.interface!, undefined, false);
                       this.cd.markForCheck();
-                      this.cd.detectChanges();
                     }
                   },
                 },
@@ -680,7 +673,6 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
             }
 
             this.cd.markForCheck();
-            this.cd.detectChanges();
           });
         } else {
           reject('ERROR appLoadeditor is undefined');
@@ -742,7 +734,6 @@ export class TranscriptionComponent extends DefaultComponent implements OnInit, 
       this.annotationStoreService.openOverviewModal();
     } else {
       this.cd.markForCheck();
-      this.cd.detectChanges();
       this.onSendNowClick();
     }
   }

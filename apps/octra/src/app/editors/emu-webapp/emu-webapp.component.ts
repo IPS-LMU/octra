@@ -66,18 +66,16 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
             listenForMessages: true,
           })}`,
         );
-        this.cd.detectChanges();
         this.cd.markForCheck();
       } else {
         this.error = 'Missing EMU webApp URL';
         this.initialized.emit();
-        this.cd.detectChanges();
       }
     } else {
       this.error = 'The EMU-webApp editor only supports audio files with a size smaller or equal 50 MB.';
       this.initialized.emit();
-      this.cd.detectChanges();
     }
+    this.cd.markForCheck();
   }
 
   afterIframeLoaded() {
@@ -228,7 +226,6 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
     }
 
     this.initialized.emit();
-    this.cd.detectChanges();
     this.cd.markForCheck();
   }
 
@@ -241,7 +238,7 @@ export class EmuWebAppEditorComponent extends OCTRAEditor implements OctraEditor
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   disableAllShortcuts() {}
 
-   
+
   openSegment(item: { levelID: number; itemID: number }) {
     // only needed if an segment can be opened. For audio files smaller than 35 sec
   }

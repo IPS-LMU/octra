@@ -194,7 +194,6 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
     this.shortcutService.registerShortcutGroup(this.shortcuts);
 
     this.cd.markForCheck();
-    this.cd.detectChanges();
     this.subscribe(timer(100), {
       next: () => {
         this.initialized.emit();
@@ -204,7 +203,6 @@ export class DictaphoneEditorComponent extends OCTRAEditor implements OnInit, On
       next: () => {
         this.loadEditor();
         this.cd.markForCheck();
-        this.cd.detectChanges();
       },
     });
   }

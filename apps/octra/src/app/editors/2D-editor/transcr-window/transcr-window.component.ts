@@ -10,7 +10,6 @@ import {
   inject,
   OnChanges,
   OnInit,
-  Output,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -275,9 +274,11 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
 
   constructor() {
     super();
+  }
 
+  init() {
     this.subscribe(this.asrStoreService.queue$, {
-      next: (queue) => {
+      next: async (queue) => {
         const item = this.audiochunk
           ? queue?.items.find(
               (a) => a.time.sampleStart === this.audiochunk.time.start.samples && a.time.sampleLength === this.audiochunk.time.duration.samples,
@@ -286,15 +287,12 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
 
         if (item) {
           if (item.status === ASRProcessStatus.FINISHED && item.result !== undefined) {
-            this.transcript = item.result;
-          } else {
-            console.log(`Can't set transcript, ${item.status}, ${item.result}`);
+            await this.editor.setTranscript(item.result);
+            await this.editor.focus(true);
           }
 
           this.magnifier.redraw();
-
           this.cd.markForCheck();
-          this.cd.detectChanges();
         }
       },
       error: (error) => {
@@ -307,7 +305,6 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
     if (!this._loading) {
       this._loading = true;
       this.cd.markForCheck();
-      this.cd.detectChanges();
 
       const doFunc = async () => {
         try {
@@ -342,7 +339,6 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
           } finally {
             this._loading = false;
             this.cd.markForCheck();
-            this.cd.detectChanges();
           }
         } else {
           this.close();
@@ -404,7 +400,6 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
     this.isShortAudiofile = this.audio.audioManager.resource.info.duration.seconds <= 35;
 
     this.cd.markForCheck();
-    this.cd.detectChanges();
   }
 
   protected updateNeighbours() {
@@ -679,7 +674,6 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
           });
 
           this.cd.markForCheck();
-          this.cd.detectChanges();
         } else {
           resolve();
         }
@@ -836,7 +830,6 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
       {
         next: (status) => {
           this.cd.markForCheck();
-          this.cd.detectChanges();
         },
         error: (error) => {
           console.error(`couldn't update view for audio chunk in transcription window.`);
@@ -1194,7 +1187,6 @@ export class TranscrWindowComponent extends DefaultComponent implements OnInit, 
       this.magnifier.settings.lineheight = this.audioViewerHeight;
 
       this.cd.markForCheck();
-      this.cd.detectChanges();
     }
   }
 

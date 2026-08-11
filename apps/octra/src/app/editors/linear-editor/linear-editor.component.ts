@@ -477,7 +477,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     });
 
     this.cd.markForCheck();
-    this.cd.detectChanges();
   }
 
   override ngOnDestroy() {
@@ -507,7 +506,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
   }
 
   ngAfterViewInit() {
-    this.cd.detectChanges();
     if (this.appStorage.showMagnifier) {
       this.minimagnifierComponent.av.zoomY = this.factor;
     }
@@ -524,6 +522,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
       },
       'topSignalInitialized',
     );
+    this.cd.markForCheck();
   }
 
   onSelectionChanged(selection: AudioSelection) {
@@ -553,7 +552,6 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
     this.signalDisplayTop?.redraw();
     this.signalDisplayDown?.redraw();
     this.cd.markForCheck();
-    this.cd.detectChanges();
     this.saving = false;
   }
 
@@ -781,7 +779,7 @@ export class LinearEditorComponent extends OCTRAEditor implements OnInit, AfterV
         }
       },
     );
-    this.cd.detectChanges();
+    this.cd.markForCheck();
   }
 
   onViewerMouseDown() {

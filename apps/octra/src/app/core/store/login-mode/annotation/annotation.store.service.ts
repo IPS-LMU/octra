@@ -154,6 +154,7 @@ export class AnnotationStoreService {
     }
     return undefined;
   });
+
   private _currentLevel?: OctraAnnotationAnyLevel<OctraAnnotationSegment>;
 
   get currentLevel(): OctraAnnotationAnyLevel<OctraAnnotationSegment> | undefined {
@@ -182,6 +183,15 @@ export class AnnotationStoreService {
   status$ = this.store.select((state: RootState) => getModeState(state)?.currentSession?.status);
   private _transcript?: OctraAnnotation<ASRContext, OctraAnnotationSegment>;
   private _task?: TaskDto;
+
+  watchTranscriptItemChanges = (itemID: number) =>
+    this.store.select((state: RootState) => {
+      const transcriptState = getModeState(state)?.transcript;
+      if (transcriptState) {
+        return transcriptState.currentLevel.items.find((a) => a.id === itemID);
+      }
+      return undefined;
+    });
 
   transcriptString$ = this.transcript$.pipe(
     map((transcript) => {

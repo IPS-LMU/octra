@@ -22,7 +22,7 @@ import { OctraAnnotationSegment } from '@octra/annotation';
 import { OctraGuidelines } from '@octra/assets';
 import { SampleUnit } from '@octra/media';
 import { TimespanPipe } from '@octra/ngx-utilities';
-import { escapeHtml, escapeRegex, insertString, isNumber, unEscapeHtml } from '@octra/utilities';
+import { escapeHtml, escapeRegex, insertString, isNumber, unEscapeHtml, wait } from '@octra/utilities';
 import { AudioChunk, AudioManager, BrowserInfo, findElements, getAttr, setStyle, Shortcut, ShortcutGroup, ShortcutManager } from '@octra/web-media';
 import { HotkeysEvent } from 'hotkeys-js';
 import { IControlType, IJodit, IToolbarButton } from 'jodit/types/types';
@@ -161,7 +161,7 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
   };
 
   public htmlValue = '';
-  private initialized = false;
+  protected initialized = false;
 
   constructor() {
     super();
@@ -385,8 +385,11 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
   /**
    * initializes the editor and the containing jodit editor
    */
-  public initialize = () => {
-    if (this.audiochunk !== undefined && this.transcrEditor && this.joditComponent) {
+  public initialize = async () => {
+    await wait(0);
+    if (this.audiochunk !== undefined && this.transcrEditor) {
+      this.initialized = false;
+      this.cd.markForCheck();
       this.initializeShortcuts();
       this.shortcutService.unregisterShortcutGroup('texteditor');
       this.shortcutService.registerShortcutGroup(this.shortcuts);
@@ -412,7 +415,6 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
         buttons: [],
         extraButtons: [],
       };
-      this.initialized = false;
       this.initToolbar();
 
       if (this.settings.specialMarkers.boundary && this.joditOptions.extraButtons) {
@@ -422,8 +424,6 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
         }
       }
       this.joditOptions.extraButtons!.push(this.createFontSelectionButton() as any);
-
-      this.cd.markForCheck();
 
       const validationError = this.renderer.createElement('div');
       validationError.setAttribute('class', 'card error-card');
@@ -458,6 +458,7 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
       }
 
       this.initialized = true;
+      this.cd.markForCheck();
     }
   };
 
@@ -584,12 +585,12 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
     });
   };
 
-  ngAfterViewInit() {
+  async ngAfterViewInit() {
     this.settings.height = this.height;
     if (this.audiochunk !== undefined) {
       this._lastAudioChunkID = this.audiochunk.id;
     }
-    this.initialize();
+    await this.initialize();
 
     this.subscribe(this.asrStoreService.queue$, {
       next: this.onASRQueueChange,
@@ -648,6 +649,7 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
     }
 
     if (obj['transcript'] !== undefined && obj['transcript'].currentValue !== undefined && !obj['transcript'].firstChange) {
+      console.log(`not first change ${obj['transcript'].currentValue}`);
       await this.setTranscript(obj['transcript'].currentValue);
     }
 
@@ -657,15 +659,14 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
     }
 
     if (renew) {
-      this.initialize();
-      this.initPopover();
+      await this.initialize();
+      await this.initPopover();
     }
   }
 
-  public update() {
+  public async update() {
     this.subscriptionManager.destroy();
-    this.initialize();
-    this.cd.markForCheck();
+    await this.initialize();
   }
 
   /**
@@ -1099,7 +1100,7 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
     this.lastHighlightedSegment = -1;
   }
 
-  public highlightCurrentSegment(playPosition: SampleUnit) {
+  public async highlightCurrentSegment(playPosition: SampleUnit) {
     if (!this.annotationStoreService.currentLevel || !this.wysiwyg) {
       return;
     }
@@ -1188,7 +1189,7 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
         this.lastHighlightedSegment = currentSegIndex;
       }
       this.restoreSelection();
-      this.initPopover();
+      await this.initPopover();
     }
   }
 
@@ -1246,9 +1247,9 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
           this.markerClick.emit('boundary');
           this.insertBoundary('assets/img/components/transcr-editor/boundary.png');
           this.subscribe(timer(100), {
-            next: () => {
+            next: async () => {
               //this.validate();
-              this.initPopover();
+              await this.initPopover();
             },
           });
         },

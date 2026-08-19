@@ -1,10 +1,8 @@
-<div id="scroll-container" #scrollContainer>
-  <octra-transcr-overview
-    [targetName]="'Matrix-Editor'"
-    (segmentclicked)="openSegment($event)"
-    [showStatistics]="false"
-    (statusChange)="overviewStatusChange($event)"
-    [showSignal]="true"
-  >
-  </octra-transcr-overview>
-</div>
+<octra-transcr-overview class="h-100"
+  [targetName]="'Matrix-Editor'"
+  (segmentclicked)="openSegment($event)"
+  [showStatistics]="false"
+  (statusChange)="overviewStatusChange($event)"
+  [showSignal]="true"
+>
+</octra-transcr-overview>

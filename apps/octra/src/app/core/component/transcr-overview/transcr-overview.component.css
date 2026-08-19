@@ -1,4 +1,5 @@
 :host {
+  overflow-x: hidden;
   overflow-y: auto;
   scroll-behavior: smooth;
 }
@@ -9,7 +10,7 @@
 
 .segment-number {
   padding: 3px;
-  width: 50px;
+  white-space: nowrap;
   vertical-align: middle;
 }
 
@@ -36,18 +37,18 @@
   text-align: center;
 }
 
-.table thead th {
+.v-table-head-row {
   text-align: center;
-  vertical-align: middle;
+  font-weight: bold;
 }
 
-.table .last-column {
+.v-table .last-column {
   text-align: center;
   vertical-align: middle;
   width: 100px;
 }
 
-.table fa-icon {
+.v-table fa-icon {
   cursor: pointer;
 }
 
@@ -85,8 +86,57 @@
   color: black;
 }
 
-#transcription-table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 100;
+/* Table replaced by a grid-based layout so rows can be virtualized with cdk-virtual-scroll-viewport. */
+.v-table {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid #dee2e6;
+}
+
+.v-table-row {
+  box-sizing: border-box;
+  display: grid;
+  /* Fixed widths (not "auto") so every row's columns line up: each row is its own grid
+     context, so a content-based track size would differ per row (and vs. the header). */
+  grid-template-columns: 25px 100px 1fr 100px;
+  align-items: stretch;
+  padding:0;
+  border-collapse: collapse;
+}
+
+.v-table-row + .v-table-row {
+  border-top: 1px solid #dee2e6;
+}
+
+.v-table-head-row {
+  border-bottom: 2px solid #dee2e6;
+  /* Compensated in TS to match the viewport's scrollbar width, so header and body columns stay aligned. */
+  border-collapse: collapse;
+  padding-right: 0;
+}
+
+.v-table-cell {
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  border: none !important;
+}
+
+.v-table-cell + .v-table-cell {
+  border-left: 1px solid #dee2e6;
+}
+
+/* cdk-virtual-scroll-viewport requires a bounded height to compute the visible range. */
+.v-table-viewport {
+  height: 60vh;
+  min-height: 300px;
+  overflow-x: hidden;
+}
+
+.v-table-viewport .v-table-row {
+  min-height: 42px;
 }

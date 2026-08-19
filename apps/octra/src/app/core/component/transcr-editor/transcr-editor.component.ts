@@ -161,7 +161,7 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
   };
 
   public htmlValue = '';
-  protected initialized = false;
+  initialized = false;
 
   constructor() {
     super();
@@ -386,9 +386,9 @@ export class TranscrEditorComponent extends DefaultComponent implements OnChange
    * initializes the editor and the containing jodit editor
    */
   public initialize = async () => {
+    this.initialized = false;
     await wait(0);
     if (this.audiochunk !== undefined && this.transcrEditor) {
-      this.initialized = false;
       this.cd.markForCheck();
       this.initializeShortcuts();
       this.shortcutService.unregisterShortcutGroup('texteditor');

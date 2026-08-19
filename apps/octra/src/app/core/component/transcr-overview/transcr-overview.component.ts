@@ -1,4 +1,5 @@
 import { NgClass, NgStyle } from '@angular/common';
+import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -11,7 +12,6 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  Renderer2,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -52,6 +52,7 @@ import { ValidationPopoverComponent } from '../transcr-editor/validation-popover
     TranscrEditorComponent,
     AudioViewerComponent,
     AudioNavigationComponent,
+    ScrollingModule,
   ],
 })
 export class TranscrOverviewComponent extends DefaultComponent implements OnInit, OnDestroy, OnChanges {
@@ -65,8 +66,41 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
   protected routingService = inject(RoutingService);
   private shortcutService = inject(ShortcutService);
   private actions = inject(Actions);
-  private el = inject(ElementRef);
-  private renderer = inject(Renderer2);
+  protected editorLoaded = false;
+
+  /** Fixed row height (px) used by the cdk virtual scroll strategy. */
+  readonly rowHeight = 42;
+
+  viewport?: CdkVirtualScrollViewport;
+  private viewportResizeObserver?: ResizeObserver;
+
+  @ViewChild('headRow') private headRow?: ElementRef<HTMLDivElement>;
+
+  @ViewChild('viewport')
+  private set viewportRef(viewport: CdkVirtualScrollViewport | undefined) {
+    this.viewport = viewport;
+    this.viewportResizeObserver?.disconnect();
+    this.viewportResizeObserver = undefined;
+
+    if (viewport) {
+      this.viewportResizeObserver = new ResizeObserver(() => this.syncHeaderScrollbarGap());
+      this.viewportResizeObserver.observe(viewport.elementRef.nativeElement);
+    }
+  }
+
+  /**
+   * The header row lives outside the virtual scroll viewport, so a scrollbar on the
+   * viewport (once enough rows overflow it) shrinks the body rows without shrinking the
+   * header — pushing their columns out of alignment. Mirror the gap as header padding.
+   */
+  private syncHeaderScrollbarGap() {
+    if (!this.viewport || !this.headRow) {
+      return;
+    }
+    const el = this.viewport.elementRef.nativeElement;
+    const scrollbarWidth = el.offsetWidth - el.clientWidth;
+    this.headRow.nativeElement.style.paddingRight = `${scrollbarWidth}px`;
+  }
 
   get selectedUnit(): {
     selectedSegment: number;
@@ -410,6 +444,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
       console.error(err);
     });
     this.shortcutService.unregisterShortcutGroup(this.viewerShortcuts.name);
+    this.viewportResizeObserver?.disconnect();
   }
 
   init(level: OctraAnnotationAnyLevel<OctraAnnotationSegment<ASRContext>>) {
@@ -533,6 +568,7 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
       this.cd.markForCheck();
       this.appStorage.disableUndoRedo(false);
 
+      this.editorLoaded = false;
       if (this.viewer) {
         this.viewer.name = 'transcr-window viewer';
         this.viewer.av.drawnSelection = undefined;
@@ -793,20 +829,22 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
   }
 
   private scrollToSegmentIndex(segmentIndex: number) {
-    const container = this.el.nativeElement as HTMLDivElement;
-    const index = segmentIndex > 0 ? segmentIndex - 1 : segmentIndex;
-    const segmentRow = container.querySelector(`#transcr-overview-segment-${index}`) as HTMLTableRowElement;
-    const thead = container.querySelector('#table-head') as HTMLElement;
-    this.renderer.setStyle(container, 'scroll-margin-top', `${thead.offsetHeight + 50}px`);
+    if (!this.viewport) {
+      return;
+    }
+    const index = Math.max(0, segmentIndex > 0 ? segmentIndex - 1 : segmentIndex);
+    const renderedRange = this.viewport.getRenderedRange();
+    const isOutsideView = index < renderedRange.start || index >= renderedRange.end;
 
-    const isTop = segmentRow.offsetTop < container.scrollTop;
-    const isBelow = segmentRow.offsetTop > container.scrollTop + container.offsetHeight;
-
-    if (isBelow || isTop) {
+    if (isOutsideView) {
       // scroll only if outside view
-      container.scrollTo(0, Math.max(0, segmentRow.offsetTop));
+      this.viewport.scrollToIndex(index, 'auto');
       this.cd.markForCheck();
     }
+  }
+
+  trackBySegment(index: number, segment: { id: number }) {
+    return segment.id;
   }
 
   togglePlayAll() {
@@ -1040,21 +1078,23 @@ export class TranscrOverviewComponent extends DefaultComponent implements OnInit
   }
 
   async doDirection(direction: 'down' | 'up') {
-    const i = this._selectedUnit.selectedSegment;
-    if (this._selectedUnit.selectedSegment > -1) {
-      await this.onTextEditorLeave(i, true);
-    }
-
-    if (this._internLevel?.items) {
-      if (direction === 'down') {
-        this.onMouseDown(Math.min(i, this._internLevel.items.length - 2) + 1);
-      } else {
-        this.onMouseDown(Math.max(i, 1) - 1);
+    if (this.editorLoaded) {
+      const i = this._selectedUnit.selectedSegment;
+      if (this._selectedUnit.selectedSegment > -1) {
+        await this.onTextEditorLeave(i, true);
       }
-    }
 
-    await this.updateSegments();
-    this.cd.markForCheck();
+      if (this._internLevel?.items) {
+        if (direction === 'down') {
+          this.onMouseDown(Math.min(i, this._internLevel.items.length - 2) + 1);
+        } else {
+          this.onMouseDown(Math.max(i, 1) - 1);
+        }
+      }
+
+      await this.updateSegments();
+      this.cd.markForCheck();
+    }
   }
 
   toggleSkipCheckbox() {

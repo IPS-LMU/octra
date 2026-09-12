@@ -217,16 +217,10 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         preparing: true,
       };
       this.subscribe(timer(300), () => {
-        if (converter.name === 'BundleJSON') {
-          // only this converter needs an array buffer
-          /*
-            this.transcriptionService.audiofile.arraybuffer =
-              this.transcriptionService.audioManager.resource.arraybuffer!;
-             */
-        }
-
         const oAudioFile = this.audio.audioManager.resource.getOAudioFile();
-        const result: ExportResult = converter.export(oannotjson, oAudioFile, levelnum);
+        const result: ExportResult = converter.export(oannotjson, oAudioFile, {
+          levelNum: levelnum,
+        });
 
         if (!result.error && result.file) {
           this.parentformat.download = result.file.name;

@@ -33,7 +33,7 @@ export interface ExportResult {
   error?: string;
 }
 
-export abstract class Converter {
+export abstract class Converter<I extends object = object, O extends object = object> {
   protected _conversion = {
     import: false,
     export: false,
@@ -92,14 +92,10 @@ export abstract class Converter {
    * exports AnnotJSON to another annotation format considering an audio file and a level number (optional).
    * @param annotation the AnnotJSON
    * @param audiofile information about the audio file
-   * @param levelnum the level number for export
+   * @param options Options for this converter
    * returns resulted file or error.
    */
-  public abstract export(
-    annotation: OAnnotJSON,
-    audiofile: OAudiofile,
-    levelnum?: number,
-  ): ExportResult;
+  public abstract export(annotation: OAnnotJSON, audiofile: OAudiofile, options?: O): ExportResult;
 
   /**
    * converts an file to AnnotJSON considering the audio file. The audio file must be the one used for this transcript file.
@@ -107,19 +103,19 @@ export abstract class Converter {
    * @param audiofile information about the audio file.
    * returns object with an annotjson or an error.
    */
-  public abstract import(
-    file: IFile,
-    audiofile: OAudiofile,
-    options?: any,
-  ): ImportResult;
+  public abstract import(file: IFile, audiofile: OAudiofile, options?: I): ImportResult;
 
   /**
    * checks if the converter needs further options to import the file.
    * @param file the transcript file
    * @param audiofile information about the audio file.
    */
-  public abstract needsOptionsForImport(
-    file: IFile,
-    audiofile: OAudiofile,
-  ): any | undefined;
+  public abstract needsOptionsForImport(file: IFile, audiofile: OAudiofile): any | undefined;
+
+  /**
+   * checks if the converter needs further options to export a file.
+   * @param file the transcript file
+   * @param audiofile information about the audio file.
+   */
+  public abstract needsOptionsForExport(file: IFile, audiofile: OAudiofile): any | undefined;
 }

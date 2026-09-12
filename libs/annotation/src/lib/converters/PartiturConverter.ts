@@ -114,10 +114,7 @@ export class PartiturConverter extends Converter {
 
   public constructor() {
     super();
-    this._applications = [
-      { application: new BASWebservicesApplication(), recommended: true },
-      { application: new OctraApplication() },
-    ];
+    this._applications = [{ application: new BASWebservicesApplication(), recommended: true }, { application: new OctraApplication() }];
     this._extensions = ['.par'];
     this._conversion.export = true;
     this._conversion.import = true;
@@ -128,11 +125,7 @@ export class PartiturConverter extends Converter {
     this._multitiers = true;
   }
 
-  public export(
-    annotation: OAnnotJSON,
-    audiofile: OAudiofile,
-    levelnum?: number,
-  ): ExportResult {
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
     if (!annotation) {
       return {
         error: 'Annotation is undefined or null',
@@ -196,9 +189,7 @@ LBD:\n`;
 
     for (const item of items as OSegment[]) {
       const speaker = item.labels.find((l) => l.name === 'Speaker');
-      const words = (
-        item.getFirstLabelWithoutName('Speaker')?.value ?? ''
-      ).split(' ');
+      const words = (item.getFirstLabelWithoutName('Speaker')?.value ?? '').split(' ');
       ort = ort.concat(words);
       speakers = speakers.concat(words.map((a) => speaker?.value ?? 'S'));
       let trnLine = `TRN: ${item.sampleStart} ${item.sampleDur} `;
@@ -231,10 +222,11 @@ LBD:\n`;
     return result;
   }
 
-  override needsOptionsForImport(
-    file: IFile,
-    audiofile: OAudiofile,
-  ): any | undefined {
+  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): any | undefined {
+    return undefined;
+  }
+
+  override needsOptionsForExport(file: IFile, audiofile: OAudiofile): any {
     return undefined;
   }
 
@@ -251,11 +243,7 @@ LBD:\n`;
     }
 
     const lines = file.content.split(/\r?\n/g);
-    const result = new OAnnotJSON(
-      audiofile.name,
-      FileInfo.extractFileName(file.name).name,
-      audiofile.sampleRate,
-    );
+    const result = new OAnnotJSON(audiofile.name, FileInfo.extractFileName(file.name).name, audiofile.sampleRate);
 
     const parsedPartitur = new ParsedBASPartitur();
     parsedPartitur.parse(lines);
@@ -269,21 +257,14 @@ LBD:\n`;
     // skip not needed information and read needed information
     let counter = 1;
 
-    if (
-      (parsedPartitur.SPK.length === 0 && parsedPartitur.TRN.length > 0) ||
-      parsedPartitur.WOR.length === 0
-    ) {
+    if ((parsedPartitur.SPK.length === 0 && parsedPartitur.TRN.length > 0) || parsedPartitur.WOR.length === 0) {
       // fallback to TRN
       if (parsedPartitur.TRN.length > 0) {
         let level: OSegmentLevel<OSegment> | undefined = undefined;
 
         for (const item of parsedPartitur.TRN) {
-          const speaker =
-            parsedPartitur.SPK.find((a) => a.ortIndex === item.ortIndex)
-              ?.value ?? 'TRN';
-          level = result.levels.find(
-            (a) => a.name === speaker,
-          ) as OSegmentLevel<OSegment>;
+          const speaker = parsedPartitur.SPK.find((a) => a.ortIndex === item.ortIndex)?.value ?? 'TRN';
+          level = result.levels.find((a) => a.name === speaker) as OSegmentLevel<OSegment>;
           if (!level) {
             level = new OSegmentLevel<OSegment>(speaker);
             result.levels.push(level);
@@ -305,19 +286,10 @@ LBD:\n`;
         };
       } else {
         for (const worElement of parsedPartitur.WOR) {
-          if (
-            (worElement.ortIndex > -1 || parsedPartitur.SPK.length === 0) &&
-            worElement.value !== '<p:>'
-          ) {
+          if ((worElement.ortIndex > -1 || parsedPartitur.SPK.length === 0) && worElement.value !== '<p:>') {
             const speaker =
-              parsedPartitur.SPK.length === 0
-                ? 'OCTRA_1'
-                : (parsedPartitur.SPK.find(
-                    (a) => a.ortIndex === worElement.ortIndex,
-                  )?.value ?? 'NA');
-            let level: OSegmentLevel<OSegment> | undefined = result.levels.find(
-              (a) => a.name === speaker,
-            ) as any;
+              parsedPartitur.SPK.length === 0 ? 'OCTRA_1' : (parsedPartitur.SPK.find((a) => a.ortIndex === worElement.ortIndex)?.value ?? 'NA');
+            let level: OSegmentLevel<OSegment> | undefined = result.levels.find((a) => a.name === speaker) as any;
 
             if (!level) {
               level = new OSegmentLevel(speaker);
@@ -325,10 +297,7 @@ LBD:\n`;
             }
 
             level.items.push(
-              new OSegment(counter++, worElement.start, worElement.duration, [
-                new OLabel(speaker, worElement.value),
-                new OLabel('Speaker', speaker),
-              ]),
+              new OSegment(counter++, worElement.start, worElement.duration, [new OLabel(speaker, worElement.value), new OLabel('Speaker', speaker)]),
             );
           }
         }
@@ -341,8 +310,7 @@ LBD:\n`;
         for (let i = 0; i < level.items.length; i++) {
           const item = level.items[i];
           const previousItem = i > 0 ? level.items[i - 1] : undefined;
-          const startSample =
-            (previousItem?.sampleStart ?? 0) + (previousItem?.sampleDur ?? 0);
+          const startSample = (previousItem?.sampleStart ?? 0) + (previousItem?.sampleDur ?? 0);
           const gapSamples = item.sampleStart - startSample;
           const gapSeconds = gapSamples / audiofile.sampleRate;
 
@@ -356,20 +324,12 @@ LBD:\n`;
               // fill with new segment
 
               const test = item.sampleStart - (startSample + gapSamples);
-              const newItem = new OSegment(counter++, startSample, gapSamples, [
-                new OLabel(level.name, ''),
-              ]);
-              const speakerLabel = item.labels.find(
-                (a) => a.name !== level.name,
-              );
+              const newItem = new OSegment(counter++, startSample, gapSamples, [new OLabel(level.name, '')]);
+              const speakerLabel = item.labels.find((a) => a.name !== level.name);
               if (speakerLabel) {
                 newItem.labels.push(speakerLabel.clone());
               }
-              level.items = [
-                ...level.items.slice(0, i),
-                newItem,
-                ...level.items.slice(i),
-              ];
+              level.items = [...level.items.slice(0, i), newItem, ...level.items.slice(i)];
               i++;
             }
           }
@@ -380,14 +340,9 @@ LBD:\n`;
         const lastItem = last(level.items);
 
         if (!lastItem) {
-          level.items.push(
-            new OSegment(counter++, 0, audiofile.duration, [
-              new OLabel('OCTRA_1', ''),
-            ]),
-          );
+          level.items.push(new OSegment(counter++, 0, audiofile.duration, [new OLabel('OCTRA_1', '')]));
         } else {
-          const gapSamples =
-            audiofile.duration - (lastItem.sampleStart + lastItem.sampleDur);
+          const gapSamples = audiofile.duration - (lastItem.sampleStart + lastItem.sampleDur);
           const gapSeconds = gapSamples / audiofile.sampleRate;
 
           if (gapSeconds !== 0) {
@@ -395,15 +350,8 @@ LBD:\n`;
               lastItem.sampleDur += gapSamples;
             } else {
               // fill with empty item
-              const newItem = new OSegment(
-                counter++,
-                lastItem.sampleStart + lastItem.sampleDur,
-                gapSamples,
-                [new OLabel(level.name, '')],
-              );
-              const speakerLabel = lastItem.labels.find(
-                (a) => a.name !== level.name,
-              );
+              const newItem = new OSegment(counter++, lastItem.sampleStart + lastItem.sampleDur, gapSamples, [new OLabel(level.name, '')]);
+              const speakerLabel = lastItem.labels.find((a) => a.name !== level.name);
               if (speakerLabel) {
                 newItem.labels.push(speakerLabel.clone());
               }

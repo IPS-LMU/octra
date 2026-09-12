@@ -64,7 +64,9 @@ class PreparedTask extends TaskDto {
 
       if (transcriptFile?.annotjson) {
         const textConverter = new TextConverter();
-        this.transcript = textConverter.export(OAnnotJSON.deserialize(transcriptFile.annotjson)!, oAudioFile, 0)?.file?.content;
+        this.transcript = textConverter.export(OAnnotJSON.deserialize(transcriptFile.annotjson)!, oAudioFile, {
+          levelNum: 0
+        })?.file?.content;
       }
     }
   }

@@ -2263,7 +2263,9 @@ export class AnnotationEffects {
           this.audio.audioManager.resource.info.sampleRate,
           this.audio.audioManager.resource.info.duration,
         );
-        const result = converter.export(oannotjson, this.audio.audioManager.resource.getOAudioFile(), 0);
+        const result = converter.export(oannotjson, this.audio.audioManager.resource.getOAudioFile(), {
+          levelNum: 0
+        });
 
         if (!result.error && result.file) {
           // send result to iframe owner

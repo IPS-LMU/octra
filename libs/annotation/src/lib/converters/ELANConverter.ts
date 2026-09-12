@@ -3,18 +3,8 @@ import { last } from '@octra/utilities';
 import { FileInfo } from '@octra/web-media';
 import X2JS from 'x2js';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
-import {
-  Converter,
-  ExportResult,
-  IFile,
-  ImportResult,
-  OctraAnnotationFormatType,
-} from './Converter';
-import {
-  BASWebservicesApplication,
-  ELANApplication,
-  OctraApplication,
-} from './SupportedApplications';
+import { Converter, ExportResult, IFile, ImportResult, OctraAnnotationFormatType } from './Converter';
+import { BASWebservicesApplication, ELANApplication, OctraApplication } from './SupportedApplications';
 
 export class ELANConverter extends Converter {
   override _name: OctraAnnotationFormatType = 'ELAN';
@@ -67,15 +57,11 @@ export class ELANConverter extends Converter {
         _FORMAT: '3.0',
         _VERSION: '3.0',
         '_xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-        '_xsi:noNamespaceSchemaLocation':
-          'http://www.mpi.nl/tools/elan/EAFv3.0.xsd',
+        '_xsi:noNamespaceSchemaLocation': 'http://www.mpi.nl/tools/elan/EAFv3.0.xsd',
         HEADER: {
           _TIME_UNITS: 'milliseconds',
           MEDIA_DESCRIPTOR: {
-            _MEDIA_URL:
-              audiofile?.url && audiofile.url !== ''
-                ? audiofile.url
-                : `./${annotation.annotates}`,
+            _MEDIA_URL: audiofile?.url && audiofile.url !== '' ? audiofile.url : `./${annotation.annotates}`,
             _MEDIA_RELATIVE_URL: `./${annotation.annotates}`,
             _MIME_TYPE: 'audio/x-wav',
           },
@@ -110,11 +96,7 @@ export class ELANConverter extends Converter {
 
         // read annotation
         for (const segment of level.items as OSegment[]) {
-          const miliseconds = Math.round(
-            ((segment.sampleStart + segment.sampleDur) /
-              annotation.sampleRate) *
-              1000,
-          );
+          const miliseconds = Math.round(((segment.sampleStart + segment.sampleDur) / annotation.sampleRate) * 1000);
 
           // add time slot
           jsonObj.ANNOTATION_DOCUMENT.TIME_ORDER.TIME_SLOT.push({
@@ -126,8 +108,7 @@ export class ELANConverter extends Converter {
           jsonObj.ANNOTATION_DOCUMENT.TIER[i].ANNOTATION.push({
             ALIGNABLE_ANNOTATION: {
               _ANNOTATION_ID: `a${aidCounter}`,
-              ANNOTATION_VALUE:
-                segment.getFirstLabelWithoutName('Speaker')?.value ?? '',
+              ANNOTATION_VALUE: segment.getFirstLabelWithoutName('Speaker')?.value ?? '',
               _TIME_SLOT_REF1: `ts${tsidCounter - 1}`,
               _TIME_SLOT_REF2: `ts${tsidCounter}`,
             },
@@ -151,10 +132,11 @@ export class ELANConverter extends Converter {
     };
   }
 
-  override needsOptionsForImport(
-    file: IFile,
-    audiofile: OAudiofile,
-  ): any | undefined {
+  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): any | undefined {
+    return undefined;
+  }
+
+  override needsOptionsForExport(file: IFile, audiofile: OAudiofile): any {
     return undefined;
   }
 
@@ -176,11 +158,7 @@ export class ELANConverter extends Converter {
       error: '',
     };
 
-    result.annotjson = new OAnnotJSON(
-      audiofile.name,
-      FileInfo.extractFileName(file.name).name,
-      audiofile.sampleRate,
-    );
+    result.annotjson = new OAnnotJSON(audiofile.name, FileInfo.extractFileName(file.name).name, audiofile.sampleRate);
 
     const x2js = new X2JS();
     const jsonXML = x2js.xml2js<ELAN30Object>(file.content);
@@ -193,41 +171,22 @@ export class ELANConverter extends Converter {
       if (timeUnit !== undefined && timeUnit === 'milliseconds') {
         let lastSample = 0;
         for (const tier of jsonXML.ANNOTATION_DOCUMENT.TIER) {
-          const level: OSegmentLevel<OSegment> = new OSegmentLevel<OSegment>(
-            tier._TIER_ID,
-          );
+          const level: OSegmentLevel<OSegment> = new OSegmentLevel<OSegment>(tier._TIER_ID);
           const readTier = (annotationElement: any) => {
-            const t1 = this.getSamplesFromTimeSlot(
-              jsonXML,
-              annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF1,
-              audiofile.sampleRate,
-            );
-            const t2 = this.getSamplesFromTimeSlot(
-              jsonXML,
-              annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF2,
-              audiofile.sampleRate,
-            );
+            const t1 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF1, audiofile.sampleRate);
+            const t2 = this.getSamplesFromTimeSlot(jsonXML, annotationElement.ALIGNABLE_ANNOTATION._TIME_SLOT_REF2, audiofile.sampleRate);
 
             if (t1 < 0 || t2 < 0) {
               result.error = 'Invalid time unit found';
             } else {
               if (t1 > lastSample) {
                 // empty segment space before
-                (level.items as OSegment[]).push(
-                  new OSegment(counter++, lastSample, t1 - lastSample, [
-                    new OLabel(tier._TIER_ID, ''),
-                  ]),
-                );
+                (level.items as OSegment[]).push(new OSegment(counter++, lastSample, t1 - lastSample, [new OLabel(tier._TIER_ID, '')]));
               }
 
               // correct segment
               (level.items as OSegment[]).push(
-                new OSegment(counter++, t1, t2 - t1, [
-                  new OLabel(
-                    tier._TIER_ID,
-                    annotationElement.ALIGNABLE_ANNOTATION.ANNOTATION_VALUE,
-                  ),
-                ]),
+                new OSegment(counter++, t1, t2 - t1, [new OLabel(tier._TIER_ID, annotationElement.ALIGNABLE_ANNOTATION.ANNOTATION_VALUE)]),
               );
             }
             lastSample = t2;
@@ -242,20 +201,9 @@ export class ELANConverter extends Converter {
           }
 
           if (level.items.length > 0) {
-            if (
-              last(level.items) &&
-              last(level.items)!.sampleStart + last(level.items)!.sampleDur <
-                audiofile.duration
-            ) {
+            if (last(level.items) && last(level.items)!.sampleStart + last(level.items)!.sampleDur < audiofile.duration) {
               // file space at end
-              (level.items as OSegment[]).push(
-                new OSegment(
-                  counter++,
-                  lastSample,
-                  audiofile.duration - lastSample,
-                  [new OLabel(tier._TIER_ID, '')],
-                ),
-              );
+              (level.items as OSegment[]).push(new OSegment(counter++, lastSample, audiofile.duration - lastSample, [new OLabel(tier._TIER_ID, '')]));
             }
 
             result.annotjson.levels.push(level);
@@ -273,13 +221,8 @@ export class ELANConverter extends Converter {
     return result;
   }
 
-  private getSamplesFromTimeSlot(
-    obj: ELAN30Object,
-    slotID: string,
-    sampleRate: number,
-  ) {
-    for (const timeorderElement of obj.ANNOTATION_DOCUMENT.TIME_ORDER
-      .TIME_SLOT!) {
+  private getSamplesFromTimeSlot(obj: ELAN30Object, slotID: string, sampleRate: number) {
+    for (const timeorderElement of obj.ANNOTATION_DOCUMENT.TIME_ORDER.TIME_SLOT!) {
       if (timeorderElement._TIME_SLOT_ID === slotID) {
         const miliseconds = timeorderElement._TIME_VALUE!;
         return Math.round((miliseconds / 1000) * sampleRate);

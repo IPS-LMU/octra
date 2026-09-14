@@ -68,7 +68,7 @@ export class BundleJSONConverter extends Converter {
     return undefined;
   }
 
-  override needsOptionsForExport(file: IFile, audiofile: OAudiofile): any | undefined {
+  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any | undefined {
     return undefined;
   }
 

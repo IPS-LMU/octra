@@ -177,7 +177,7 @@ export class SRTConverter extends Converter<SRTConverterImportOptions, SRTConver
     };
   }
 
-  override needsOptionsForExport(file: IFile, audiofile: OAudiofile): any {
+  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any {
     return {
       $gui_support: true,
       type: 'object',
@@ -187,16 +187,18 @@ export class SRTConverter extends Converter<SRTConverterImportOptions, SRTConver
           toggleable: false,
           type: 'array',
           items: {
-            type: "number"
+            type: 'number',
           },
           description: 'Defines an array of level indices for export.',
         },
-        transformTranscriptionUnit: {
+        transformPattern: {
           title: 'transformTranscriptionUnit',
           type: 'string',
-          default: "[{{SPEAKER}}]: {{TRANSCRIPT}}",
+          toggleable: true,
+          default: '[{{LEVEL_NAME}}]: {{TRANSCRIPT}}',
+          dependsOn: ['exportLevels'],
           description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
-        }
+        },
       },
     };
   }

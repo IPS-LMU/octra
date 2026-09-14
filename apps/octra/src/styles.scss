@@ -575,6 +575,17 @@ ul.pagination.pagination-sm {
   width: 600px !important;
 }
 
-.provider-select-menu, .asr-language-select, .maus-language-select {
+.provider-select-menu,
+.asr-language-select,
+.maus-language-select {
   font-size: 1rem;
+}
+
+.ocf-control-outer-row {
+  padding-bottom: 5px;
+  padding-top: 5px;
+}
+
+.ocf-group-title {
+  font-size: 1.3rem;
 }

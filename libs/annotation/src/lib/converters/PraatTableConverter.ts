@@ -93,7 +93,7 @@ export class PraatTableConverter extends Converter {
     return undefined;
   }
 
-  override needsOptionsForExport(file: IFile, audiofile: OAudiofile): any {
+  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any {
     return undefined;
   }
 

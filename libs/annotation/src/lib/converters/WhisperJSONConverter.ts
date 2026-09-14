@@ -34,7 +34,7 @@ export class WhisperJSONConverter extends Converter<any, any> {
     return undefined;
   }
 
-  public override needsOptionsForExport(file: IFile, audiofile: OAudiofile) {
+  public override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile) {
     return undefined;
   }
 

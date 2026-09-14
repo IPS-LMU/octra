@@ -1,8 +1,9 @@
-<div class="container-fluid p-3">
+<div class="container-fluid">
   @if (jsonSchema.$gui_support) {
-    <form>
+    <form class="ocf-form">
       <octra-toolconfig-group
         [group]="form"
+        [options]="options"
         (somethingChanged)="onSomethingChanged()"
       ></octra-toolconfig-group>
     </form>

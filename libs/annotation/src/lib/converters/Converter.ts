@@ -82,7 +82,6 @@ export abstract class Converter<I extends object = object, O extends object = ob
   }
 
   protected _multitiers = true;
-  public options: any;
 
   get multitiers(): boolean {
     return this._multitiers;
@@ -117,5 +116,5 @@ export abstract class Converter<I extends object = object, O extends object = ob
    * @param file the transcript file
    * @param audiofile information about the audio file.
    */
-  public abstract needsOptionsForExport(file: IFile, audiofile: OAudiofile): any | undefined;
+  public abstract needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any | undefined;
 }

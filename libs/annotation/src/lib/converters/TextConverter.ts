@@ -1,22 +1,14 @@
 import { OAudiofile } from '@octra/media';
 import { FileInfo } from '@octra/web-media';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
-import {
-  Converter,
-  ExportResult,
-  IFile,
-  ImportResult,
-  OctraAnnotationFormatType,
-} from './Converter';
-import {
-  AnyTextEditor,
-  BASWebservicesApplication,
-  OctraApplication,
-  WordApplication,
-} from './SupportedApplications';
+import { Converter, ExportResult, IFile, ImportResult, OctraAnnotationFormatType } from './Converter';
+import { AnyTextEditor, BASWebservicesApplication, OctraApplication, WordApplication } from './SupportedApplications';
 
 export class TextConverterExportOptions {
   levelNum!: number;
+  showTimestampSamples? = false;
+  showTimestampString? = false;
+  addNewLineString? = false;
 
   constructor(partial?: Partial<TextConverterExportOptions>) {
     if (partial) Object.assign(this, partial);
@@ -26,12 +18,6 @@ export class TextConverterExportOptions {
 // https://clarin.phonetik.uni-muenchen.de/BASWebServices/#/services/WebMAUSBasic
 export class TextConverter extends Converter<any, TextConverterExportOptions> {
   override _name: OctraAnnotationFormatType = 'PlainText';
-
-  public override options = {
-    showTimestampSamples: false,
-    showTimestampString: false,
-    addNewLineString: false,
-  };
 
   public constructor() {
     super();
@@ -91,24 +77,24 @@ export class TextConverter extends Converter<any, TextConverterExportOptions> {
             const sampleEnd = item.sampleStart + item.sampleDur;
             const unixTimestamp = Math.ceil((sampleEnd * 1000) / audiofile.sampleRate);
 
-            if (this.options) {
-              if (this.options.showTimestampString || this.options.showTimestampSamples) {
+            if (options) {
+              if (options.showTimestampString || options.showTimestampSamples) {
                 result += ` <`;
-                if (this.options.showTimestampString) {
+                if (options.showTimestampString) {
                   const endTime = this.convertToTimeString(unixTimestamp, {
                     showHour: true,
                     showMilliSeconds: true,
                   });
                   result += `ts="${endTime}"`;
                 }
-                if (this.options.showTimestampSamples) {
-                  result += this.options.showTimestampString ? ' ' : '';
+                if (options.showTimestampSamples) {
+                  result += options.showTimestampString ? ' ' : '';
                   result += `sp="${sampleEnd}"`;
                 }
                 result += `>`;
               }
 
-              if (this.options.addNewLineString) {
+              if (options.addNewLineString) {
                 result += '\n';
               } else {
                 result += ' ';
@@ -141,7 +127,7 @@ export class TextConverter extends Converter<any, TextConverterExportOptions> {
     return undefined;
   }
 
-  override needsOptionsForExport(file: IFile, audiofile: OAudiofile): any {
+  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any {
     return {
       $gui_support: true,
       type: 'object',
@@ -150,7 +136,25 @@ export class TextConverter extends Converter<any, TextConverterExportOptions> {
           title: 'levelNum',
           type: 'number',
           required: true,
-        }
+        },
+        showTimestampSamples: {
+          title: 'showTimestampSamples',
+          type: 'boolean',
+          required: false,
+          default: false,
+        },
+        showTimestampString: {
+          title: 'showTimestampString',
+          type: 'boolean',
+          required: false,
+          default: false,
+        },
+        addNewLineString: {
+          title: 'addNewLineString',
+          type: 'boolean',
+          required: false,
+          default: false,
+        },
       },
     };
   }
@@ -198,7 +202,7 @@ export class TextConverter extends Converter<any, TextConverterExportOptions> {
 
         while (match !== null) {
           const olabels: OLabel[] = [];
-          let samplePoint = 0;
+          let samplePoint;
           const samplePointIndex = match.findIndex((a) => a === 'sp');
 
           if (samplePointIndex > -1 && samplePointIndex + 1 < match.length) {
@@ -263,19 +267,14 @@ export class TextConverter extends Converter<any, TextConverterExportOptions> {
   }
 
   private timeStringToSamples(timeString: string, sampleRate: number): number {
-    let hours = 0;
-    let minutes = 0;
-    let seconds = 0;
-    let milliseconds = 0;
-
     const regex = new RegExp(/([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{1,3})/g);
     const match = regex.exec(timeString);
 
     if (match !== null && match.length > 4) {
-      hours = Number(match[1]);
-      minutes = Number(match[2]);
-      seconds = Number(match[3]);
-      milliseconds = Number(match[4]);
+      const hours = Number(match[1]);
+      const minutes = Number(match[2]);
+      let seconds = Number(match[3]);
+      const milliseconds = Number(match[4]);
 
       seconds += milliseconds / 1000 + minutes * 60 + hours * 3600;
       return Math.ceil(seconds * sampleRate);

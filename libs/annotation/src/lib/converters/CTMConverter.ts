@@ -82,7 +82,7 @@ export class CTMConverter extends Converter<any, CTMConverterExportOptions> {
     return undefined;
   }
 
-  override needsOptionsForExport(file: IFile, audiofile: OAudiofile): any {
+  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any {
     return {
       $gui_support: true,
       type: 'object',

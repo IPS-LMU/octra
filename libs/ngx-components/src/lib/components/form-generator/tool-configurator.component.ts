@@ -1,14 +1,16 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  ChangeDetectionStrategy
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 import { ToolconfigGroupComponent } from './toolconfig-group/toolconfig-group.component';
+
+export class OctraToolConfiguratorOptions {
+  labelPlacement: 'top' | 'left' = 'top';
+  questionMarkVisibility: 'static' | 'onhover' = 'onhover';
+  showToggles = true;
+
+  constructor(partial?: Partial<OctraToolConfiguratorOptions>) {
+    Object.assign(this, partial);
+  }
+}
 
 @Component({
   selector: 'octra-form-configurator',
@@ -17,23 +19,18 @@ import { ToolconfigGroupComponent } from './toolconfig-group/toolconfig-group.co
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [ToolconfigGroupComponent],
 })
-export class ToolConfiguratorComponent
-  extends SubscriberComponent
-  implements OnChanges
-{
+export class ToolConfiguratorComponent extends SubscriberComponent implements OnChanges {
   @Input() jsonSchema?: any;
   @Input() jsonText?: string;
+  @Input() options = new OctraToolConfiguratorOptions();
+
+  @Output() jsonTextChange = new EventEmitter<string>();
+
   form?: ConfigurationControlGroup;
   json?: any;
   private ownChange = false;
 
-  @Output() jsonTextChange = new EventEmitter<string>();
-
-  private parse(
-    schema: any,
-    json?: any,
-    name?: string,
-  ): (ConfigurationControl | ConfigurationControlGroup)[] {
+  private parse(schema: any, name: string, json?: any): (ConfigurationControl | ConfigurationControlGroup)[] {
     const result: (ConfigurationControl | ConfigurationControlGroup)[] = [];
     const jsonValue = name ? (json ? json[name] : undefined) : undefined;
     const toggleable: boolean = schema['toggleable'] ?? false;
@@ -45,10 +42,10 @@ export class ToolConfiguratorComponent
       if (typeof items === 'object') {
         if (items['type'] === 'string') {
           const control = new ConfigurationArrayControl(
-            name!,
+            name,
             {
               title: schema['title'] ?? name,
-              type: 'text',
+              type: 'array',
               value: jsonValue ?? defaultValue,
               defaultValue,
               description: schema['description'],
@@ -59,16 +56,16 @@ export class ToolConfiguratorComponent
             },
             this.form,
           );
+          control.itemsType = 'text';
 
-          control.toggled =
-            json && name !== undefined && Object.keys(json).includes(name);
+          control.toggled = !this.options.showToggles || !control.toggleable || (json && name !== undefined && Object.keys(json).includes(name));
           result.push(control);
         } else if (items['type'] === 'number') {
           const control = new ConfigurationArrayControl(
-            name!,
+            name,
             {
               title: schema['title'] ?? name,
-              type: 'number',
+              type: 'array',
               value: jsonValue ?? defaultValue,
               defaultValue,
               description: schema['description'],
@@ -79,16 +76,16 @@ export class ToolConfiguratorComponent
             },
             this.form,
           );
-          control.toggled =
-            json && name !== undefined && Object.keys(json).includes(name);
+          control.itemsType = 'number';
+          control.toggled = !this.options.showToggles || !control.toggleable || (json && name !== undefined && Object.keys(json).includes(name));
           result.push(control);
         } else if (items['type'] === 'integer') {
           const control = new ConfigurationArrayControl(
-            name!,
+            name,
             {
               title: schema['title'] ?? name,
               toggleable: schema['toggleable'],
-              type: 'integer',
+              type: 'array',
               value: jsonValue ?? defaultValue,
               defaultValue,
               description: schema['description'],
@@ -98,8 +95,8 @@ export class ToolConfiguratorComponent
             },
             this.form,
           );
-          control.toggled =
-            json && name !== undefined && Object.keys(json).includes(name);
+          control.itemsType = 'integer';
+          control.toggled = !this.options.showToggles || !control.toggleable || (json && Object.keys(json).includes(name));
           result.push(control);
         }
       } else {
@@ -114,14 +111,10 @@ export class ToolConfiguratorComponent
         const value = properties[key];
 
         if (value['properties']) {
-          const group = new ConfigurationControlGroup(
-            value['title'] ?? key,
-            key,
-          );
-          group.controls = this.parse(value, json ? json[key] : undefined, key);
+          const group = new ConfigurationControlGroup(value['title'] ?? key, key, this.parse(value, key, json ? json[key] : undefined));
           result.push(group);
         } else {
-          result.push(...this.parse(value, json, key));
+          result.push(...this.parse(value, key, json));
         }
       }
     } else if (schema['type'] && name) {
@@ -145,8 +138,7 @@ export class ToolConfiguratorComponent
           },
           this.form,
         );
-        control.toggled =
-          json && name !== undefined && Object.keys(json).includes(name);
+        control.toggled = !this.options.showToggles || !control.toggleable || (json && Object.keys(json).includes(name));
         result.push(control);
       } else if (schema['type'] === 'number') {
         const control = new ConfigurationNumberControl(
@@ -163,8 +155,7 @@ export class ToolConfiguratorComponent
           },
           this.form,
         );
-        control.toggled =
-          json && name !== undefined && Object.keys(json).includes(name);
+        control.toggled = !this.options.showToggles || !control.toggleable || (json && Object.keys(json).includes(name));
         result.push(control);
       } else if (schema['type'] === 'integer') {
         const control = new ConfigurationNumberControl(
@@ -181,8 +172,7 @@ export class ToolConfiguratorComponent
           },
           this.form,
         );
-        control.toggled =
-          json && name !== undefined && Object.keys(json).includes(name);
+        control.toggled = !this.options.showToggles || !control.toggleable || (json && Object.keys(json).includes(name));
         result.push(control);
       } else if (schema['type'] === 'string') {
         let control: ConfigurationControl = new ConfigurationSelectControl(
@@ -202,8 +192,7 @@ export class ToolConfiguratorComponent
           },
           this.form,
         );
-        control.toggled =
-          json && name !== undefined && Object.keys(json).includes(name);
+        control.toggled = !this.options.showToggles || !control.toggleable || json && Object.keys(json).includes(name);
 
         if (enumValues) {
           // select
@@ -222,8 +211,7 @@ export class ToolConfiguratorComponent
             },
             this.form,
           );
-          control.toggled =
-            json && name !== undefined && Object.keys(json).includes(name);
+          control.toggled = !this.options.showToggles || !control.toggleable || (json && Object.keys(json).includes(name));
           result.push(control);
         }
       }
@@ -238,11 +226,10 @@ export class ToolConfiguratorComponent
       const schema = schemaChange.currentValue;
 
       if (schema) {
-        this.form = new ConfigurationControlGroup(
-          schema['title'] ?? '',
-          schema['name'] ?? '',
-        );
-        this.form.controls = this.parse(schema, this.json, undefined);
+        const name = schema['name'] ?? '';
+        const group = new ConfigurationControlGroup(schema['title'] ?? '', name, []);
+        this.form = group;
+        group.controls = this.parse(schema, name, this.json);
       }
     }
 
@@ -260,11 +247,10 @@ export class ToolConfiguratorComponent
         }
       }
       if (this.jsonSchema) {
-        this.form = new ConfigurationControlGroup(
-          this.jsonSchema['title'] ?? '',
-          this.jsonSchema['name'] ?? '',
-        );
-        this.form.controls = this.parse(this.jsonSchema, this.json, undefined);
+        const name = this.jsonSchema['name'] ?? '';
+        const group = new ConfigurationControlGroup(this.jsonSchema['title'] ?? '', name, []);
+        this.form = group;
+        group.controls = this.parse(this.jsonSchema, name, this.json);
       }
     } else if (this.ownChange) {
       this.ownChange = false;
@@ -281,15 +267,7 @@ export class ToolConfiguratorComponent
 }
 
 export class ConfigurationControlOptions<R, S = any> {
-  type?:
-    | 'switch'
-    | 'select'
-    | 'number'
-    | 'integer'
-    | 'multiple-choice'
-    | 'text'
-    | 'textarea'
-    | 'array';
+  type?: 'switch' | 'select' | 'number' | 'integer' | 'multiple-choice' | 'text' | 'textarea' | 'array';
   title?: string;
   description?: string;
   value?: R;
@@ -300,19 +278,8 @@ export class ConfigurationControlOptions<R, S = any> {
   context?: S;
 }
 
-export class FixedConfigurationControlOptions<
-  R,
-  S = any,
-> extends ConfigurationControlOptions<R, S> {
-  declare type:
-    | 'switch'
-    | 'select'
-    | 'number'
-    | 'integer'
-    | 'multiple-choice'
-    | 'text'
-    | 'textarea'
-    | 'array';
+export class FixedConfigurationControlOptions<R, S = any> extends ConfigurationControlOptions<R, S> {
+  declare type: 'switch' | 'select' | 'number' | 'integer' | 'multiple-choice' | 'text' | 'textarea' | 'array';
 
   constructor() {
     super();
@@ -382,16 +349,14 @@ export class ConfigurationControl<R = any, S = any> {
 
   toObj(): any {
     const result: any = {};
-    result[this._name] = !this.checkToggleStateOfControl()
-      ? undefined
-      : this._options.value;
+    result[this._name] = !this.checkToggleStateOfControl() ? undefined : this._options.value;
     return result;
   }
 
   checkToggleStateOfControl() {
     if (this.toggleable && !this.toggled) {
       return false;
-    } else if (this.dependsOn.length > 0) {
+    } else if (this.dependsOn && this.dependsOn.length > 0) {
       for (const dependsOnAttributePath of this.dependsOn) {
         const found = this.findControlOfAttributeName(dependsOnAttributePath);
         if (!found?.toggled || !found?.value) {
@@ -399,21 +364,21 @@ export class ConfigurationControl<R = any, S = any> {
         }
       }
       return true;
+    } else if (!this.dependsOn) {
+      return true;
     }
-
     return this.toggled;
   }
 
-  private findControlOfAttributeName(
-    path: string,
-  ): ConfigurationControl | ConfigurationControlGroup | undefined {
+  // TODO missing required attribute in options json schema and form generator
+  // TODO missing validation of json options
+
+  private findControlOfAttributeName(path: string): ConfigurationControl | ConfigurationControlGroup | undefined {
     const splitted = path.split('.').filter((a) => a !== '');
     let pointer: ConfigurationControlGroup = this._root as any;
     for (let i = 0; i < splitted.length; i++) {
       const searchPart = splitted[i];
-      const index = (pointer?.controls ?? []).findIndex(
-        (a) => a.name === searchPart,
-      );
+      const index = (pointer?.controls ?? []).findIndex((a) => a.name === searchPart);
 
       if (index > -1) {
         if (i === splitted.length - 1) {
@@ -639,16 +604,12 @@ export class ConfigurationControlGroup {
     return this.toggled;
   }
 
-  private findControlOfAttributeName(
-    path: string,
-  ): ConfigurationControl | ConfigurationControlGroup | undefined {
+  private findControlOfAttributeName(path: string): ConfigurationControl | ConfigurationControlGroup | undefined {
     const splitted = path.split('.').filter((a) => a !== '');
     let pointer: ConfigurationControlGroup = this.root as any;
     for (let i = 0; i < splitted.length; i++) {
       const searchPart = splitted[i];
-      const index = (pointer?.controls ?? []).findIndex(
-        (a) => a.name === searchPart,
-      );
+      const index = (pointer?.controls ?? []).findIndex((a) => a.name === searchPart);
 
       if (index > -1) {
         if (i === splitted.length - 1) {

@@ -206,12 +206,6 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     this.cd.markForCheck();
   }
 
-  onSelectionChange(converter: Converter, value: any) {
-    if (value !== '') {
-      this.updateParentFormat(converter, value);
-    }
-  }
-
   updateParentFormat(converter: Converter, jsonOptions) {
     const options = JSON.parse(jsonOptions);
 
@@ -248,6 +242,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         } else {
           console.error(`Annotation conversion error: ${result.error}`);
         }
+        this.cd.markForCheck();
       });
     }
     this.cd.markForCheck();
@@ -300,11 +295,6 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
       const url = this.parentformat.uri.toString();
       window.URL.revokeObjectURL(url);
     }
-    this.cd.markForCheck();
-  }
-
-  onPlaintextTimestampOptionChanged(converter: Converter) {
-    this.updateParentFormat(converter, this.selectedLevel);
     this.cd.markForCheck();
   }
 }

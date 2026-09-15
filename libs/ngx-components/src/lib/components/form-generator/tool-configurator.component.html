@@ -1,6 +1,6 @@
 <div class="container-fluid">
   @if (jsonSchema.$gui_support) {
-    <form class="ocf-form" #ngForm=ngForm (ngSubmit)="ngSubmit.next($event)">
+    <form class="ocf-form" #ngForm=ngForm (ngSubmit)="ngSubmit.next($event)" (change)="formChange($event)">
       <octra-toolconfig-group
         [group]="form"
         [options]="options"

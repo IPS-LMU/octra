@@ -74,31 +74,32 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
       value: string;
     }[] = [];
 
-    const transform = (speaker: string, transcript: string)=> {
-      return options?.transformTranscriptionUnit ? options.transformTranscriptionUnit.replace(`{{SPEAKER}}`, speaker).replace("{{TRANSCRIPT}}", transcript) : transcript;
-    }
+    const transform = (speaker: string, transcript: string) => {
+      return options?.transformTranscriptionUnit
+        ? options.transformTranscriptionUnit.replace(`{{SPEAKER}}`, speaker).replace('{{TRANSCRIPT}}', transcript)
+        : transcript;
+    };
 
     // prepare all transcripts
     for (let i = 0; i < annotation.levels.length; i++) {
       const level = annotation.levels[i];
 
-      if((options?.exportLevels ?? []).includes(level.name))
+      if ((options?.exportLevels ?? []).includes(level.name))
+        if (level.type === 'SEGMENT' && !this.EXPORT_EXCLUDED_LEVEL_NAMES.includes(level.name.toLowerCase())) {
+          for (const item of level.items as OSegment[]) {
+            const speaker = item.labels.find((a) => a.name.toLowerCase() === 'speaker')?.value || level.name;
+            const value = (item.getFirstLabelWithoutName('Speaker')?.value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-      if (level.type === 'SEGMENT' && !this.EXPORT_EXCLUDED_LEVEL_NAMES.includes(level.name.toLowerCase())) {
-        for (const item of level.items as OSegment[]) {
-          const speaker = item.labels.find((a) => a.name.toLowerCase() === 'speaker')?.value || level.name;
-          const value = (item.getFirstLabelWithoutName('Speaker')?.value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-          if (value !== '') {
-            transcripts.push({
-              sampleStart: item.sampleStart,
-              sampleDur: item.sampleDur,
-              value,
-              speaker,
-            });
+            if (value !== '') {
+              transcripts.push({
+                sampleStart: item.sampleStart,
+                sampleDur: item.sampleDur,
+                value,
+                speaker,
+              });
+            }
           }
         }
-      }
     }
 
     transcripts.sort((a, b) => a.sampleStart - b.sampleStart);
@@ -110,7 +111,7 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
 
       result += `${i + 1}\n`;
       result += `${start} --> ${end}\n`;
-      result += transform(transcript.speaker, transcript.value) + "\n\n";
+      result += transform(transcript.speaker, transcript.value) + '\n\n';
     }
 
     filename = `${annotation.name}${this._extensions[0]}`;
@@ -160,12 +161,11 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
     return {
       $gui_support: true,
       type: 'object',
+      required: ['exportLevels', 'transformTranscriptionUnit', "test"],
       properties: {
         exportLevels: {
           title: 'exportLevels',
           type: 'array',
-          toggleable: true,
-          required: true,
           default: [...annotation.levels.map((a) => a.name)],
           items: {
             type: 'string',
@@ -179,8 +179,30 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
           type: 'string',
           dependsOn: ['exportLevels'],
           default: '[{{SPEAKER}}]: {{TRANSCRIPT}}',
-          required: true,
           description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
+        },
+        test: {
+          type: 'object',
+          required: ['exportLevels2', 'transformTranscriptionUnit2'],
+          properties: {
+            exportLevels2: {
+              title: 'exportLevels2',
+              type: 'array',
+              default: [...annotation.levels.map((a) => a.name)],
+              items: {
+                type: 'string',
+                enum: [...annotation.levels.map((a) => a.name)],
+                title: 'Level Name',
+              },
+              description: 'Defines an array of level indices for export.',
+            },
+            transformTranscriptionUnit2: {
+              title: 'transformTranscriptionUnit2',
+              type: 'string',
+              default: '[{{SPEAKER}}]: {{TRANSCRIPT}}',
+              description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
+            },
+          },
         },
       },
     };

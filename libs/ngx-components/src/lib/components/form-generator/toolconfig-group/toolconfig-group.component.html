@@ -1,244 +1,226 @@
-@if (group !== undefined) {
-  @if (group!.title) {
-    <h4 class="ocf-group-title">{{ group!.title }}</h4>
-  }
-  @for (control of group!.controls; track control.id) {
-    @if (control.type === 'switch' && !control.ignore) {
-      <ng-container
-        *ngTemplateOutlet="
-          controlRow;
-          context: {
-            control: control,
-            content: switchContent,
-            options: options,
-            showTitle: options.labelPlacement === 'left',
-            labelFor: 'switch-' + control.id,
-          }
-        "
-      ></ng-container>
-      <ng-template #switchContent let-control="control">
-        <div class="form-check form-switch ocf-form-switch">
+<div class="ocf-control-group">
+  @if (group !== undefined) {
+    @if (group!.title) {
+      <h4 class="ocf-group-title">{{ group!.title }}</h4>
+    }
+    @for (control of group!.controls; track control.id) {
+      @if (control.type === 'switch' && !control.ignore) {
+        <ng-container
+          *ngTemplateOutlet="
+            controlRow;
+            context: {
+              control: control,
+              content: switchContent,
+              options: options,
+              showTitle: options.labelPlacement === 'left',
+              labelFor: 'switch-' + control.id,
+            }
+          "
+        ></ng-container>
+        <ng-template #switchContent let-control="control">
+          <div class="form-check form-switch ocf-form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              [id]="'switch-' + control.id"
+              [disabled]="!control.checkToggleStateOfControl()"
+              [required]="control.required"
+              [name]="'switch_' + control.id"
+              (focusin)="control.focused = true"
+              (focusout)="control.focused = false"
+              [(ngModel)]="control.value"
+              (ngModelChange)="somethingChanged.emit()"
+            />
+            @if (options.labelPlacement === 'top') {
+              <label
+                class="form-check-label mb-0 ocf-form-check-label"
+                [for]="'switch-' + control.id"
+                [ngClass]="{
+                  'opacity-50': !control.checkToggleStateOfControl(),
+                }"
+              >
+                {{ control.title }}
+              </label>
+            }
+          </div>
+        </ng-template>
+      }
+      @if ((control.type === 'number' || control.type === 'integer') && !control.ignore) {
+        <ng-container
+          *ngTemplateOutlet="
+            controlRow;
+            context: { control: control, content: numberContent, options: options, showTitle: true, labelFor: 'number-' + control.id }
+          "
+        ></ng-container>
+        <ng-template #numberContent let-control="control">
           <input
-            class="form-check-input"
-            type="checkbox"
-            role="switch"
-            [id]="'switch-' + control.id"
+            type="number"
+            class="form-control ocf-form-control"
+            [id]="'number-' + control.id"
+            [name]="'number_' + control.id"
+            [step]="control.type === 'integer' ? 1 : 0.1"
             [disabled]="!control.checkToggleStateOfControl()"
             [required]="control.required"
-            [name]="'switch_' + control.id"
             (focusin)="control.focused = true"
             (focusout)="control.focused = false"
             [(ngModel)]="control.value"
             (ngModelChange)="somethingChanged.emit()"
           />
-          @if (options.labelPlacement === 'top') {
-            <label
-              class="form-check-label mb-0 ocf-form-check-label"
-              [for]="'switch-' + control.id"
-              [ngClass]="{
-                'opacity-50': !control.checkToggleStateOfControl(),
-              }"
-            >
-              {{ control.title }}
-            </label>
-          }
-        </div>
-      </ng-template>
-    }
-    @if ((control.type === 'number' || control.type === 'integer') && !control.ignore) {
-      <ng-container
-        *ngTemplateOutlet="
-          controlRow;
-          context: { control: control, content: numberContent, options: options, showTitle: true, labelFor: 'number-' + control.id }
-        "
-      ></ng-container>
-      <ng-template #numberContent let-control="control">
-        <input
-          type="number"
-          class="form-control ocf-form-control"
-          [id]="'number-' + control.id"
-          [name]="'number_' + control.id"
-          [step]="control.type === 'integer' ? 1 : 0.1"
-          [disabled]="!control.checkToggleStateOfControl()"
-          [required]="control.required"
-          (focusin)="control.focused = true"
-          (focusout)="control.focused = false"
-          [(ngModel)]="control.value"
-          (ngModelChange)="somethingChanged.emit()"
-        />
-      </ng-template>
-    }
-    @if (control.type === 'text' && !control.ignore) {
-      <ng-container
-        *ngTemplateOutlet="
-          controlRow;
-          context: { control: control, content: textContent, options: options, showTitle: true, labelFor: 'text-' + control.id }
-        "
-      ></ng-container>
-      <ng-template #textContent let-control="control">
-        <input
-          type="text"
-          class="form-control"
-          [id]="'text-' + control.id"
-          [name]="'text-' + control.id"
-          [disabled]="!control.checkToggleStateOfControl()"
-          [required]="control.required"
-          (focusin)="control.focused = true"
-          (focusout)="control.focused = false"
-          [(ngModel)]="control.value"
-          (ngModelChange)="somethingChanged.emit()"
-        />
-      </ng-template>
-    }
-    @if (control.type === 'select' && !control.ignore) {
-      <ng-container
-        *ngTemplateOutlet="
-          controlRow;
-          context: { control: control, content: selectContent, options: options, showTitle: true, labelFor: 'select-' + control.id }
-        "
-      ></ng-container>
-      <ng-template #selectContent let-control="control">
-        <select
-          [id]="'select-' + control.id"
-          class="form-select"
-          [(ngModel)]="control.value"
-          (ngModelChange)="somethingChanged.emit()"
-          [disabled]="!control.checkToggleStateOfControl()"
-          [required]="control.required"
-          [name]="'select-' + control.id"
-          (focusin)="control.focused = true"
-          (focusout)="control.focused = false"
-        >
-          <option value="undefined">Nothing selected</option>
-          @for (option of control.context; track option) {
-            <option [value]="option.value">{{ option.label }}</option>
-          }
-        </select>
-      </ng-template>
-    }
-    @if (control.type === 'array' && !control.ignore) {
-      <ng-container
-        *ngTemplateOutlet="
-          controlRow;
-          context: { control: control, content: arrayContent, options: options, showTitle: true, labelFor: 'array-' + control.id }
-        "
-      ></ng-container>
-      <ng-template #arrayContent let-control="control">
-        <div
-          class="border border-1 p-1 rounded rounded-3 array-control-items-list"
-          [ngClass]="{
-            disabled: !control.checkToggleStateOfControl(),
-          }"
-        >
-          <div class="row p-0 align-items-center" (mouseenter)="control.focused = true">
-            <div class="col" (mouseenter)="control.focused = true" [id]="'array-' + control.id">
-              @if (control.value !== undefined && control.value.length > 0) {
-                @if (control.itemsType === 'text' || control.itemsType === 'number' || control.itemsType === 'integer') {
-                  @for (item of control.value; track item; let i = $index) {
-                    <div class="array-item">
-                      <span class="me-1">{{ item }}</span>
-                      @if (control.checkToggleStateOfControl()) {
-                        <i class="bi bi-x-lg pointer" (click)="onArrayItemDelete(control, i)"></i>
-                      }
-                    </div>
-                  }
-                }
-              }
-            </div>
-            <div class="col-auto" (mouseenter)="control.focused = true">
-              <octra-toolconfig-array-adder
-                (itemsAdd)="onArrayItemAdd(control, $event)"
-                [type]="control.itemsType"
-                [disabled]="!control.checkToggleStateOfControl()"
-                [items]="control.context"
-              ></octra-toolconfig-array-adder>
-            </div>
-          </div>
-        </div>
-      </ng-template>
-    }
+        </ng-template>
+      }
+      @if (control.type === 'text' && !control.ignore) {
+        <ng-container
+          *ngTemplateOutlet="
+            controlRow;
+            context: { control: control, content: textContent, options: options, showTitle: true, labelFor: 'text-' + control.id }
+          "
+        ></ng-container>
+        <ng-template #textContent let-control="control">
+          <input
+            type="text"
+            class="form-control"
+            [id]="'text-' + control.id"
+            [name]="'text-' + control.id"
+            [disabled]="!control.checkToggleStateOfControl()"
+            [required]="control.required"
+            (focusin)="control.focused = true"
+            (focusout)="control.focused = false"
+            [(ngModel)]="control.value"
+            (ngModelChange)="somethingChanged.emit()"
+          />
+        </ng-template>
+      }
+      @if (control.type === 'select' && !control.ignore) {
+        <ng-container
+          *ngTemplateOutlet="
+            controlRow;
+            context: { control: control, content: selectContent, options: options, showTitle: true, labelFor: 'select-' + control.id }
+          "
+        ></ng-container>
+        <ng-template #selectContent let-control="control">
+          <select
+            [id]="'select-' + control.id"
+            class="form-select"
+            [(ngModel)]="control.value"
+            (ngModelChange)="somethingChanged.emit()"
+            [disabled]="!control.checkToggleStateOfControl()"
+            [required]="control.required"
+            [name]="'select-' + control.id"
+            (focusin)="control.focused = true"
+            (focusout)="control.focused = false"
+          >
+            <option value="undefined">Nothing selected</option>
+            @for (option of control.context; track option) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </ng-template>
+      }
+      @if (control.type === 'array' && !control.ignore) {
+        <ng-container
+          *ngTemplateOutlet="
+            controlRow;
+            context: { control: control, content: arrayContent, options: options, showTitle: true, labelFor: 'array-' + control.id }
+          "
+        ></ng-container>
+        <ng-template #arrayContent let-control="control">
+          <octra-toolconfig-array-control
+            [id]="'array-' + control.id"
+            [name]="'array_' + control.id"
+            [itemsType]="control.itemsType"
+            [items]="control.context"
+            [required]="control.required"
+            [disabled]="!control.checkToggleStateOfControl()"
+            [(ngModel)]="control.value"
+            (ngModelChange)="somethingChanged.emit()"
+          ></octra-toolconfig-array-control>
+        </ng-template>
+      }
 
-    @if (control.type === 'group') {
-      <octra-toolconfig-group
-        [group]="control"
-        class="mt-4 mb-4"
-        [options]="options"
-        (somethingChanged)="somethingChanged.emit()"
-      ></octra-toolconfig-group>
+      @if (control.type === 'group') {
+        <octra-toolconfig-group
+          [group]="control"
+          class="mt-4 mb-4"
+          [options]="options"
+          (somethingChanged)="somethingChanged.emit()"
+        ></octra-toolconfig-group>
+      }
     }
   }
-}
 
-<ng-template #controlRow let-control="control" let-content="content" let-options="options" let-showTitle="showTitle" let-labelFor="labelFor">
-  <ng-template #toggle let-control="control" let-visible="visible">
-    <div
-      class="form-check mb-0 ocf-form-check"
-      [ngStyle]="{
-        visibility: visible ? 'inherit' : 'hidden',
-      }"
-    >
-      <input
-        class="form-check-input ocf-form-check-input"
-        type="checkbox"
-        [id]="'check_toggleable_' + control.id"
-        [name]="'check_toggleable_' + control.id"
-        [(ngModel)]="control.toggled"
-        (ngModelChange)="somethingChanged.emit()"
-      />
-    </div>
-  </ng-template>
-
-  <div class="row align-items-center ocf-control-outer-row" (mouseenter)="control.focused = true" (mouseleave)="control.focused = false">
-    @if (options.showToggles && options.labelPlacement === 'top') {
-      <div class="col-auto">
-        <ng-container *ngTemplateOutlet="toggle; context: { control: control, options: options, visible: control.toggleable }"></ng-container>
+  <ng-template #controlRow let-control="control" let-content="content" let-options="options" let-showTitle="showTitle" let-labelFor="labelFor">
+    <ng-template #toggle let-control="control" let-visible="visible">
+      <div
+        class="form-check mb-0 ocf-form-check"
+        [ngStyle]="{
+          visibility: visible ? 'inherit' : 'hidden',
+        }"
+      >
+        <input
+          class="form-check-input ocf-form-check-input"
+          type="checkbox"
+          [id]="'check_toggleable_' + control.id"
+          [name]="'check_toggleable_' + control.id"
+          [(ngModel)]="control.toggled"
+          (ngModelChange)="somethingChanged.emit()"
+        />
       </div>
-    }
-    <div class="col-md">
-      <div class="row g-0 align-items-center">
-        <div
-          [ngClass]="{
-            'col-md-3': options.labelPlacement === 'left',
-            'col-md-12': options.labelPlacement === 'top',
-          }"
-        >
-          <div class="d-flex flex-row flex-auto align-items-center">
-            @if (options.labelPlacement === 'left' && options.showToggles && control.toggleable) {
-              <ng-container *ngTemplateOutlet="toggle; context: { control: control, options: options, visibility: true }"></ng-container>
-            }
+    </ng-template>
 
-            @if (showTitle) {
-              <label
-                class="form-check-label mb-0 ocf-form-check-label"
-                [for]="labelFor"
-                [ngClass]="{
-                  'opacity-50': !control.checkToggleStateOfControl(),
-                }"
-              >
-                <span>{{ control.title }}</span>
-                @if (control.required) {
-                  <span class="text-danger">*</span>
-                }
-              </label>
-            }
+    <div class="row g-3 align-items-center ocf-control-outer-row" (mouseenter)="control.focused = true" (mouseleave)="control.focused = false">
+      @if (options.showToggles && options.labelPlacement === 'top') {
+        <div class="col-auto">
+          <ng-container *ngTemplateOutlet="toggle; context: { control: control, options: options, visible: control.toggleable }"></ng-container>
+        </div>
+      }
+      <div class="col-md order-1 order-md-0">
+        <div class="row col-12 g-0 align-items-center">
+          <div
+            [ngClass]="{
+              'col-md-3': options.labelPlacement === 'left',
+              'col-md-12': options.labelPlacement === 'top',
+            }"
+          >
+            <div class="d-flex flex-row flex-auto align-items-center">
+              @if (options.labelPlacement === 'left' && options.showToggles && control.toggleable) {
+                <ng-container *ngTemplateOutlet="toggle; context: { control: control, options: options, visibility: true }"></ng-container>
+              }
+
+              @if (showTitle) {
+                <label
+                  class="form-check-label mb-0 ocf-form-check-label"
+                  [for]="labelFor"
+                  [ngClass]="{
+                    'opacity-50': !control.checkToggleStateOfControl(),
+                  }"
+                >
+                  <span class="ocf-control-title">{{ control.title }}</span>
+                  @if (control.required) {
+                    <span class="text-danger ms-1">*</span>
+                  }
+                </label>
+              }
+            </div>
+          </div>
+          <div class="col-12 col-md">
+            <ng-container *ngTemplateOutlet="content; context: { control: control }"></ng-container>
           </div>
         </div>
-        <div class="col-md">
-          <ng-container *ngTemplateOutlet="content; context: { control: control }"></ng-container>
-        </div>
+      </div>
+      <div class="col col-md-auto text-end text-md-center order-0 order-md-1">
+        <octra-question-mark
+          [text]="control.description"
+          class="ocf-octra-question-mark"
+          [ngStyle]="{
+            visibility:
+              (control.description && options.questionMarkVisibility === 'static') ||
+              (options.questionMarkVisibility === 'onhover' && control.focused)
+                ? 'visible'
+                : 'hidden',
+          }"
+        ></octra-question-mark>
       </div>
     </div>
-    <div class="col-md-auto">
-      <octra-question-mark
-        [text]="control.description"
-        class="ocf-octra-question-mark"
-        [ngStyle]="{
-          visibility:
-            (control.description && options.questionMarkVisibility === 'static') || (options.questionMarkVisibility === 'onhover' && control.focused)
-              ? 'visible'
-              : 'hidden',
-        }"
-      ></octra-question-mark>
-    </div>
-  </div>
-</ng-template>
+  </ng-template>
+</div>

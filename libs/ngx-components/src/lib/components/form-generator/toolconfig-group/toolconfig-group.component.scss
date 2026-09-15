@@ -1,5 +1,4 @@
-:host {
-  display: block;
+.ocf-control-group {
 }
 
 /*
@@ -9,21 +8,10 @@
 }
  */
 
-.array-item {
-  user-focus: none;
-  user-select: none;
-  display: inline-block;
-  padding: 5px;
-  background-color: whitesmoke;
-  border-radius: 5px;
-  margin-right: 5px;
-  font-size: 0.9rem;
-}
-
-.array-control-items-list.disabled {
-  background-color: var(--bs-secondary-bg);
-}
-
 .ocf-group-title {
   margin-top: 20px;
+}
+
+.ocf-control-title {
+  font-weight: 500;
 }

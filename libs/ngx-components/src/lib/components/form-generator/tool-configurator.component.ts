@@ -1,7 +1,9 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { SubscriberComponent } from '@octra/ngx-utilities';
-import { ToolconfigGroupComponent } from './toolconfig-group/toolconfig-group.component';
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
+import { SubscriberComponent } from '@octra/ngx-utilities';
+import Ajv from 'ajv';
+import { timer } from 'rxjs';
+import { ToolconfigGroupComponent } from './toolconfig-group/toolconfig-group.component';
 
 export class OctraToolConfiguratorOptions {
   labelPlacement: 'top' | 'left' = 'top';
@@ -20,7 +22,7 @@ export class OctraToolConfiguratorOptions {
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [ToolconfigGroupComponent, FormsModule],
 })
-export class ToolConfiguratorComponent extends SubscriberComponent implements OnChanges {
+export class ToolConfiguratorComponent extends SubscriberComponent implements OnChanges, AfterViewInit {
   @Input() jsonSchema?: any;
   @Input() jsonText?: string;
   @Input() options = new OctraToolConfiguratorOptions();
@@ -31,13 +33,13 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
   }>();
   @Output() ngSubmit = new EventEmitter<any>();
 
-  @ViewChild("ngForm") ngForm!: NgForm;
+  @ViewChild('ngForm') ngForm!: NgForm;
 
   form?: ConfigurationControlGroup;
   json?: any;
   private ownChange = false;
 
-  private parse(schema: any, name: string, json?: any): (ConfigurationControl | ConfigurationControlGroup)[] {
+  private parse(schema: any, name: string, parent?: any, json?: any): (ConfigurationControl | ConfigurationControlGroup)[] {
     const result: (ConfigurationControl | ConfigurationControlGroup)[] = [];
     const jsonValue = name ? (json ? json[name] : undefined) : undefined;
     const toggleable: boolean = schema['toggleable'] ?? false;
@@ -60,7 +62,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               context: items['enum'],
               dependsOn: schema['dependsOn'],
               toggleable: schema['toggleable'],
-              required: schema['required'],
+              required: this.checkIfRequired(name, parent['required']),
             },
             this.form,
           );
@@ -81,7 +83,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               context: items['enum'],
               dependsOn: schema['dependsOn'],
               toggleable: schema['toggleable'],
-              required: items['required'],
+              required: this.checkIfRequired(name, parent['required']),
             },
             this.form,
           );
@@ -101,7 +103,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               dependsOn: schema['dependsOn'],
               ignore: false,
               context: items['enum'],
-              required: items['required'],
+              required: this.checkIfRequired(name, parent['required']),
             },
             this.form,
           );
@@ -121,10 +123,10 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
         const value = properties[key];
 
         if (value['properties']) {
-          const group = new ConfigurationControlGroup(value['title'] ?? key, key, this.parse(value, key, json ? json[key] : undefined));
+          const group = new ConfigurationControlGroup(value['title'], key, this.parse(value, key, schema, json ? json[key] : undefined));
           result.push(group);
         } else {
-          result.push(...this.parse(value, key, json));
+          result.push(...this.parse(value, key, schema, json));
         }
       }
     } else if (schema['type'] && name) {
@@ -145,7 +147,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
             ignore,
             dependsOn,
             toggleable,
-            required: schema['required'],
+            required: this.checkIfRequired(name, parent['required']),
           },
           this.form,
         );
@@ -163,7 +165,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
             dependsOn,
             toggleable,
             ignore,
-            required: schema['required'],
+            required: this.checkIfRequired(name, parent['required']),
           },
           this.form,
         );
@@ -181,7 +183,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
             ignore,
             toggleable,
             dependsOn,
-            required: schema['required'],
+            required: this.checkIfRequired(name, parent['required']),
           },
           this.form,
         );
@@ -202,7 +204,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               label: a,
               value: a,
             })),
-            required: schema['required'],
+            required: this.checkIfRequired(name, parent['required']),
           },
           this.form,
         );
@@ -222,7 +224,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               ignore,
               toggleable,
               dependsOn,
-              required: schema['required'],
+              required: this.checkIfRequired(name, parent['required']),
             },
             this.form,
           );
@@ -235,6 +237,14 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
     return result;
   }
 
+  checkIfRequired(search: string, requiredArray: string[] | undefined) {
+    return requiredArray !== undefined && requiredArray !== null && requiredArray.length > 0 && requiredArray.includes(search);
+  }
+
+  ngAfterViewInit() {
+    this.onSomethingChanged();
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     const schemaChange = changes['jsonSchema'];
     if (schemaChange) {
@@ -244,7 +254,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
         const name = schema['name'] ?? '';
         const group = new ConfigurationControlGroup(schema['title'] ?? '', name, []);
         this.form = group;
-        group.controls = this.parse(schema, name, this.json);
+        group.controls = this.parse(schema, name, undefined, this.json);
       }
     }
 
@@ -265,7 +275,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
         const name = this.jsonSchema['name'] ?? '';
         const group = new ConfigurationControlGroup(this.jsonSchema['title'] ?? '', name, []);
         this.form = group;
-        group.controls = this.parse(this.jsonSchema, name, this.json);
+        group.controls = this.parse(this.jsonSchema, name, undefined, this.json);
       }
     } else if (this.ownChange) {
       this.ownChange = false;
@@ -277,14 +287,27 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
       const json = this.form.toObj();
       this.ownChange = true;
       this.jsonTextChange.emit(JSON.stringify(json, null, 2));
-      this.validationChange.next({
-        valid: this.ngForm.valid && this.validateJSON(json, this.jsonSchema),
+
+      this.subscribe(timer(0), {
+        next: () => {
+          const jsonValid = this.validateJSON(json, this.jsonSchema);
+          this.validationChange.next({
+            valid: this.ngForm.valid && jsonValid,
+          });
+        },
       });
     }
   }
 
-  private validateJSON(json : any, schema: any){
-    return true;
+  formChange(event: any) {
+    console.log(event);
+  }
+
+  private validateJSON(json: any, schema: any) {
+    const ajv = new Ajv({ allErrors: true, strict: 'log' }); // options can be passed, e.g. {allErrors: true}
+    const validate = ajv.compile(schema);
+    validate(json);
+    return !validate.errors || validate.errors.length === 0;
   }
 }
 
@@ -396,9 +419,6 @@ export class ConfigurationControl<R = any, S = any> {
     }
     return this.toggled;
   }
-
-  // TODO missing required attribute in options json schema and form generator
-  // TODO missing validation of json options
 
   private findControlOfAttributeName(path: string): ConfigurationControl | ConfigurationControlGroup | undefined {
     const splitArray = path.split('.').filter((a) => a !== '');

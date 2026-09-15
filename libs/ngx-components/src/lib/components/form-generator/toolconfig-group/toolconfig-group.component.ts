@@ -1,6 +1,6 @@
 import { NgClass, NgStyle, NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, Input, Output, ViewEncapsulation } from '@angular/core';
+import { ControlContainer, FormsModule } from '@angular/forms';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 import { QuestionMarkComponent } from '../../question-mark/question-mark.component';
 import { ToolConfigArrayAdderComponent } from '../array-adder/toolconfig-array-adder.component';
@@ -13,6 +13,15 @@ import { ConfigurationControlGroup, OctraToolConfiguratorOptions } from '../tool
   changeDetection: ChangeDetectionStrategy.Eager,
   encapsulation: ViewEncapsulation.None,
   imports: [QuestionMarkComponent, NgStyle, FormsModule, NgClass, ToolConfigArrayAdderComponent, NgTemplateOutlet],
+  // Bridges the ancestor <form>'s NgForm into this component's view: NgModel injects its
+  // ControlContainer parent with @Host(), which stops at the component boundary, so without
+  // this the inputs here would never register with the outer NgForm and it would stay "valid".
+  viewProviders: [
+    {
+      provide: ControlContainer,
+      useFactory: () => inject(ControlContainer, { skipSelf: true }),
+    },
+  ],
 })
 export class ToolconfigGroupComponent extends SubscriberComponent {
   @Input() group?: ConfigurationControlGroup;

@@ -92,7 +92,7 @@
                       <octra-form-configurator
                         [jsonSchema]="exportStates[i].options"
                         [(jsonText)]="jsonText"
-                        (validationChange)="exportStates[i].validOptions = $event.valid"
+                        (validationChange)="onValidationChange($event, i)"
                         [options]="{
                           labelPlacement: 'top',
                           questionMarkVisibility: 'onhover',

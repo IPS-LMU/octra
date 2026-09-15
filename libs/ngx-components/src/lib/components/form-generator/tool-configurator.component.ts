@@ -304,7 +304,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
   }
 
   private validateJSON(json: any, schema: any) {
-    const ajv = new Ajv({ allErrors: true, strict: 'log' }); // options can be passed, e.g. {allErrors: true}
+    const ajv = new Ajv({ allErrors: true, strict: false }); // options can be passed, e.g. {allErrors: true}
     const validate = ajv.compile(schema);
     validate(json);
     return !validate.errors || validate.errors.length === 0;

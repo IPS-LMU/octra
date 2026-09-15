@@ -206,6 +206,11 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     this.cd.markForCheck();
   }
 
+  onValidationChange($event: any, index: number) {
+    this.exportStates[index].validOptions = $event.valid;
+    this.cd.markForCheck();
+  }
+
   updateParentFormat(converter: Converter, jsonOptions) {
     const options = JSON.parse(jsonOptions);
 

@@ -24,6 +24,7 @@
             role="switch"
             [id]="'switch-' + control.id"
             [disabled]="!control.checkToggleStateOfControl()"
+            [required]="control.required"
             [name]="'switch_' + control.id"
             (focusin)="control.focused = true"
             (focusout)="control.focused = false"
@@ -59,6 +60,7 @@
           [name]="'number_' + control.id"
           [step]="control.type === 'integer' ? 1 : 0.1"
           [disabled]="!control.checkToggleStateOfControl()"
+          [required]="control.required"
           (focusin)="control.focused = true"
           (focusout)="control.focused = false"
           [(ngModel)]="control.value"
@@ -80,6 +82,7 @@
           [id]="'text-' + control.id"
           [name]="'text-' + control.id"
           [disabled]="!control.checkToggleStateOfControl()"
+          [required]="control.required"
           (focusin)="control.focused = true"
           (focusout)="control.focused = false"
           [(ngModel)]="control.value"
@@ -101,6 +104,7 @@
           [(ngModel)]="control.value"
           (ngModelChange)="somethingChanged.emit()"
           [disabled]="!control.checkToggleStateOfControl()"
+          [required]="control.required"
           [name]="'select-' + control.id"
           (focusin)="control.focused = true"
           (focusout)="control.focused = false"
@@ -123,8 +127,8 @@
         <div
           class="border border-1 p-1 rounded rounded-3 array-control-items-list"
           [ngClass]="{
-              disabled: !control.checkToggleStateOfControl(),
-            }"
+            disabled: !control.checkToggleStateOfControl(),
+          }"
         >
           <div class="row p-0 align-items-center" (mouseenter)="control.focused = true">
             <div class="col" (mouseenter)="control.focused = true" [id]="'array-' + control.id">
@@ -201,6 +205,7 @@
             @if (options.labelPlacement === 'left' && options.showToggles && control.toggleable) {
               <ng-container *ngTemplateOutlet="toggle; context: { control: control, options: options, visibility: true }"></ng-container>
             }
+
             @if (showTitle) {
               <label
                 class="form-check-label mb-0 ocf-form-check-label"
@@ -209,7 +214,10 @@
                   'opacity-50': !control.checkToggleStateOfControl(),
                 }"
               >
-                {{ control.title }}
+                <span>{{ control.title }}</span>
+                @if (control.required) {
+                  <span class="text-danger">*</span>
+                }
               </label>
             }
           </div>

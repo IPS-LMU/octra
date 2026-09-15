@@ -156,9 +156,6 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
     };
   }
 
-  // TODO add toggleable
-  // TODO add dependsOn
-
   override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any {
     return {
       $gui_support: true,
@@ -168,6 +165,8 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
           title: 'exportLevels',
           type: 'array',
           toggleable: true,
+          required: true,
+          default: [...annotation.levels.map((a) => a.name)],
           items: {
             type: 'string',
             enum: [...annotation.levels.map((a) => a.name)],
@@ -180,6 +179,7 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
           type: 'string',
           dependsOn: ['exportLevels'],
           default: '[{{SPEAKER}}]: {{TRANSCRIPT}}',
+          required: true,
           description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
         },
       },

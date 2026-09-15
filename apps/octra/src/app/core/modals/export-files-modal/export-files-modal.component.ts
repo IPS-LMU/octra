@@ -41,6 +41,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   public exportStates: {
     status: string;
     options: any;
+    validOptions: boolean;
     value: any;
   }[] = [];
   public preparing = {
@@ -143,6 +144,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
 
       this.exportStates.push({
         status: 'close',
+        validOptions: false,
         options: converter.needsOptionsForExport(oannotjson, this.audio.audioManager.resource.getOAudioFile()),
         value: {},
       });

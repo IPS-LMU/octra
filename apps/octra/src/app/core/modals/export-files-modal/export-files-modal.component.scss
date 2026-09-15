@@ -46,3 +46,8 @@ progressbar {
   margin-left: 2px !important;
   white-space: nowrap;
 }
+
+.btn.disabled {
+  color: white;
+  opacity: 0.5;
+}

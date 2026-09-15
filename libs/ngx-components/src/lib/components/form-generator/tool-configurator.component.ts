@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 import { ToolconfigGroupComponent } from './toolconfig-group/toolconfig-group.component';
+import { FormsModule, NgForm } from '@angular/forms';
 
 export class OctraToolConfiguratorOptions {
   labelPlacement: 'top' | 'left' = 'top';
@@ -17,7 +18,7 @@ export class OctraToolConfiguratorOptions {
   templateUrl: './tool-configurator.component.html',
   styleUrls: ['./tool-configurator.component.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [ToolconfigGroupComponent],
+  imports: [ToolconfigGroupComponent, FormsModule],
 })
 export class ToolConfiguratorComponent extends SubscriberComponent implements OnChanges {
   @Input() jsonSchema?: any;
@@ -25,6 +26,12 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
   @Input() options = new OctraToolConfiguratorOptions();
 
   @Output() jsonTextChange = new EventEmitter<string>();
+  @Output() validationChange = new EventEmitter<{
+    valid: boolean;
+  }>();
+  @Output() ngSubmit = new EventEmitter<any>();
+
+  @ViewChild("ngForm") ngForm!: NgForm;
 
   form?: ConfigurationControlGroup;
   json?: any;
@@ -53,6 +60,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               context: items['enum'],
               dependsOn: schema['dependsOn'],
               toggleable: schema['toggleable'],
+              required: schema['required'],
             },
             this.form,
           );
@@ -73,6 +81,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               context: items['enum'],
               dependsOn: schema['dependsOn'],
               toggleable: schema['toggleable'],
+              required: items['required'],
             },
             this.form,
           );
@@ -92,6 +101,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               dependsOn: schema['dependsOn'],
               ignore: false,
               context: items['enum'],
+              required: items['required'],
             },
             this.form,
           );
@@ -135,6 +145,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
             ignore,
             dependsOn,
             toggleable,
+            required: schema['required'],
           },
           this.form,
         );
@@ -152,6 +163,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
             dependsOn,
             toggleable,
             ignore,
+            required: schema['required'],
           },
           this.form,
         );
@@ -169,6 +181,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
             ignore,
             toggleable,
             dependsOn,
+            required: schema['required'],
           },
           this.form,
         );
@@ -189,10 +202,11 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               label: a,
               value: a,
             })),
+            required: schema['required'],
           },
           this.form,
         );
-        control.toggled = !this.options.showToggles || !control.toggleable || json && Object.keys(json).includes(name);
+        control.toggled = !this.options.showToggles || !control.toggleable || (json && Object.keys(json).includes(name));
 
         if (enumValues) {
           // select
@@ -208,6 +222,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               ignore,
               toggleable,
               dependsOn,
+              required: schema['required'],
             },
             this.form,
           );
@@ -262,7 +277,14 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
       const json = this.form.toObj();
       this.ownChange = true;
       this.jsonTextChange.emit(JSON.stringify(json, null, 2));
+      this.validationChange.next({
+        valid: this.ngForm.valid && this.validateJSON(json, this.jsonSchema),
+      });
     }
+  }
+
+  private validateJSON(json : any, schema: any){
+    return true;
   }
 }
 
@@ -274,6 +296,7 @@ export class ConfigurationControlOptions<R, S = any> {
   defaultValue?: R;
   ignore = false;
   toggleable = false;
+  required = false;
   dependsOn: string[] = [];
   context?: S;
 }
@@ -327,6 +350,10 @@ export class ConfigurationControl<R = any, S = any> {
     return this._options.ignore;
   }
 
+  get required(): boolean | undefined {
+    return this._options.required;
+  }
+
   get id(): any {
     return this._id;
   }
@@ -374,14 +401,14 @@ export class ConfigurationControl<R = any, S = any> {
   // TODO missing validation of json options
 
   private findControlOfAttributeName(path: string): ConfigurationControl | ConfigurationControlGroup | undefined {
-    const splitted = path.split('.').filter((a) => a !== '');
+    const splitArray = path.split('.').filter((a) => a !== '');
     let pointer: ConfigurationControlGroup = this._root as any;
-    for (let i = 0; i < splitted.length; i++) {
-      const searchPart = splitted[i];
+    for (let i = 0; i < splitArray.length; i++) {
+      const searchPart = splitArray[i];
       const index = (pointer?.controls ?? []).findIndex((a) => a.name === searchPart);
 
       if (index > -1) {
-        if (i === splitted.length - 1) {
+        if (i === splitArray.length - 1) {
           return pointer.controls[index];
         } else {
           pointer = pointer.controls[index] as ConfigurationControlGroup;

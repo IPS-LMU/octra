@@ -92,30 +92,33 @@
                       <octra-form-configurator
                         [jsonSchema]="exportStates[i].options"
                         [(jsonText)]="jsonText"
+                        (validationChange)="exportStates[i].validOptions = $event.valid"
                         [options]="{
-                        labelPlacement: 'top',
-                        questionMarkVisibility: 'onhover',
-                        showToggles: true,
-                      }"
+                          labelPlacement: 'top',
+                          questionMarkVisibility: 'onhover',
+                          showToggles: true,
+                        }"
                         (jsonTextChange)="updateParentFormat(converter, $event)"
-                      ></octra-form-configurator>
-
-                      <pre>
-                        {{jsonText}}
-                      </pre>
-                    }
-
-                    @if (preparing.name === converter.name && !preparing.preparing) {
-                      <a
-                        style="margin-left: 10px"
-                        download="{{ parentformat.download }}"
-                        [href]="parentformat.uri"
-                        class="link"
-                        (click)="onDownloadClick(i)"
                       >
-                        <i class="bi bi-save-fill"></i>
-                        Download
-                      </a>
+                        <div footer class="mt-3">
+                          @if (preparing.name === converter.name && !preparing.preparing) {
+                            <div class="d-inline-block" [ngbTooltip]="!exportStates[i].validOptions ? 'Disabled due to invalid options' : ''">
+                              <a
+                                class="btn btn-info"
+                                [href]="parentformat.uri"
+                                [ngClass]="{
+                                  disabled: !exportStates[i].validOptions,
+                                }"
+                                (click)="onDownloadClick(i)"
+                                [download]="parentformat.download"
+                              >
+                                <i class="bi bi-save-fill"></i>
+                                Download
+                              </a>
+                            </div>
+                          }
+                        </div>
+                      </octra-form-configurator>
                     }
                   </div>
                 </td>

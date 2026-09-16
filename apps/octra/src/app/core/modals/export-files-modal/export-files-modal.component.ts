@@ -14,6 +14,7 @@ import { AnnotationStoreService } from '../../store/login-mode/annotation/annota
 import { NamingDragAndDropComponent } from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import { TableConfiguratorComponent } from '../../tools/table-configurator/table-configurator.component';
 import { OctraModal } from '../types';
+import { ErrorObject } from 'ajv/dist/types';
 
 @Component({
   selector: 'octra-export-files-modal',
@@ -206,7 +207,13 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     this.cd.markForCheck();
   }
 
-  onValidationChange($event: any, index: number) {
+  onValidationChange(
+    $event: {
+      valid: boolean;
+      errors?: null | ErrorObject[];
+    },
+    index: number,
+  ) {
     console.log($event);
     this.exportStates[index].validOptions = $event.valid;
     this.cd.markForCheck();
@@ -260,7 +267,6 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
       preparing: true,
     };
     this.parentformat.download = this.audio.audioManager.resource.info.name + '.json';
-
     if (this.parentformat.uri !== undefined) {
       window.URL.revokeObjectURL(this.parentformat.uri.toString());
     }
@@ -273,11 +279,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   }
 
   onDownloadClick(i: number, form: ToolConfiguratorComponent) {
-    if (this.exportStates[i].validOptions) {
-      this.subscribe(timer(500), () => {
-        this.exportStates[i].status = 'inactive';
-      });
-    } else {
+    if (!this.exportStates[i].validOptions) {
       form.touchForm();
     }
   }
@@ -286,7 +288,6 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     for (let i = 0; i < this.exportStates.length; i++) {
       this.exportStates[i].status = 'inactive';
     }
-
     this.tools.audioCutting.status = 'idle';
     this.tools.audioCutting.progressbarType = 'idle';
     this.tools.audioCutting.progressbarType = 'idle';

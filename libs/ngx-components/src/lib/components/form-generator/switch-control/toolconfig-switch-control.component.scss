@@ -1,1 +1,5 @@
 @use "../base-control/toolconfig-base-control";
+
+:host(.ng-invalid.ng-touched) input {
+  outline: 2px solid red;
+}

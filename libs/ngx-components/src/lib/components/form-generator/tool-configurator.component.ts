@@ -2,6 +2,7 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input,
 import { AbstractControl, FormArray, FormGroup, FormsModule, NgForm } from '@angular/forms';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 import Ajv from 'ajv';
+import { ErrorObject } from 'ajv/dist/types';
 import { timer } from 'rxjs';
 import {
   ConfigurationArrayControl,
@@ -39,6 +40,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
   @Output() jsonTextChange = new EventEmitter<string>();
   @Output() validationChange = new EventEmitter<{
     valid: boolean;
+    errors?: null | ErrorObject[];
   }>();
   @Output() ngSubmit = new EventEmitter<any>();
 
@@ -323,18 +325,26 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
       this.subscribe(timer(0), {
         next: () => {
           const jsonValid = this.validateJSON(json, this.jsonSchema);
-          this.validationChange.next({
-            valid: this.ngForm.valid && jsonValid,
-          });
+          this.validationChange.next(jsonValid);
         },
       });
     }
   }
 
-  private validateJSON(json: any, schema: any) {
+  private validateJSON(
+    json: any,
+    schema: any,
+  ): {
+    valid: boolean;
+    errors?: null | ErrorObject[];
+  } {
     const ajv = new Ajv({ allErrors: true, strict: false }); // options can be passed, e.g. {allErrors: true}
     const validate = ajv.compile(schema);
     validate(json);
-    return !validate.errors || validate.errors.length === 0;
+
+    return {
+      valid: !validate.errors || validate.errors.length === 0,
+      errors: validate.errors,
+    };
   }
 }

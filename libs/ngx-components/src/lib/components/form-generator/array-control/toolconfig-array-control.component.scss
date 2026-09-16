@@ -14,3 +14,7 @@
 .array-control-items-list.disabled {
   background-color: var(--bs-secondary-bg);
 }
+
+:host(.ng-invalid.ng-touched) {
+  border-bottom: 2px solid red;
+}

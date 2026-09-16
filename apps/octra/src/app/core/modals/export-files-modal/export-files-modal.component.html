@@ -91,6 +91,7 @@
                     @if (exportStates[i].options) {
                       <octra-form-configurator #form
                         [jsonSchema]="exportStates[i].options"
+                                               class="d-block mt-3"
                         [(jsonText)]="jsonText"
                         (validationChange)="onValidationChange($event, i)"
                         [options]="{
@@ -100,7 +101,7 @@
                         }"
                         (jsonTextChange)="updateParentFormat(converter, $event)"
                       >
-                        <div footer class="mt-3">
+                        <div footer>
                           @if (exportStates[i].validOptions) {
                             <a
                               class="btn btn-info"

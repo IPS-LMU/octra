@@ -76,7 +76,7 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
 
     const transform = (speaker: string, transcript: string) => {
       return options?.transformTranscriptionUnit
-        ? options.transformTranscriptionUnit.replace(`{{SPEAKER}}`, speaker).replace('{{TRANSCRIPT}}', transcript)
+        ? options.transformTranscriptionUnit.replace(`{{LEVEL_NAME}}`, speaker).replace('{{TRANSCRIPT}}', transcript)
         : transcript;
     };
 
@@ -161,7 +161,7 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
     return {
       $gui_support: true,
       type: 'object',
-      required: ['exportLevels', 'transformTranscriptionUnit', "test"],
+      required: ['exportLevels', 'transformTranscriptionUnit'],
       properties: {
         exportLevels: {
           title: 'exportLevels',
@@ -178,32 +178,9 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
           title: 'transformTranscriptionUnit',
           type: 'string',
           dependsOn: ['exportLevels'],
-          default: '[{{SPEAKER}}]: {{TRANSCRIPT}}',
+          default: '[{{LEVEL_NAME}}]: {{TRANSCRIPT}}',
           description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
-        },
-        test: {
-          type: 'object',
-          required: ['exportLevels2', 'transformTranscriptionUnit2'],
-          properties: {
-            exportLevels2: {
-              title: 'exportLevels2',
-              type: 'array',
-              default: [...annotation.levels.map((a) => a.name)],
-              items: {
-                type: 'string',
-                enum: [...annotation.levels.map((a) => a.name)],
-                title: 'Level Name',
-              },
-              description: 'Defines an array of level indices for export.',
-            },
-            transformTranscriptionUnit2: {
-              title: 'transformTranscriptionUnit2',
-              type: 'string',
-              default: '[{{SPEAKER}}]: {{TRANSCRIPT}}',
-              description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
-            },
-          },
-        },
+        }
       },
     };
   }

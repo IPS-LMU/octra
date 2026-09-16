@@ -3,7 +3,17 @@
   [ngClass]="{
     disabled: disabled,
   }"
+  [ngbPopover]="popover"
+  [disablePopover]="!touched || errorMessages.length === 0"
+  triggers="mouseover:mouseleave"
 >
+  <ng-template #popover>
+    <span class="text-danger small d-block">
+      @for (message of errorMessages; track message) {
+        <span class="d-block">{{ message }}</span>
+      }
+    </span>
+  </ng-template>
   <div class="row p-0 align-items-center">
     <div class="col">
       @if (value !== undefined && value.length > 0) {

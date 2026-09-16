@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { FormsModule, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ToolconfigBaseControlComponent } from '../base-control/toolconfig-base-control';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'octra-toolconfig-select-control',
   templateUrl: './toolconfig-select-control.component.html',
   styleUrls: ['./toolconfig-select-control.component.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [FormsModule],
+  imports: [FormsModule, NgbPopover],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

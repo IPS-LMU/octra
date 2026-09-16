@@ -80,6 +80,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               dependsOn: schema['dependsOn'],
               toggleable: schema['toggleable'],
               required: this.checkIfRequired(name, parent['required']),
+              schema
             },
             this.form,
           );
@@ -102,6 +103,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               dependsOn: schema['dependsOn'],
               toggleable: schema['toggleable'],
               required: this.checkIfRequired(name, parent['required']),
+              schema
             },
             this.form,
           );
@@ -123,6 +125,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               ignore: false,
               context: items['enum'],
               required: this.checkIfRequired(name, parent['required']),
+              schema,
             },
             this.form,
           );
@@ -168,6 +171,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
             dependsOn,
             toggleable,
             required: this.checkIfRequired(name, parent['required']),
+            schema,
           },
           this.form,
         );
@@ -186,6 +190,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
             toggleable,
             ignore,
             required: this.checkIfRequired(name, parent['required']),
+            schema,
           },
           this.form,
         );
@@ -204,6 +209,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
             toggleable,
             dependsOn,
             required: this.checkIfRequired(name, parent['required']),
+            schema,
           },
           this.form,
         );
@@ -225,6 +231,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               value: a,
             })),
             required: this.checkIfRequired(name, parent['required']),
+            schema,
           },
           this.form,
         );
@@ -245,6 +252,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               toggleable,
               dependsOn,
               required: this.checkIfRequired(name, parent['required']),
+              schema,
             },
             this.form,
           );
@@ -263,6 +271,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
 
   private markControlsAsTouched(control: AbstractControl): void {
     control.markAsTouched({ onlySelf: true });
+    control.updateValueAndValidity({ onlySelf: true });
 
     if (control instanceof FormGroup || control instanceof FormArray) {
       Object.values(control.controls).forEach((child) => this.markControlsAsTouched(child));
@@ -324,6 +333,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
 
       this.subscribe(timer(0), {
         next: () => {
+          console.log("form errors");
           const jsonValid = this.validateJSON(json, this.jsonSchema);
           this.validationChange.next(jsonValid);
         },

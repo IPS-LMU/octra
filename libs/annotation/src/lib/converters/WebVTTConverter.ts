@@ -3,6 +3,7 @@ import { FileInfo } from '@octra/web-media';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import { Converter, ExportResult, IFile, ImportResult, OctraAnnotationFormatType } from './Converter';
 import { AnyTextEditor, AnyVideoPlayer, OctraApplication, WordApplication } from './SupportedApplications';
+import { JSONSchema7 } from 'json-schema';
 
 export class WebVTTConverterImportOptions {
   sortSpeakerSegments = false;
@@ -167,6 +168,7 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
           title: 'exportLevels',
           type: 'array',
           default: [...annotation.levels.map((a) => a.name)],
+          minItems: 3,
           items: {
             type: 'string',
             enum: [...annotation.levels.map((a) => a.name)],
@@ -178,11 +180,11 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
           title: 'transformTranscriptionUnit',
           type: 'string',
           dependsOn: ['exportLevels'],
-          default: '[{{LEVEL_NAME}}]: {{TRANSCRIPT}}',
+          pattern: "hallo",
           description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
         }
       },
-    };
+    } as JSONSchema7;
   }
 
   public import(file: IFile, audiofile: OAudiofile, options: WebVTTConverterImportOptions = new WebVTTConverterImportOptions()): ImportResult {

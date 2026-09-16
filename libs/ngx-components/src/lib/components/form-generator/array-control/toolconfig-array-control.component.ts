@@ -3,13 +3,14 @@ import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/
 import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ToolConfigArrayAdderComponent } from '../array-adder/toolconfig-array-adder.component';
 import { ToolconfigBaseControlComponent } from '../base-control/toolconfig-base-control';
+import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'octra-toolconfig-array-control',
   templateUrl: './toolconfig-array-control.component.html',
   styleUrls: ['./toolconfig-array-control.component.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [NgClass, ToolConfigArrayAdderComponent],
+  imports: [NgClass, ToolConfigArrayAdderComponent, NgbPopover],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

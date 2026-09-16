@@ -9,4 +9,14 @@
   [ngModel]="value"
   (ngModelChange)="onValueChange($event)"
   (blur)="markAsTouched()"
+  [ngbPopover]="popover"
+  [disablePopover]="!touched || errorMessages.length === 0"
+  triggers="mouseover:mouseleave"
 />
+<ng-template #popover>
+  <span class="text-danger small d-block">
+    @for (message of errorMessages; track message) {
+      <span class="d-block">{{ message }}</span>
+    }
+  </span>
+</ng-template>

@@ -6,9 +6,19 @@
   (blur)="markAsTouched()"
   [disabled]="disabled"
   [required]="required"
+  [ngbPopover]="popover"
+  [disablePopover]="!touched || errorMessages.length === 0"
+  triggers="mouseover:mouseleave"
 >
   <option value="">Nothing selected {{value}}</option>
   @for (item of items; track item) {
     <option [value]="item.value">{{ item.label }}</option>
   }
 </select>
+<ng-template #popover>
+  <span class="text-danger small d-block">
+    @for (message of errorMessages; track message) {
+      <span class="d-block">{{ message }}</span>
+    }
+  </span>
+</ng-template>

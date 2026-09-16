@@ -1,3 +1,5 @@
+import { JSONSchema7 } from 'json-schema';
+
 let idCounter = 1;
 
 function nextControlId(): number {
@@ -15,6 +17,7 @@ export class ConfigurationControlOptions<R, S = any> {
   required = false;
   dependsOn: string[] = [];
   context?: S;
+  schema: JSONSchema7;
 }
 
 export class FixedConfigurationControlOptions<R, S = any> extends ConfigurationControlOptions<R, S> {
@@ -60,6 +63,10 @@ export class ConfigurationControl<R = any, S = any> {
 
   set value(value: R | undefined) {
     this._options.value = value;
+  }
+
+  get schema(): JSONSchema7 {
+    return this._options.schema;
   }
 
   get ignore(): boolean {

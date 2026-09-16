@@ -1,6 +1,4 @@
-:host {
-  display: block;
-}
+@use "../base-control/toolconfig-base-control";
 
 .array-item {
   user-focus: none;

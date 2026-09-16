@@ -1,0 +1,11 @@
+<input
+  type="text"
+  class="form-control"
+  [id]="id"
+  [name]="name"
+  [disabled]="disabled"
+  [required]="required"
+  [ngModel]="value"
+  (ngModelChange)="onValueChange($event)"
+  (blur)="markAsTouched()"
+/>

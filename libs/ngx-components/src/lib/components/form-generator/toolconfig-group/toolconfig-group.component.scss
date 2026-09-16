@@ -1,15 +1,11 @@
+@use '../base-control/toolconfig-base-control';
+
 .ocf-control-group {
-}
-
-/*
-.wrap-text {
-  white-space: break-spaces;
-  word-break: break-all;
-}
- */
-
-.ocf-group-title {
-  margin-top: 20px;
+  display: block;
+  border-top: 1px solid lightgrey;
+  border-collapse: collapse;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .ocf-control-title {

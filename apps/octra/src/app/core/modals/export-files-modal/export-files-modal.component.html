@@ -85,36 +85,47 @@
                 [animate.leave]="['animate__animated', 'animate__fadeOut', 'animate__faster']"
                 [ngbCollapse]="exportStates[i].status !== 'active'"
               >
-                <td colspan="5" style="padding-left: 20px">
+                <td colspan="5" style="padding-left: 20px;padding-right:0;">
                   <div class="p-1 p-md-3">
                     <p class="mb-0">Klicke auf eine der Checkboxen, um Einstellungen zu überschreiben</p>
                     @if (exportStates[i].options) {
-                      <octra-form-configurator
+                      <octra-form-configurator #form
                         [jsonSchema]="exportStates[i].options"
                         [(jsonText)]="jsonText"
                         (validationChange)="onValidationChange($event, i)"
                         [options]="{
                           labelPlacement: 'top',
                           questionMarkVisibility: 'onhover',
-                          showToggles: true,
+                          showToggles: 'auto'
                         }"
                         (jsonTextChange)="updateParentFormat(converter, $event)"
                       >
                         <div footer class="mt-3">
-                          <div class="d-inline-block" [ngbTooltip]="!exportStates[i].validOptions ? 'Disabled due to invalid options' : ''">
+                          @if (exportStates[i].validOptions) {
                             <a
                               class="btn btn-info"
                               [href]="parentformat.uri"
-                              [ngClass]="{
-                                  disabled: preparing.name !== converter.name || preparing.preparing || !exportStates[i].validOptions,
-                                }"
-                              (click)="onDownloadClick(i)"
+                              (click)="onDownloadClick(i, form)"
                               [download]="parentformat.download"
                             >
                               <i class="bi bi-save-fill"></i>
                               Download
                             </a>
-                          </div>
+                          } @else {
+                            <a
+                              class="btn btn-info"
+                              [ngClass]="{
+                                  disabled: preparing.name !== converter.name || preparing.preparing,
+                                }"
+                              (click)="onDownloadClick(i, form)"
+                            >
+                              <i class="bi bi-save-fill"></i>
+                              Download
+                            </a>
+                          }
+                          @if (form.formTouched && !exportStates[i].validOptions) {
+                            <span class="d-block small text-danger">Errors found. Please check the form</span>
+                          }
                         </div>
                       </octra-form-configurator>
                     }
@@ -165,7 +176,7 @@
             [ngbCollapse]="!tools.tableConfigurator.opened"
           >
             <td></td>
-            <td colspan="4" style="padding-left: 20px">
+            <td colspan="4" style="padding-left: 20px;">
               <div class="card" style="padding: 10px">
                 <octra-table-configurator
                   [columns]="tools.tableConfigurator.columns"

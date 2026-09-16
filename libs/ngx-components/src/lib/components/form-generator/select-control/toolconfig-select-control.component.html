@@ -1,0 +1,14 @@
+<select
+  class="form-select"
+  [name]="'ocf-select-' + id"
+  [ngModel]="value"
+  (ngModelChange)="onValueChange($event)"
+  (blur)="markAsTouched()"
+  [disabled]="disabled"
+  [required]="required"
+>
+  <option value="">Nothing selected {{value}}</option>
+  @for (item of items; track item) {
+    <option [value]="item.value">{{ item.label }}</option>
+  }
+</select>

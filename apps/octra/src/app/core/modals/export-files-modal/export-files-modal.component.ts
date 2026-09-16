@@ -207,6 +207,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   }
 
   onValidationChange($event: any, index: number) {
+    console.log($event);
     this.exportStates[index].validOptions = $event.valid;
     this.cd.markForCheck();
   }
@@ -271,10 +272,14 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     };
   }
 
-  onDownloadClick(i: number) {
-    this.subscribe(timer(500), () => {
-      this.exportStates[i].status = 'inactive';
-    });
+  onDownloadClick(i: number, form: ToolConfiguratorComponent) {
+    if (this.exportStates[i].validOptions) {
+      this.subscribe(timer(500), () => {
+        this.exportStates[i].status = 'inactive';
+      });
+    } else {
+      form.touchForm();
+    }
   }
 
   onHidden() {

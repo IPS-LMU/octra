@@ -1,6 +1,7 @@
 import {
   HttpClient,
   HttpEventType,
+  HttpHeaders,
   HttpRequest,
   HttpResponse,
 } from '@angular/common/http';
@@ -43,6 +44,7 @@ export function downloadFile<T>(
   http: HttpClient,
   url: string,
   responseType: 'arraybuffer' | 'blob' | 'json' | 'text',
+  headers?: Record<string, string>,
 ): Subject<{
   progress: number;
   result?: T;
@@ -52,6 +54,7 @@ export function downloadFile<T>(
   const req = new HttpRequest('GET', url, {
     reportProgress: true,
     responseType,
+    headers: headers ? new HttpHeaders(headers) : undefined,
   });
 
   http.request(req).subscribe({

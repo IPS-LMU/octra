@@ -6,7 +6,7 @@ import { OAnnotJSON, TextConverter } from '@octra/annotation';
 import { ProjectDto, TaskDto, TaskInputOutputDto, TaskStatus } from '@octra/api-types';
 import { OAudiofile } from '@octra/media';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import { removeProperties } from '@octra/utilities';
+import { appendURLQueryParams, removeProperties } from '@octra/utilities';
 import { DefaultComponent } from '../../../../component/default.component';
 import { OctraModalService } from '../../../../modals/octra-modal.service';
 import { YesNoModalComponent } from '../../../../modals/yes-no-modal/yes-no-modal.component';
@@ -41,7 +41,14 @@ class PreparedTask extends TaskDto {
     if (audioFile?.metadata?.sampleRate && audioFile?.metadata?.duration?.seconds) {
       this.audio = {
         name: audioFile.filename,
-        url: this.api.prepareFileURL(audioFile.url!),
+        // bypass the Angular Service Worker: this is a native <audio> element
+        // that fetches the (potentially very large) file directly, including
+        // range requests on seek. Letting the SW intercept those exposes them
+        // to unrelated SW-internal state transitions and can abort playback
+        // with an opaque "ServiceWorker intercepted the request" error.
+        url: appendURLQueryParams(this.api.prepareFileURL(audioFile.url!), {
+          'ngsw-bypass': true,
+        }),
         type: audioFile.fileType!,
       };
 

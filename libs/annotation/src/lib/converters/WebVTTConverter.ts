@@ -158,6 +158,8 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
     };
   }
 
+  // TODO add interface for new JSON schema extending JSONSchema7
+
   override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any {
     return {
       $gui_support: true,

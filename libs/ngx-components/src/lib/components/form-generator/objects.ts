@@ -368,3 +368,7 @@ export class ConfigurationControlGroup {
     return undefined;
   }
 }
+
+export interface FormGeneratorJSONSchema extends JSONSchema7{
+  title?: string;
+}

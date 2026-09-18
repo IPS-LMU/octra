@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Store } from '@ngrx/store';
+import { Action, Store } from '@ngrx/store';
 import {
   AnnotJSONConverter,
   Converter,
@@ -19,7 +19,22 @@ import { ProjectDto, TaskDto, TaskInputOutputCreatorType, TaskInputOutputDto, Ta
 import { SampleUnit } from '@octra/media';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { appendURLQueryParams, extractFileNameFromURL, hasProperty, SubscriptionManager } from '@octra/utilities';
-import { catchError, delay, exhaustMap, forkJoin, interval, map, Observable, of, Subscription, tap, timer, withLatestFrom } from 'rxjs';
+import {
+  catchError,
+  delay,
+  exhaustMap,
+  finalize,
+  forkJoin,
+  interval,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  Subscription,
+  tap,
+  timer,
+  withLatestFrom,
+} from 'rxjs';
 import { AppInfo } from '../../../../app.info';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
 import { NgbModalWrapper } from '../../../modals/ng-modal-wrapper';
@@ -92,6 +107,11 @@ export class AnnotationEffects {
   } = {};
 
   subscrManager = new SubscriptionManager();
+
+  // guards against duplicate getProject/continueTask calls for the same
+  // project+task being triggered in quick succession by independent effects
+  // (e.g. IDB-restored startup state and post-login state racing each other)
+  private pendingProjectTaskLoads = new Map<string, Observable<Action>>();
 
   startNewAnnotation$ = createEffect(() =>
     this.actions$.pipe(
@@ -1042,7 +1062,16 @@ export class AnnotationEffects {
                 );
               }
 
-              return forkJoin({
+              const requestKey = `${a.projectID}:${a.taskID}`;
+              const pendingLoad = this.pendingProjectTaskLoads.get(requestKey);
+              if (pendingLoad) {
+                // an identical request for this project+task is already in flight
+                // (e.g. dispatched by both the startup and the post-login flow) -
+                // reuse its result instead of firing getProject/continueTask again
+                return pendingLoad;
+              }
+
+              const request$: Observable<Action> = forkJoin({
                 currentProject: this.apiService.getProject(a.projectID).pipe(catchError((b) => of(undefined))),
                 task: this.apiService.continueTask(a.projectID, a.taskID).pipe(catchError((b) => of(undefined))),
               }).pipe(
@@ -1071,7 +1100,13 @@ export class AnnotationEffects {
                     },
                   );
                 }),
+                shareReplay(1),
+                finalize(() => {
+                  this.pendingProjectTaskLoads.delete(requestKey);
+                }),
               );
+              this.pendingProjectTaskLoads.set(requestKey, request$);
+              return request$;
             }),
             catchError((error) => {
               if (!a.startup) {
@@ -1655,13 +1690,16 @@ export class AnnotationEffects {
           // user want to continue last task
           const project: ProjectDto | undefined = action.project ?? mode.currentSession?.currentProject;
           const taskID: string | undefined = mode.currentSession?.task?.id ?? mode.previousSession?.task?.id;
+          const currentTask = mode.currentSession?.task?.id === taskID ? mode.currentSession?.task : undefined;
 
           return forkJoin<{
             project: Observable<ProjectDto>;
             task: Observable<TaskDto>;
           }>({
             project: project ? of(project) : this.apiService.getProject(mode.previousSession!.project.id),
-            task: this.apiService.getTask(project?.id ?? mode.previousSession!.project.id, taskID!),
+            // reuse the already-loaded task instead of re-fetching it over the
+            // network when it's already the one we want to resume
+            task: currentTask ? of(currentTask) : this.apiService.getTask(project?.id ?? mode.previousSession!.project.id, taskID!),
           }).pipe(
             map((result) => {
               if (result.project && result.task) {
@@ -1703,11 +1741,11 @@ export class AnnotationEffects {
 
         if (a.project && a.task) {
           return this.apiService.continueTask(a.project.id, a.task.id).pipe(
-            map(() => {
+            map((task) => {
               return AnnotationActions.prepareTaskDataForAnnotation.do({
                 mode: state.application.mode!,
                 currentProject: a.project,
-                task: a.task,
+                task,
               });
             }),
             catchError((error: HttpErrorResponse) =>

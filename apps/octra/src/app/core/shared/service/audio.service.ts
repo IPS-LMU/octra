@@ -16,6 +16,7 @@ export class AudioService {
   private afterloaded: EventEmitter<any> = new EventEmitter<any>();
 
   private _audiomanagers: AudioManager[] = [];
+  private _loadingRequests = new Map<string, Subject<any>>();
 
   get audiomanagers(): AudioManager[] {
     return this._audiomanagers;
@@ -41,11 +42,27 @@ export class AudioService {
     url: string,
     audioInput: TaskInputOutputDto,
   ) => Subject<any> = (url: string, audioInput: TaskInputOutputDto) => {
+    // guard against duplicate downloads of the same audio file being triggered
+    // in parallel (e.g. by racing effects on app startup)
+    const runningRequest = this._loadingRequests.get(url);
+    if (runningRequest) {
+      return runningRequest;
+    }
+
     this._loaded = false;
 
     const subj = new Subject<number>();
+    this._loadingRequests.set(url, subj);
 
-    downloadFile<ArrayBuffer>(this.http, url, 'arraybuffer').subscribe({
+    // bypass the Angular Service Worker for this download: it's a large,
+    // long-running binary transfer that isn't part of any asset/data group,
+    // and letting the SW intercept it exposes it to unrelated SW-internal
+    // state transitions (e.g. an app-version check completing mid-download),
+    // which can abort the request with an opaque "ServiceWorker intercepted
+    // the request" error - see ngsw-bypass usage in asr.effects.service.ts
+    downloadFile<ArrayBuffer>(this.http, url, 'arraybuffer', {
+      'ngsw-bypass': 'true',
+    }).subscribe({
       next: (event) => {
         subj.next(0.5 * event.progress);
         if (event.progress === 1 && event.result) {
@@ -63,6 +80,7 @@ export class AudioService {
                   this.registerAudioManager(result.audioManager);
                   this.afterloaded.emit({ status: 'success' });
 
+                  this._loadingRequests.delete(url);
                   subj.next(result.progress);
                   subj.complete();
                 } else {
@@ -70,6 +88,7 @@ export class AudioService {
                 }
               },
               error: (error: any) => {
+                this._loadingRequests.delete(url);
                 subj.error(error);
               },
             }),
@@ -77,6 +96,7 @@ export class AudioService {
         }
       },
       error: (error) => {
+        this._loadingRequests.delete(url);
         subj.error(error);
       },
     });
@@ -108,6 +128,7 @@ export class AudioService {
       await audioManager.destroy(disconnect);
     }
     this._audiomanagers = [];
+    this._loadingRequests.clear();
     this.subscrmanager.destroy();
   }
 }

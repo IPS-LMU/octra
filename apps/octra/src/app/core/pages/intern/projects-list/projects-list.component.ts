@@ -7,7 +7,7 @@ import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { AccountProjectRoleDto, ProjectDto, ProjectListDto, TaskDto } from '@octra/api-types';
 import { OctraAPIService } from '@octra/ngx-octra-api';
-import { forkJoin, withLatestFrom } from 'rxjs';
+import { catchError, distinctUntilChanged, forkJoin, of, switchMap, tap, withLatestFrom } from 'rxjs';
 import { AppInfo } from '../../../../app.info';
 import { DefaultComponent } from '../../../component/default.component';
 import { ErrorModalComponent } from '../../../modals/error-modal/error-modal.component';
@@ -99,38 +99,54 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
         this.cd.markForCheck();
       },
     });
-    this.subscribe(authStoreService.sameUserWithOpenTask$, {
-      next: (result) => {
-        this.sameUserWithOpenTask = result;
-        if (result?.projectID && result?.taskID) {
-          this.subscribe(
-            forkJoin({
-              project: this.api.getProject(result.projectID),
-              task: this.api.getTask(result.projectID, result.taskID),
-            }).pipe(withLatestFrom(this.authStoreService.me$)),
-            {
-              next: ([{ project, task }, me]) => {
-                if (task.worker_username === me.username || task.assigned_worker_username === me.username) {
-                  this.previousProject = project;
-                } else {
-                  this.previousProject = undefined;
-                }
+    this.subscribe(
+      authStoreService.sameUserWithOpenTask$.pipe(
+        distinctUntilChanged((a, b) => a?.projectID === b?.projectID && a?.taskID === b?.taskID),
+        tap((result) => {
+          this.sameUserWithOpenTask = result;
+          if (!result?.projectID || !result?.taskID) {
+            this.previousProject = undefined;
+          }
+          this.cd.markForCheck();
+        }),
+        // switchMap cancels a still-running lookup for a previously open task
+        // as soon as the derived project/task changes, instead of piling up
+        // an additional, independent request on top of it
+        switchMap((result) => {
+          if (!result?.projectID || !result?.taskID) {
+            return of(undefined);
+          }
 
-                this.cd.markForCheck();
-              },
-              error: () => {
-                console.warn(
-                  `Another user was previously logged in. User is not allowed to continue task ${result.taskID} of project ${result.projectID}`,
-                );
-              },
-            },
+          return forkJoin({
+            project: this.api.getProject(result.projectID),
+            task: this.api.getTask(result.projectID, result.taskID),
+          }).pipe(
+            withLatestFrom(this.authStoreService.me$),
+            catchError(() => {
+              console.warn(
+                `Another user was previously logged in. User is not allowed to continue task ${result.taskID} of project ${result.projectID}`,
+              );
+              return of(undefined);
+            }),
           );
-        } else {
-          this.previousProject = undefined;
-        }
-        this.cd.markForCheck();
+        }),
+      ),
+      {
+        next: (value) => {
+          if (!value) {
+            return;
+          }
+          const [{ project, task }, me] = value;
+          if (task.worker_username === me.username || task.assigned_worker_username === me.username) {
+            this.previousProject = project;
+          } else {
+            this.previousProject = undefined;
+          }
+
+          this.cd.markForCheck();
+        },
       },
-    });
+    );
   }
 
   async ngOnInit() {

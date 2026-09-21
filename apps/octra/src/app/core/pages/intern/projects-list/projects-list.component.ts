@@ -8,6 +8,7 @@ import { Store } from '@ngrx/store';
 import { AccountProjectRoleDto, ProjectDto, ProjectListDto, TaskDto } from '@octra/api-types';
 import { SkeletonDirective } from '@octra/ngx-components';
 import { OctraAPIService } from '@octra/ngx-octra-api';
+import { wait } from '@octra/utilities';
 import { catchError, distinctUntilChanged, forkJoin, of, switchMap, tap, withLatestFrom } from 'rxjs';
 import { AppInfo } from '../../../../app.info';
 import { DefaultComponent } from '../../../component/default.component';
@@ -177,6 +178,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     this.shownProjects = Array.from({ length: 20 }, () => new PreparedProjectDto());
     this.cd.markForCheck();
 
+    await wait(5);
     this.subscribe(
       this.api.listProjects({
         manageable: false,
@@ -187,6 +189,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
       }),
       {
         next: async (projects) => {
+          await wait(5);
           this.projects = {
             ...projects,
             list: projects.list?.filter((a: any) => {

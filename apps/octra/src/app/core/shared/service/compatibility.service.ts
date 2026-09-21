@@ -85,7 +85,7 @@ export class CompatibilityService {
     return false;
   }
 
-  testCompability(): Promise<boolean> {
+  testCompatibility(options: { hideSupportedFeatures: boolean }): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       this.supportedBrowsers = this.getValidBrowsers();
       let valid = true;
@@ -103,6 +103,10 @@ export class CompatibilityService {
               valid = false;
             }
           }
+          if (options.hideSupportedFeatures) {
+            this.rules = this.rules.filter((a) => a.state === 'failed');
+          }
+
           resolve(valid);
         })
         .catch((error) => {
@@ -114,24 +118,11 @@ export class CompatibilityService {
   getValidBrowsers(): string {
     let result = '';
 
-    if (
-      !(
-        this.settingsService.appSettings === undefined ||
-        this.settingsService.appSettings === undefined
-      )
-    ) {
-      for (
-        let i = 0;
-        i < this.settingsService.appSettings.octra.allowed_browsers.length;
-        i++
-      ) {
-        const browser =
-          this.settingsService.appSettings.octra.allowed_browsers[i];
+    if (!(this.settingsService.appSettings === undefined || this.settingsService.appSettings === undefined)) {
+      for (let i = 0; i < this.settingsService.appSettings.octra.allowed_browsers.length; i++) {
+        const browser = this.settingsService.appSettings.octra.allowed_browsers[i];
         result += browser.name;
-        if (
-          i <
-          this.settingsService.appSettings.octra.allowed_browsers.length - 1
-        ) {
+        if (i < this.settingsService.appSettings.octra.allowed_browsers.length - 1) {
           result += ', ';
         }
       }
@@ -151,12 +142,8 @@ export class CompatibilityService {
           resolve(Modernizr['' + name]);
         }
       } else {
-        if (
-          this.settingsService.appSettings.octra.allowed_browsers.length > 0
-        ) {
-          const valid = this.isValidBrowser(
-            this.settingsService.appSettings.octra.allowed_browsers,
-          );
+        if (this.settingsService.appSettings.octra.allowed_browsers.length > 0) {
+          const valid = this.isValidBrowser(this.settingsService.appSettings.octra.allowed_browsers);
           resolve(valid);
         } else {
           resolve(true);

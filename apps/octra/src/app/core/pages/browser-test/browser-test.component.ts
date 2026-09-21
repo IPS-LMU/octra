@@ -1,5 +1,5 @@
 import { NgStyle } from '@angular/common';
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { BrowserInfo } from '@octra/web-media';
 import { CompatibilityService } from '../../shared/service/compatibility.service';

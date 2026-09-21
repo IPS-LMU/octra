@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, ElementRef, inject, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -44,6 +44,7 @@ export class LoginComponent
   private elementRef = inject(ElementRef);
   appStorage = inject(AppStorageService);
   api = inject(OctraAPIService);
+  cd = inject(ChangeDetectorRef);
   settingsService = inject(SettingsService);
   private audioService = inject(AudioService);
   authStoreService = inject(AuthenticationStoreService);
@@ -101,13 +102,16 @@ export class LoginComponent
     super();
     const elementRef = this.elementRef;
 
-    this.compatibilityService.testCompability().then((result) => {
+    this.compatibilityService.testCompatibility({
+      hideSupportedFeatures: true
+    }).then((result) => {
       this.compatibleBrowser = result;
       setTimeout(() => {
         elementRef.nativeElement.scroll({
           top: 0,
           left: 0,
         });
+        this.cd.markForCheck();
       }, 0);
     });
     const subject = 'Octra Server is offline';

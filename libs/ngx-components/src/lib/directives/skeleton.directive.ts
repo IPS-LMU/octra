@@ -36,17 +36,6 @@ const CSS = `
   [data-skeleton] [data-skeleton-image] {
     border-radius: 0 !important;
   }
-
-  /* Workaround: -webkit-line-clamp prevents background rendering
-     for transparent text in Chromium */
-  [data-skeleton] p {
-    display: block !important;
-    min-height: 3em;
-  }
-
-  [data-skeleton] h2 {
-    min-width: 100px;
-  }
 `;
 
 /**
@@ -55,12 +44,6 @@ const CSS = `
  * Applies an animated shimmer effect to all child elements
  * while skeleton() === true. The template itself stays unchanged —
  * no duplicate code for the loading and content states.
- *
- * Usage:
- *   <article [skeleton]="isLoading()">
- *     <h2>{{ post().title }}</h2>
- *     <p>{{ post().excerpt }}</p>
- *   </article>
  *
  * Note: the host element itself must not be undefined/null
  * while skeleton() === true. For signals, a placeholder object

@@ -178,7 +178,6 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
     this.shownProjects = Array.from({ length: 20 }, () => new PreparedProjectDto());
     this.cd.markForCheck();
 
-    await wait(5);
     this.subscribe(
       this.api.listProjects({
         manageable: false,
@@ -189,7 +188,6 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
       }),
       {
         next: async (projects) => {
-          await wait(5);
           this.projects = {
             ...projects,
             list: projects.list?.filter((a: any) => {

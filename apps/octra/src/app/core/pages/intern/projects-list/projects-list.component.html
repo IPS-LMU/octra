@@ -37,159 +37,174 @@
       </p>
     </div>
     <div>
-      @if (shownProjects) {
-        <div class="row shadow p-3 m-3 rounded">
-          <div class="col-auto align-items-center">
-            <i class="bi bi-stars" style="font-size: 2rem; color: #ffb700"></i>
-          </div>
-          <div class="col align-items-center">
-            {{ 'projects-list.resuming feature' | transloco }}
-            <a [href]="AppInfo.manualURL" target="_blank">{{ 'p.further information' | transloco }}</a>
-          </div>
+      <div class="row shadow p-3 m-3 rounded">
+        <div class="col-auto align-items-center">
+          <i class="bi bi-stars" style="font-size: 2rem; color: #ffb700"></i>
         </div>
+        <div class="col align-items-center">
+          {{ 'projects-list.resuming feature' | transloco }}
+          <a [href]="AppInfo.manualURL" target="_blank">{{ 'p.further information' | transloco }}</a>
+        </div>
+      </div>
 
-        <div class="text-end link" style="font-size: 0.8rem" (click)="openCreateProjectRequestModal()">
-          {{ 'projects-list.project creation wanted' | transloco }}
-        </div>
-        <div class="list-group">
-          <div class="list-group-item">
-            <div class="row g-0">
-              <div class="col"></div>
-              <div class="col-auto text-right">
-                <ngb-pagination
-                  [size]="'sm'"
-                  [page]="currentPage!.page"
-                  [collectionSize]="currentPage!.collectionSize"
-                  [pageSize]="itemsPerPage"
-                  (pageChange)="showProjects($event)"
-                ></ngb-pagination>
-              </div>
+      <div class="text-end link" style="font-size: 0.8rem" (click)="openCreateProjectRequestModal()">
+        {{ 'projects-list.project creation wanted' | transloco }}
+      </div>
+      <div class="list-group">
+        <div class="list-group-item">
+          <div class="row g-0">
+            <div class="col"></div>
+            <div class="col-auto text-right">
+              <ngb-pagination
+                octraSkeleton
+                [enabled]="projects === undefined"
+                [size]="'sm'"
+                [page]="currentPage?.page"
+                [collectionSize]="currentPage?.collectionSize"
+                [pageSize]="itemsPerPage"
+                (pageChange)="showProjects($event)"
+              ></ngb-pagination>
             </div>
           </div>
-          <div class="table-wrapper">
-            @if (shownProjects.length > 0) {
-              <div ngbAccordion #accordion="ngbAccordion" [closeOthers]="true" [destroyOnHide]="true">
-                @for (project of shownProjects; track project) {
-                  <div [ngbAccordionItem]="project.id" #acc="ngbAccordionItem">
-                    <div ngbAccordionHeader class="list-group-item">
-                      <div class="row g-3 align-items-center justify-items-center justify-content-center">
-                        <div class="col-auto project-name">
-                          <i
-                            class="bi ms-2 pointer"
-                            [ngClass]="{
-                              'bi-chevron-down': acc.collapsed,
-                              'bi-chevron-up': !acc.collapsed,
-                            }"
-                            ngbAccordionToggle
-                            [ngStyle]="{
-                              visibility: project.canExpand ? 'visible' : 'hidden',
-                            }"
-                          ></i>
-                        </div>
-                        <div class="col">
-                          <div class="row align-items-center justify-items-center justify-content-center">
-                            @if ((authStoreService.me$ | async)?.systemRole?.label === 'administrator' || istProjectAdmin) {
-                              <div class="col-auto project-name">
-                                @if (project.active) {
-                                  <i class="bi bi-check-circle" style="color: green"></i>
-                                }
-                                @if (!project.active) {
-                                  <i class="bi bi-dash-circle" style="color: red"></i>
-                                }
-                              </div>
-                            }
-                            <div class="col align-items-center justify-items-center justify-content-center">
-                              <span class="project-name">{{ project.name }} ({{ project.shortname }})</span>
+        </div>
+        <div class="table-wrapper">
+          @if (shownProjects.length > 0) {
+            <div ngbAccordion #accordion="ngbAccordion" [closeOthers]="true" [destroyOnHide]="true">
+              @for (project of shownProjects; track project) {
+                <div [ngbAccordionItem]="project.id" #acc="ngbAccordionItem">
+                  <div ngbAccordionHeader class="list-group-item">
+                    <div class="row g-3 align-items-center justify-items-center justify-content-center">
+                      <div class="col-auto project-name" octraSkeleton [enabled]="project.loadingStatus === 'loading'">
+                        <i
+                          class="bi ms-2 pointer"
+                          [ngClass]="{
+                            'bi-chevron-down': acc.collapsed,
+                            'bi-chevron-up': !acc.collapsed,
+                          }"
+                          ngbAccordionToggle
+                          [ngStyle]="{
+                            visibility: project.canExpand ? 'visible' : 'hidden',
+                          }"
+                        ></i>
+                      </div>
+                      <div class="col">
+                        <div class="row align-items-center justify-items-center justify-content-center">
+                          @if ((authStoreService.me$ | async)?.systemRole?.label === 'administrator' || istProjectAdmin) {
+                            <div class="col-auto project-name" octraSkeleton [enabled]="project.loadingStatus === 'loading'">
+                              @if (project.active) {
+                                <i class="bi bi-check-circle" style="color: green"></i>
+                              }
+                              @if (!project.active) {
+                                <i class="bi bi-dash-circle" style="color: red"></i>
+                              }
+                            </div>
+                          }
+                          <div class="col align-items-center justify-items-center justify-content-center">
+                            <span
+                              class="project-name"
+                              octraSkeleton
+                              [enabled]="project.loadingStatus === 'loading'"
+                              styleWhileEnabled="width:200px;display:inline-grid;"
+                            >
+                              <span>{{ project.name }} ({{ project.shortname }})</span>
+                            </span>
 
-                              <div class="row">
-                                <div class="col text-muted project-description">
-                                  {{ project.public_description }}
+                            <div class="row">
+                              <div class="col text-muted project-description">
+                                <div
+                                  octraSkeleton
+                                  [enabled]="project.loadingStatus === 'loading'"
+                                  styleWhileEnabled="height:40px;width:400px;display:inline-grid;margin-top:5px;"
+                                >
+                                  <div>
+                                    {{ project.public_description }}
+                                  </div>
                                 </div>
                               </div>
-                              <div class="row">
-                                <div class="col mb-2">
-                                  <span class="rounded-pill text-white property-pill me-1" style="background-color: purple">
-                                    <i class="bi bi-list-ol"></i>
-                                    {{ 'g.free tasks' | transloco }}:
-                                    {{ project.freeTasks }}
-                                  </span>
-                                  @if (project.pausedTasks > 0) {
-                                    <span
-                                      class="rounded-pill text-white property-pill me-1 text-bg-warning paused-tasks-badge pointer"
-                                      (click)="acc.collapsed = !acc.collapsed"
-                                    >
-                                      <i class="bi bi-pause"></i>
+                            </div>
+                            <div class="row">
+                              <div class="col mb-2" octraSkeleton [enabled]="project.loadingStatus === 'loading'">
+                                <span class="rounded-pill text-white property-pill me-1" style="background-color: purple">
+                                  <i class="bi bi-list-ol"></i>
+                                  {{ 'g.free tasks' | transloco }}:
+                                  {{ project.freeTasks }}
+                                </span>
+                                @if (project.pausedTasks > 0) {
+                                  <span
+                                    class="rounded-pill text-white property-pill me-1 text-bg-warning paused-tasks-badge pointer"
+                                    (click)="acc.collapsed = !acc.collapsed"
+                                  >
+                                    <i class="bi bi-pause"></i>
+                                    <span>
                                       {{ 'g.paused tasks' | transloco }}:
                                       {{ project.pausedTasks }}
                                     </span>
-                                  }
+                                  </span>
+                                }
 
-                                  @if (project.enddate) {
-                                    <span class="rounded-pill text-white property-pill me-1 bg-info">
-                                      <i class="bi bi-calendar-day"></i>
-                                      {{ 'p.available until' | transloco }}:
-                                      {{
-                                        project.enddate
-                                          | luxonShortDateTime
-                                            : {
-                                                locale: $safeNavigationMigration((authStoreService.me$ | async)?.locale),
-                                              }
-                                      }}
-                                    </span>
-                                  }
-                                </div>
+                                @if (project.enddate || project.loadingStatus === 'loading') {
+                                  <span class="rounded-pill text-white property-pill me-1 bg-info">
+                                    <i class="bi bi-calendar-day"></i>
+                                    {{ 'p.available until' | transloco }}:
+                                    {{
+                                      project.enddate
+                                        | luxonShortDateTime
+                                          : {
+                                              locale: $safeNavigationMigration((authStoreService.me$ | async)?.locale),
+                                            }
+                                    }}
+                                  </span>
+                                }
                               </div>
                             </div>
-                            <div class="col-md-3 align-items-center justify-items-center justify-content-center">
-                              @if (project.freeTasks > 0) {
-                                <button
-                                  class="btn btn-primary btn-sm w-100"
-                                  size="sm"
-                                  [disabled]="projectStarting"
-                                  (click)="onStartNewTaskClick(project)"
-                                >
-                                  {{ 'transcription.new' | transloco }}
-                                  <i class="bi bi-play-fill"></i>
-                                </button>
-                              }
-                            </div>
+                          </div>
+                          <div class="col-md-3 align-items-center justify-items-center justify-content-center"
+                               octraSkeleton
+                               [enabled]="project.loadingStatus === 'loading'">
+                            @if (project.freeTasks > 0) {
+                              <button
+                                class="btn btn-primary btn-sm w-100"
+                                size="sm"
+                                [disabled]="projectStarting"
+                                (click)="onStartNewTaskClick(project)"
+                              >
+                                {{ 'transcription.new' | transloco }}
+                                <i class="bi bi-play-fill"></i>
+                              </button>
+                            } @else {
+                              <span style="height:32px; display:inline-grid; width:100%;"></span>
+                            }
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div ngbAccordionCollapse>
-                      <div ngbAccordionBody>
-                        <ng-template>
-                          <div class="border bg-light-subtle">
-                            <octra-my-tasks [project]="project" (continueTask)="pausedTaskContinueClick($event)"></octra-my-tasks>
-                          </div>
-                        </ng-template>
-                      </div>
+                  </div>
+                  <div ngbAccordionCollapse>
+                    <div ngbAccordionBody>
+                      <ng-template>
+                        <div class="border bg-light-subtle">
+                          <octra-my-tasks [project]="project" (continueTask)="pausedTaskContinueClick($event)"></octra-my-tasks>
+                        </div>
+                      </ng-template>
                     </div>
                   </div>
-                }
-              </div>
-            } @else {
-              <div
-                class="text-center p-5"
-                [innerHTML]="
-                  'projects-list.no free tasks'
-                    | transloco
-                      : {
-                          email: '<a href=\'mailto:' + email + '\'>' + email + '</a>',
-                        }
-                "
-              ></div>
-            }
-          </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div
+              class="text-center p-5"
+              [innerHTML]="
+                'projects-list.no free tasks'
+                  | transloco
+                    : {
+                        email: '<a href=\'mailto:' + email + '\'>' + email + '</a>',
+                      }
+              "
+            ></div>
+          }
         </div>
-      } @else {
-        <div class="text-center mt-5">
-          <div class="spinner-border" role="status" style="width: 6rem; height: 6rem; color: lightgrey">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </div>
-      }
+      </div>
     </div>
   </div>
 </div>

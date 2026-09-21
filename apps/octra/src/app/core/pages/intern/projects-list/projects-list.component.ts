@@ -6,6 +6,7 @@ import { NgbAccordionModule, NgbPagination } from '@ng-bootstrap/ng-bootstrap';
 import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { AccountProjectRoleDto, ProjectDto, ProjectListDto, TaskDto } from '@octra/api-types';
+import { SkeletonDirective } from '@octra/ngx-components';
 import { OctraAPIService } from '@octra/ngx-octra-api';
 import { catchError, distinctUntilChanged, forkJoin, of, switchMap, tap, withLatestFrom } from 'rxjs';
 import { AppInfo } from '../../../../app.info';
@@ -29,6 +30,8 @@ class PreparedProjectDto extends ProjectDto {
   pausedTasks = 0;
   freeTasks = 0;
 
+  loadingStatus: 'loading' | 'finished' | 'empty' = 'loading';
+
   constructor(partial?: Partial<ProjectDto>) {
     super();
     Object.assign(this, partial);
@@ -49,7 +52,17 @@ class PreparedProjectDto extends ProjectDto {
   templateUrl: './projects-list.component.html',
   styleUrls: ['./projects-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AsyncPipe, TranslocoPipe, LuxonShortDateTimePipe, NgbPagination, NgStyle, NgbAccordionModule, NgClass, MyTasksComponent],
+  imports: [
+    AsyncPipe,
+    TranslocoPipe,
+    NgbAccordionModule,
+    NgbPagination,
+    MyTasksComponent,
+    NgStyle,
+    NgClass,
+    LuxonShortDateTimePipe,
+    SkeletonDirective,
+  ],
 })
 export class ProjectsListComponent extends DefaultComponent implements OnInit {
   private api = inject(OctraAPIService);
@@ -156,11 +169,13 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
         this.cd.markForCheck();
       },
     });
-    this.loadProjects(1);
+    await this.loadProjects(1);
   }
 
-  loadProjects(page: number) {
+  async loadProjects(page: number) {
     this.projects = undefined;
+    this.shownProjects = Array.from({ length: 20 }, () => new PreparedProjectDto());
+    this.cd.markForCheck();
 
     this.subscribe(
       this.api.listProjects({
@@ -171,7 +186,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
         order_by: 'name',
       }),
       {
-        next: (projects) => {
+        next: async (projects) => {
           this.projects = {
             ...projects,
             list: projects.list?.filter((a: any) => {
@@ -207,7 +222,11 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   }
 
   showProjects(page: number) {
-    this.shownProjects = this.projects!.list.slice((page - 1) * this.itemsPerPage, page * this.itemsPerPage).map((a) => new PreparedProjectDto(a));
+    this.shownProjects = this.projects!.list.slice((page - 1) * this.itemsPerPage, page * this.itemsPerPage).map((a) => {
+      const showProject = new PreparedProjectDto(a);
+      showProject.loadingStatus = 'finished';
+      return showProject;
+    });
     this.currentPage = {
       page,
       collectionSize: this.projects!.list.length,

@@ -36,11 +36,11 @@ import { CompatibilityService } from './core/shared/service/compatibility.servic
 import { IDBService } from './core/shared/service/idb.service';
 import { APIEffects } from './core/store/api';
 import { ApplicationEffects } from './core/store/application/application.effects';
+import * as fromApplication from './core/store/application/application.reducer';
 import { AsrEffects } from './core/store/asr/asr.effects.service';
+import * as fromASR from './core/store/asr/asr.reducer';
 import { AuthenticationEffects, authenticationReducer } from './core/store/authentication';
 import { IDBEffects } from './core/store/idb/idb-effects.service';
-import * as fromApplication from './core/store/application/application.reducer';
-import * as fromASR from './core/store/asr/asr.reducer';
 import * as fromUser from './core/store/user/user.reducer';
 
 export const appConfig: ApplicationConfig = {

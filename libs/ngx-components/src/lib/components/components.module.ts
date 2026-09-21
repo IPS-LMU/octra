@@ -10,9 +10,9 @@ import { OctraUtilitiesModule } from '@octra/ngx-utilities';
 import {
   OctraASRLanguageSelectComponent,
   OctraProviderSelectComponent,
-} from './components/asr-options';
-import { AudioViewerComponent } from './components/audio/audio-viewer';
-import { AudioplayerComponent } from './components/audio/audioplayer';
+} from './asr-options';
+import { AudioViewerComponent } from './audio/audio-viewer';
+import { AudioplayerComponent } from './audio/audioplayer';
 
 @NgModule({
   declarations: [],

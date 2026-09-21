@@ -1,9 +1,9 @@
 import { OAudiofile } from '@octra/media';
+import { FormGeneratorJSONSchema } from '@octra/utilities';
 import { FileInfo } from '@octra/web-media';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import { Converter, ExportResult, IFile, ImportResult, OctraAnnotationFormatType } from './Converter';
 import { AnyTextEditor, AnyVideoPlayer, OctraApplication, WordApplication } from './SupportedApplications';
-import { JSONSchema7 } from 'json-schema';
 
 export class WebVTTConverterImportOptions {
   sortSpeakerSegments = false;
@@ -158,35 +158,42 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
     };
   }
 
-  // TODO add interface for new JSON schema extending JSONSchema7
+  // TODO add option for i18n
 
   override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any {
     return {
       $gui_support: true,
       type: 'object',
+      title: '',
       required: ['exportLevels', 'transformTranscriptionUnit'],
       properties: {
         exportLevels: {
-          title: 'exportLevels',
+          title: 'Export levels',
           type: 'array',
           default: [...annotation.levels.map((a) => a.name)],
-          minItems: 3,
           items: {
             type: 'string',
             enum: [...annotation.levels.map((a) => a.name)],
             title: 'Level Name',
           },
-          description: 'Defines an array of level indices for export.',
+          description: 'Defines a list of level names that should be exported.',
         },
         transformTranscriptionUnit: {
-          title: 'transformTranscriptionUnit',
+          title: 'Transform Transcripts',
           type: 'string',
           dependsOn: ['exportLevels'],
-          pattern: "hallo",
-          description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
+          default: '[{{LEVEL_NAME}}]: {{TRANSCRIPT}}',
+          pattern: '(\\{\\{LEVEL_NAME\\}\\})|(\\{\\{TRANSCRIPT\\}\\})',
+          description:
+            'Defines how the transcript of each unit should be transformed using placeholders. Supported placeholders: {{LEVEL_NAME}}, {{TRANSCRIPT}}.',
+        },
+        test: {
+          title: "test",
+          type: "string",
+          placeholder: "HAllo, das ist ein test"
         }
       },
-    } as JSONSchema7;
+    } as FormGeneratorJSONSchema;
   }
 
   public import(file: IFile, audiofile: OAudiofile, options: WebVTTConverterImportOptions = new WebVTTConverterImportOptions()): ImportResult {

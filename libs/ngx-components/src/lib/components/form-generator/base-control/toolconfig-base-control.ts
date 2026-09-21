@@ -8,6 +8,7 @@ export abstract class ToolconfigBaseControlComponent<T> implements ControlValueA
   @Input() id?: string;
   @Input() name?: string;
   @Input() required?: boolean;
+  @Input() placeholder?: string;
   @Input() schema?: JSONSchema7;
 
   protected value?: T;

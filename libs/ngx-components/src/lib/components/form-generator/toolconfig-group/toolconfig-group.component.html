@@ -84,6 +84,7 @@
           [id]="'text-' + control.id"
           [name]="'text-' + control.id"
           [required]="control.required"
+          [placeholder]="control.placeholder"
           [schema]="control.schema"
           [disabled]="!control.checkToggleStateOfControl()"
           [(ngModel)]="control.value"

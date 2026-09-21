@@ -10,6 +10,7 @@
   (blur)="markAsTouched()"
   [ngbPopover]="popover"
   [disablePopover]="!touched || errorMessages.length === 0"
+  [placeholder]="placeholder ?? ''"
   triggers="mouseover:mouseleave"
 />
 <ng-template #popover>

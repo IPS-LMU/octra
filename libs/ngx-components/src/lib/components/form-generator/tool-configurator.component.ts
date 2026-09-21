@@ -1,6 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup, FormsModule, NgForm } from '@angular/forms';
 import { SubscriberComponent } from '@octra/ngx-utilities';
+import { FormGeneratorJSONSchema } from '@octra/utilities';
 import Ajv from 'ajv';
 import { ErrorObject } from 'ajv/dist/types';
 import { timer } from 'rxjs';
@@ -33,7 +34,7 @@ export class OctraToolConfiguratorOptions {
   imports: [ToolconfigGroupComponent, FormsModule],
 })
 export class ToolConfiguratorComponent extends SubscriberComponent implements OnChanges, AfterViewInit {
-  @Input() jsonSchema?: any;
+  @Input() jsonSchema?: FormGeneratorJSONSchema;
   @Input() jsonText?: string;
   @Input() options = new OctraToolConfiguratorOptions();
 
@@ -55,32 +56,38 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
     return this.ngForm?.touched ?? false;
   }
 
-  private parse(schema: any, name: string, parent?: any, json?: any): (ConfigurationControl | ConfigurationControlGroup)[] {
+  private parse(
+    schema: FormGeneratorJSONSchema,
+    name: string,
+    parent?: FormGeneratorJSONSchema,
+    json?: any,
+  ): (ConfigurationControl | ConfigurationControlGroup)[] {
     const result: (ConfigurationControl | ConfigurationControlGroup)[] = [];
     const jsonValue = name ? (json ? json[name] : undefined) : undefined;
-    const toggleable: boolean = schema['toggleable'] ?? false;
-    const dependsOn: string[] = schema['dependsOn'] ?? [];
+    const toggleable: boolean = schema.toggleable ?? false;
+    const dependsOn: string[] = schema.dependsOn ?? [];
     this.showToggles = this.showToggles || toggleable;
 
-    if (schema['items']) {
-      const items = schema['items'];
-      const defaultValue = schema['default'];
+    if (schema.items) {
+      const items = schema.items;
+      const defaultValue = schema.default;
       if (typeof items === 'object') {
-        if (items['type'] === 'string') {
+        const itemsDefinition = items as FormGeneratorJSONSchema;
+        if (itemsDefinition.type === 'string') {
           const control = new ConfigurationArrayControl(
             name,
             {
-              title: schema['title'] ?? name,
+              title: schema.title ?? name,
               type: 'array',
               value: jsonValue ?? defaultValue,
-              defaultValue,
-              description: schema['description'],
+              defaultValue: defaultValue as string[],
+              description: schema.description,
               ignore: false,
-              context: items['enum'],
-              dependsOn: schema['dependsOn'],
-              toggleable: schema['toggleable'],
-              required: this.checkIfRequired(name, parent['required']),
-              schema
+              context: itemsDefinition.enum,
+              dependsOn: schema.dependsOn,
+              toggleable: schema.toggleable,
+              required: this.checkIfRequired(name, parent.required),
+              schema,
             },
             this.form,
           );
@@ -89,21 +96,22 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
           control.toggled =
             this.options.showToggles === 'hide' || !control.toggleable || (json && name !== undefined && Object.keys(json).includes(name));
           result.push(control);
-        } else if (items['type'] === 'number') {
+        } else if (itemsDefinition.type === 'number') {
           const control = new ConfigurationArrayControl(
             name,
             {
-              title: schema['title'] ?? name,
+              title: schema.title ?? name,
               type: 'array',
               value: jsonValue ?? defaultValue,
-              defaultValue,
-              description: schema['description'],
+              defaultValue: defaultValue as string[],
+              description: schema.description,
+              placeholder: schema.placeholder,
               ignore: false,
-              context: items['enum'],
-              dependsOn: schema['dependsOn'],
-              toggleable: schema['toggleable'],
-              required: this.checkIfRequired(name, parent['required']),
-              schema
+              context: itemsDefinition.enum,
+              dependsOn: schema.dependsOn,
+              toggleable: schema.toggleable,
+              required: this.checkIfRequired(name, parent.required),
+              schema,
             },
             this.form,
           );
@@ -111,20 +119,20 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
           control.toggled =
             this.options.showToggles === 'hide' || !control.toggleable || (json && name !== undefined && Object.keys(json).includes(name));
           result.push(control);
-        } else if (items['type'] === 'integer') {
+        } else if (itemsDefinition.type === 'integer') {
           const control = new ConfigurationArrayControl(
             name,
             {
-              title: schema['title'] ?? name,
-              toggleable: schema['toggleable'],
+              title: schema.title ?? name,
+              toggleable: schema.toggleable,
               type: 'array',
               value: jsonValue ?? defaultValue,
-              defaultValue,
-              description: schema['description'],
-              dependsOn: schema['dependsOn'],
+              defaultValue: defaultValue as string[],
+              description: schema.description,
+              dependsOn: schema.dependsOn,
               ignore: false,
-              context: items['enum'],
-              required: this.checkIfRequired(name, parent['required']),
+              context: itemsDefinition.enum,
+              required: this.checkIfRequired(name, parent.required),
               schema,
             },
             this.form,
@@ -137,91 +145,91 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
         // TODO add
         const t = '';
       }
-    } else if (schema['properties']) {
+    } else if (schema.properties) {
       // type = "object"
-      const properties = schema['properties'];
+      const properties = schema.properties;
       const keys = Object.keys(properties);
       for (const key of keys) {
         const value = properties[key];
 
-        if (value['properties']) {
-          const group = new ConfigurationControlGroup(value['title'], key, this.parse(value, key, schema, json ? json[key] : undefined));
-          group.description = value['description'];
+        if (value.properties) {
+          const group = new ConfigurationControlGroup(value.title, key, this.parse(value, key, schema, json ? json[key] : undefined));
+          group.description = value.description;
           result.push(group);
         } else {
           result.push(...this.parse(value, key, schema, json));
         }
       }
-    } else if (schema['type'] && name) {
-      const defaultValue = schema['default'];
-      const enumValues: string[] = schema['enum'];
-      const title: string = schema['title'];
-      const description: string = schema['description'];
+    } else if (schema.type && name) {
+      const defaultValue = schema.default;
+      const enumValues: string[] = schema.enum as string[];
+      const title: string = schema.title;
+      const description: string = schema.description;
       const ignore = ['version', '$schema'].includes(name);
 
-      if (schema['type'] === 'boolean') {
+      if (schema.type === 'boolean') {
         const control = new ConfigurationSwitchControl(
           name,
           {
             title: title ?? name,
             value: jsonValue ?? defaultValue,
-            defaultValue,
+            defaultValue: defaultValue as boolean,
             description,
             ignore,
             dependsOn,
             toggleable,
-            required: this.checkIfRequired(name, parent['required']),
+            required: this.checkIfRequired(name, parent.required),
             schema,
           },
           this.form,
         );
         control.toggled = this.options.showToggles === 'hide' || !control.toggleable || (json && Object.keys(json).includes(name));
         result.push(control);
-      } else if (schema['type'] === 'number') {
+      } else if (schema.type === 'number') {
         const control = new ConfigurationNumberControl(
           name,
           {
             title: title ?? name,
             type: 'number',
             value: jsonValue ?? defaultValue,
-            defaultValue,
+            defaultValue: defaultValue as number,
             description,
             dependsOn,
             toggleable,
             ignore,
-            required: this.checkIfRequired(name, parent['required']),
+            required: this.checkIfRequired(name, parent.required),
             schema,
           },
           this.form,
         );
         control.toggled = this.options.showToggles === 'hide' || !control.toggleable || (json && Object.keys(json).includes(name));
         result.push(control);
-      } else if (schema['type'] === 'integer') {
+      } else if (schema.type === 'integer') {
         const control = new ConfigurationNumberControl(
           name,
           {
             title: title ?? name,
             type: 'integer',
             value: jsonValue ?? defaultValue,
-            defaultValue,
+            defaultValue: defaultValue as number,
             description,
             ignore,
             toggleable,
             dependsOn,
-            required: this.checkIfRequired(name, parent['required']),
+            required: this.checkIfRequired(name, parent.required),
             schema,
           },
           this.form,
         );
         control.toggled = this.options.showToggles === 'hide' || !control.toggleable || (json && Object.keys(json).includes(name));
         result.push(control);
-      } else if (schema['type'] === 'string') {
+      } else if (schema.type === 'string') {
         let control: ConfigurationControl = new ConfigurationSelectControl(
           name,
           {
             title: title ?? name,
             value: jsonValue ?? defaultValue,
-            defaultValue,
+            defaultValue: defaultValue as string,
             description,
             ignore,
             toggleable,
@@ -230,7 +238,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               label: a,
               value: a,
             })),
-            required: this.checkIfRequired(name, parent['required']),
+            required: this.checkIfRequired(name, parent.required),
             schema,
           },
           this.form,
@@ -246,12 +254,13 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
             {
               title: title ?? name,
               value: jsonValue ?? defaultValue,
-              defaultValue,
+              defaultValue: defaultValue as string,
               description,
               ignore,
               toggleable,
               dependsOn,
-              required: this.checkIfRequired(name, parent['required']),
+              placeholder: schema.placeholder,
+              required: this.checkIfRequired(name, parent.required),
               schema,
             },
             this.form,
@@ -294,7 +303,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
       if (schema) {
         const name = schema['name'] ?? '';
         const group = new ConfigurationControlGroup(schema['title'] ?? '', name, []);
-        group.description = schema['description'];
+        group.description = schema.description;
         this.form = group;
         group.controls = this.parse(schema, name, undefined, this.json);
       }
@@ -316,7 +325,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
       if (this.jsonSchema) {
         const name = this.jsonSchema['name'] ?? '';
         const group = new ConfigurationControlGroup(this.jsonSchema['title'] ?? '', name, []);
-        group.description = this.jsonSchema['description'];
+        group.description = this.jsonSchema.description;
         this.form = group;
         group.controls = this.parse(this.jsonSchema, name, undefined, this.json);
       }
@@ -333,7 +342,7 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
 
       this.subscribe(timer(0), {
         next: () => {
-          console.log("form errors");
+          console.log('form errors');
           const jsonValid = this.validateJSON(json, this.jsonSchema);
           this.validationChange.next(jsonValid);
         },

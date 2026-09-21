@@ -10,6 +10,7 @@ export class ConfigurationControlOptions<R, S = any> {
   type?: 'switch' | 'select' | 'number' | 'integer' | 'multiple-choice' | 'text' | 'textarea' | 'array';
   title?: string;
   description?: string;
+  placeholder?: string;
   value?: R;
   defaultValue?: R;
   ignore = false;
@@ -43,6 +44,10 @@ export class ConfigurationControl<R = any, S = any> {
 
   get description(): string | undefined {
     return this._options.description;
+  }
+
+  get placeholder(): string | undefined {
+    return this._options.placeholder;
   }
 
   get context(): any {
@@ -367,8 +372,4 @@ export class ConfigurationControlGroup {
     }
     return undefined;
   }
-}
-
-export interface FormGeneratorJSONSchema extends JSONSchema7{
-  title?: string;
 }

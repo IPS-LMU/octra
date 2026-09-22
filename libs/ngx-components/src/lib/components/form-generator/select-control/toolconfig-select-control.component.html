@@ -10,7 +10,7 @@
   [disablePopover]="!touched || errorMessages.length === 0"
   triggers="mouseover:mouseleave"
 >
-  <option value="">Nothing selected {{value}}</option>
+  <option value="">Nothing selected</option>
   @for (item of items; track item) {
     <option [value]="item.value">{{ item.label }}</option>
   }

@@ -16,8 +16,8 @@ export class SRTConverterImportOptions {
 }
 
 export class SRTConverterExportOptions {
-  exportLevels?: number[];
-  transformTranscriptionUnit?: string;
+  exportLevels?: string[];
+  transformPattern?: string;
 
   constructor(partial?: Partial<SRTConverterExportOptions>) {
     if (partial) Object.assign(this, partial);
@@ -94,45 +94,51 @@ export class SRTConverter extends Converter<SRTConverterImportOptions, SRTConver
     let filename = '';
 
     const transcripts: {
-      speaker?: string;
+      speaker: string;
       sampleStart: number;
       sampleDur: number;
       value: string;
     }[] = [];
 
+    const transform = (speaker: string, transcript: string) => {
+      return options?.transformPattern
+        ? options.transformPattern.replace(`{{LEVEL_NAME}}`, speaker).replace('{{TRANSCRIPT}}', transcript)
+        : transcript;
+    };
+
     // prepare all transcripts
     for (let i = 0; i < annotation.levels.length; i++) {
       const level = annotation.levels[i];
 
-      if (level.type === 'SEGMENT' && !this.EXPORT_EXCLUDED_LEVEL_NAMES.includes(level.name.toLowerCase())) {
-        for (const item of level.items as OSegment[]) {
-          const speaker = item.labels.find((a) => a.name.toLowerCase() === 'speaker')?.value || level.name;
-          const value = item.getFirstLabelWithoutName('Speaker')?.value || '';
+      if ((options?.exportLevels ?? []).includes(level.name)) {
+        if (level.type === 'SEGMENT' && !this.EXPORT_EXCLUDED_LEVEL_NAMES.includes(level.name.toLowerCase())) {
+          for (const item of level.items as OSegment[]) {
+            const speaker = item.labels.find((a) => a.name.toLowerCase() === 'speaker')?.value || level.name;
+            const value = item.getFirstLabelWithoutName('Speaker')?.value || '';
 
-          if (value !== '') {
-            transcripts.push({
-              sampleStart: item.sampleStart,
-              sampleDur: item.sampleDur,
-              value,
-              speaker,
-            });
+            if (value !== '') {
+              transcripts.push({
+                sampleStart: item.sampleStart,
+                sampleDur: item.sampleDur,
+                value,
+                speaker,
+              });
+            }
           }
         }
       }
     }
 
     transcripts.sort((a, b) => a.sampleStart - b.sampleStart);
-    const speakers = new Set(transcripts.map((a) => a.speaker).filter((a) => a !== undefined));
 
     for (let i = 0; i < transcripts.length; i++) {
       const transcript = transcripts[i];
       const start = this.getTimeStringFromSamples(transcript.sampleStart, audiofile.sampleRate);
       const end = this.getTimeStringFromSamples(transcript.sampleStart + transcript.sampleDur, audiofile.sampleRate);
-      const speaker = speakers.size > 1 ? `[${transcript.speaker}]: ` : '';
 
       result += `${i + 1}\n`;
       result += `${start} --> ${end}\n`;
-      result += `${speaker}${transcript.value}\n\n`;
+      result += transform(transcript.speaker, transcript.value) + '\n\n';
     }
 
     filename = `${annotation.name}${this._extensions[0]}`;
@@ -147,40 +153,33 @@ export class SRTConverter extends Converter<SRTConverterImportOptions, SRTConver
     };
   }
 
-  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): FormGeneratorJSONSchema | undefined {
+  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): FormGeneratorJSONSchema {
     return {
       $gui_support: true,
       type: 'object',
+      description: 'The following set of options is related to speakers.',
       properties: {
-        speakers: {
-          type: 'object',
-          title: 'Speakers',
-          description: 'The following set of options is related to speakers.',
-          properties: {
-            speakerIdentifierPattern: {
-              title: 'some title',
-              type: 'string',
-              default: '\\[(SPEAKER_[0-9]+)] *: *',
-              description: 'Defines the pattern to recognize the speaker from a given transcript text.',
-              toggleable: true,
-            },
-            sortSpeakerSegments: {
-              title: 'sortSpeakerSegments',
-              dependsOn: ['speakers.speakerIdentifierPattern'],
-              type: 'boolean',
-              default: false,
-              description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
-            },
-            combineSegmentsWithSameSpeakerThreshold: {
-              title: 'combineSegmentsWithSameSpeakerThreshold',
-              dependsOn: ['speakers.speakerIdentifierPattern'],
-              type: 'number',
-              default: 2000,
-              toggleable: true,
-              description:
-                'Defines max. duration an empty segment between two segments may have to be combined together. Set empty to deactivate it.',
-            },
-          },
+        speakerIdentifierPattern: {
+          title: 'some title',
+          toggleable: true,
+          type: 'string',
+          default: '\\[(SPEAKER_[0-9]+)] *: *',
+          description: 'Defines the pattern to recognize the speaker from a given transcript text.',
+        },
+        sortSpeakerSegments: {
+          title: 'sortSpeakerSegments',
+          dependsOn: ['speakerIdentifierPattern'],
+          type: 'boolean',
+          default: false,
+          description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
+        },
+        combineSegmentsWithSameSpeakerThreshold: {
+          title: 'combineSegmentsWithSameSpeakerThreshold',
+          dependsOn: ['speakerIdentifierPattern'],
+          toggleable: true,
+          type: 'number',
+          default: 2000,
+          description: 'Defines max. duration an empty segment between two segments may have to be combined together. Set empty to deactivate it.',
         },
       },
     };
@@ -190,7 +189,7 @@ export class SRTConverter extends Converter<SRTConverterImportOptions, SRTConver
     return {
       $gui_support: true,
       type: 'object',
-      required: ['exportLevels'],
+      required: ['exportLevels', 'transformPattern'],
       properties: {
         exportLevels: {
           title: 'exportLevels',
@@ -208,6 +207,7 @@ export class SRTConverter extends Converter<SRTConverterImportOptions, SRTConver
           type: 'string',
           default: '[{{LEVEL_NAME}}]: {{TRANSCRIPT}}',
           dependsOn: ['exportLevels'],
+          pattern: '\\{\\{TRANSCRIPT\\}\\}',
           description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
         },
       },
@@ -259,6 +259,22 @@ class SRTImporter {
     if (!this.audiofile) {
       return {
         error: `The audio file does not exist.`,
+      };
+    }
+
+    if (!this.audiofile?.sampleRate) {
+      return {
+        error: 'Missing sample rate',
+      };
+    }
+    if (!this.audiofile?.name) {
+      return {
+        error: 'Missing audiofile name',
+      };
+    }
+    if (!this.audiofile?.duration) {
+      return {
+        error: 'Missing audiofile duration',
       };
     }
 

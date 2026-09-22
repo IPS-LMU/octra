@@ -85,52 +85,53 @@
                 [animate.leave]="['animate__animated', 'animate__fadeOut', 'animate__faster']"
                 [ngbCollapse]="exportStates[i].status !== 'active'"
               >
-                <td colspan="5" style="padding-left: 20px;padding-right:0;">
+                <td colspan="5" style="padding-left: 20px; padding-right: 0">
                   <div class="p-1 p-md-3">
-                    <p class="mb-0">
-                      Für den Datenexport stehen ggf. weitere Optionen zur Verfügung. Falls eine Checkbox links neben einer Option angezeigt wird, wird diese Option nur dann verwendet, wenn die Checkbox aktiviert ist.
-                    </p>
                     @if (exportStates[i].options) {
-                      <octra-form-configurator #form
+                      <p class="mb-0">
+                        {{ 'forms.export.introduction' | transloco }}
+                      </p>
+                      <octra-form-configurator
+                        #form
                         [jsonSchema]="exportStates[i].options"
-                                               class="d-block mt-3"
+                        class="d-block mt-3"
                         [(jsonText)]="jsonText"
                         (validationChange)="onValidationChange($event, i)"
                         [options]="{
                           labelPlacement: 'top',
                           questionMarkVisibility: 'onhover',
-                          showToggles: 'auto'
+                          showToggles: 'auto',
                         }"
                         (jsonTextChange)="updateParentFormat(converter, $event)"
                       >
-                        <div footer class="pt-3">
+                        <div footer class="mt-3">
                           @if (exportStates[i].validOptions) {
-                            <a
-                              class="btn btn-info"
-                              [href]="parentformat.uri"
-                              (click)="onDownloadClick(i, form)"
-                              [download]="parentformat.download"
-                            >
+                            <a class="btn btn-info" [href]="parentformat.uri" (click)="onDownloadClick(i, form)" [download]="parentformat.download">
                               <i class="bi bi-save-fill"></i>
-                              Download
+                              {{ 'g.download' | transloco }}
                             </a>
                           } @else {
                             <a
                               class="btn btn-info"
                               [ngClass]="{
-                                  disabled: preparing.name !== converter.name || preparing.preparing,
-                                }"
+                                disabled: preparing.name !== converter.name || preparing.preparing,
+                              }"
                               (click)="onDownloadClick(i, form)"
                             >
                               <i class="bi bi-save-fill"></i>
-                              Download
+                              {{ 'g.download' | transloco }}
                             </a>
                           }
                           @if (form.formTouched && !exportStates[i].validOptions) {
-                            <span class="d-block small text-danger">Errors found. Please check the form</span>
+                            <span class="d-block small text-danger">{{ 'forms.errors found' | transloco }}</span>
                           }
                         </div>
                       </octra-form-configurator>
+                    } @else {
+                      <a class="btn btn-info" [href]="parentformat.uri" (click)="onDownloadClick(i)" [download]="parentformat.download">
+                        <i class="bi bi-save-fill"></i>
+                        {{ 'g.download' | transloco }}
+                      </a>
                     }
                   </div>
                 </td>
@@ -179,7 +180,7 @@
             [ngbCollapse]="!tools.tableConfigurator.opened"
           >
             <td></td>
-            <td colspan="4" style="padding-left: 20px;">
+            <td colspan="4" style="padding-left: 20px">
               <div class="card" style="padding: 10px">
                 <octra-table-configurator
                   [columns]="tools.tableConfigurator.columns"
@@ -241,7 +242,7 @@
               @if (preparing.name === 'Protocol' && !preparing.preparing) {
                 <a download="{{ parentformat.download }}" [href]="parentformat.uri" class="link">
                   <i class="bi bi-save-fill"></i>
-                  Download
+                  {{ 'g.download' | transloco }}
                 </a>
               }
             </td>

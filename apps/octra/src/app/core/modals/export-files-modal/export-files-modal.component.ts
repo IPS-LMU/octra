@@ -2,19 +2,20 @@ import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbActiveModal, NgbCollapse, NgbModalOptions, NgbPopover, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Converter, ExportResult } from '@octra/annotation';
 import { ToolConfiguratorComponent } from '@octra/ngx-components';
+import { ErrorObject } from 'ajv/dist/types';
 import { timer } from 'rxjs';
 import { AppInfo } from '../../../app.info';
 import { NavbarService } from '../../component/navbar/navbar.service';
+import { translateOrUndefined } from '../../shared';
 import { AudioService, UserInteractionsService } from '../../shared/service';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { NamingDragAndDropComponent } from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
 import { TableConfiguratorComponent } from '../../tools/table-configurator/table-configurator.component';
 import { OctraModal } from '../types';
-import { ErrorObject } from 'ajv/dist/types';
 
 @Component({
   selector: 'octra-export-files-modal',
@@ -29,6 +30,7 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   annotationStoreService = inject(AnnotationStoreService);
   protected override activeModal: NgbActiveModal;
   protected cd = inject(ChangeDetectorRef);
+  private transloco = inject(TranslocoService);
   jsonText = '';
 
   public static options: NgbModalOptions = {
@@ -142,11 +144,24 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         this.audio.audioManager.sampleRate,
         this.audio.audioManager.resource.info.duration,
       );
+      const options = converter.needsOptionsForExport(oannotjson, this.audio.audioManager.resource.getOAudioFile());
+
+      if (options) {
+        // translate option labels
+        const root = `converters.${converter.name}.exportOptions`;
+        for (const key of Object.keys(options.properties)) {
+          const propertyDefinition = options.properties[key];
+          if (propertyDefinition.title) {
+            propertyDefinition.title = translateOrUndefined(this.transloco, `${root}.${key}.title`) ?? propertyDefinition.title;
+            propertyDefinition.description = translateOrUndefined(this.transloco, `${root}.${key}.description`) ?? propertyDefinition.description;
+          }
+        }
+      }
 
       this.exportStates.push({
         status: 'close',
         validOptions: false,
-        options: converter.needsOptionsForExport(oannotjson, this.audio.audioManager.resource.getOAudioFile()),
+        options,
         value: {},
       });
     }
@@ -175,14 +190,14 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   }
 
   onLineClick(converter: Converter, index: number) {
-    this.toggleLine(index);
+    this.toggleLine(converter, index);
   }
 
   sanitize(url: string): SafeUrl {
     return this.sanitizer.bypassSecurityTrustUrl(url);
   }
 
-  toggleLine(index: number) {
+  toggleLine(converter: Converter, index: number) {
     for (let i = 0; i < this.exportStates.length; i++) {
       if (this.exportStates[i].status === 'active') {
         this.exportStates[i].status = 'close';
@@ -194,6 +209,15 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         this.exportStates[index].status = 'inactive';
       } else {
         this.exportStates[index].status = 'active';
+        const oannotjson = this.annotationStoreService.transcript?.serialize(
+          this.audio.audioManager.resource.info.fullname,
+          this.audio.audioManager.sampleRate,
+          this.audio.audioManager.resource.info.duration,
+        );
+        const oAudio = this.audio.audioManager.resource.getOAudioFile();
+        if (!converter.needsOptionsForExport(oannotjson, oAudio)) {
+          this.updateParentFormat(converter, '{}');
+        }
       }
     }
     this.cd.markForCheck();
@@ -214,12 +238,11 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     },
     index: number,
   ) {
-    console.log($event);
     this.exportStates[index].validOptions = $event.valid;
     this.cd.markForCheck();
   }
 
-  updateParentFormat(converter: Converter, jsonOptions) {
+  updateParentFormat(converter: Converter, jsonOptions: string) {
     const options = JSON.parse(jsonOptions);
 
     if (!this.preparing.preparing) {
@@ -278,8 +301,8 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     };
   }
 
-  onDownloadClick(i: number, form: ToolConfiguratorComponent) {
-    if (!this.exportStates[i].validOptions) {
+  onDownloadClick(i: number, form?: ToolConfiguratorComponent) {
+    if (form && !this.exportStates[i].validOptions) {
       form.touchForm();
     }
   }

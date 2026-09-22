@@ -1,10 +1,10 @@
-import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { Converter } from '@octra/annotation';
 import { OctraFormGeneratorModule } from '@octra/ngx-components';
-import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { translateOrUndefined } from '../../shared';
+import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { OctraModal } from '../types';
 
 @Component({
@@ -41,16 +41,12 @@ export class ImportOptionsModalComponent extends OctraModal implements OnInit {
 
   ngOnInit() {
     if (this.schema && this.converter) {
-      const root = `converters.${this.converter.name}.options`;
+      const root = `converters.${this.converter.name}.importOptions`;
       for (const key of Object.keys(this.schema.properties)) {
         const propertyDefinition = this.schema.properties[key];
         if (propertyDefinition.title) {
-          propertyDefinition.title =
-            translateOrUndefined(this.transloco, `${root}.${key}.title`) ??
-            propertyDefinition.title;
-          propertyDefinition.description =
-            translateOrUndefined(this.transloco, `${root}.${key}.description`) ??
-            propertyDefinition.description;
+          propertyDefinition.title = translateOrUndefined(this.transloco, `${root}.${key}.title`) ?? propertyDefinition.title;
+          propertyDefinition.description = translateOrUndefined(this.transloco, `${root}.${key}.description`) ?? propertyDefinition.description;
         }
       }
     }

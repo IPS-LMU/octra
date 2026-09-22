@@ -84,6 +84,9 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               description: schema.description,
               ignore: false,
               context: itemsDefinition.enum,
+              examples: itemsDefinition.examples,
+              textAbove: itemsDefinition.textAbove,
+              textBottom: itemsDefinition.textBottom,
               dependsOn: schema.dependsOn,
               toggleable: schema.toggleable,
               required: this.checkIfRequired(name, parent.required),
@@ -106,6 +109,9 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               defaultValue: defaultValue as string[],
               description: schema.description,
               placeholder: schema.placeholder,
+              examples: schema.examples,
+              textAbove: schema.textAbove,
+              textBottom: schema.textBottom,
               ignore: false,
               context: itemsDefinition.enum,
               dependsOn: schema.dependsOn,
@@ -127,6 +133,9 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               toggleable: schema.toggleable,
               type: 'array',
               value: jsonValue ?? defaultValue,
+              examples: schema.examples,
+              textAbove: schema.textAbove,
+              textBottom: schema.textBottom,
               defaultValue: defaultValue as string[],
               description: schema.description,
               dependsOn: schema.dependsOn,
@@ -153,7 +162,16 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
         const value = properties[key];
 
         if (value.properties) {
-          const group = new ConfigurationControlGroup(value.title, key, this.parse(value, key, schema, json ? json[key] : undefined));
+          const group = new ConfigurationControlGroup(
+            key,
+            {
+              title: value.title,
+              description: value.description,
+              textAbove: schema.textAbove,
+              textBottom: schema.textBottom,
+            },
+            this.parse(value, key, schema, json ? json[key] : undefined),
+          );
           group.description = value.description;
           result.push(group);
         } else {
@@ -174,6 +192,9 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
             title: title ?? name,
             value: jsonValue ?? defaultValue,
             defaultValue: defaultValue as boolean,
+            examples: schema.examples,
+            textAbove: schema.textAbove,
+            textBottom: schema.textBottom,
             description,
             ignore,
             dependsOn,
@@ -193,6 +214,9 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
             type: 'number',
             value: jsonValue ?? defaultValue,
             defaultValue: defaultValue as number,
+            examples: schema.examples,
+            textAbove: schema.textAbove,
+            textBottom: schema.textBottom,
             description,
             dependsOn,
             toggleable,
@@ -212,6 +236,9 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
             type: 'integer',
             value: jsonValue ?? defaultValue,
             defaultValue: defaultValue as number,
+            examples: schema.examples,
+            textAbove: schema.textAbove,
+            textBottom: schema.textBottom,
             description,
             ignore,
             toggleable,
@@ -230,6 +257,9 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
             title: title ?? name,
             value: jsonValue ?? defaultValue,
             defaultValue: defaultValue as string,
+            examples: schema.examples,
+            textAbove: schema.textAbove,
+            textBottom: schema.textBottom,
             description,
             ignore,
             toggleable,
@@ -255,6 +285,9 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
               title: title ?? name,
               value: jsonValue ?? defaultValue,
               defaultValue: defaultValue as string,
+              examples: schema.examples,
+              textAbove: schema.textAbove,
+              textBottom: schema.textBottom,
               description,
               ignore,
               toggleable,
@@ -295,14 +328,22 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
     this.onSomethingChanged();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(changes: SimpleChanges<ToolConfiguratorComponent>): void {
     const schemaChange = changes['jsonSchema'];
     if (schemaChange) {
       const schema = schemaChange.currentValue;
 
       if (schema) {
-        const name = schema['name'] ?? '';
-        const group = new ConfigurationControlGroup(schema['title'] ?? '', name, []);
+        const name = schema.name ?? 'group';
+        const group = new ConfigurationControlGroup(
+          name,
+          {
+            title: schema.title ?? '',
+            textBottom: schema.textBottom,
+            textAbove: schema.textAbove,
+          },
+          [],
+        );
         group.description = schema.description;
         this.form = group;
         group.controls = this.parse(schema, name, undefined, this.json);
@@ -323,8 +364,16 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
         }
       }
       if (this.jsonSchema) {
-        const name = this.jsonSchema['name'] ?? '';
-        const group = new ConfigurationControlGroup(this.jsonSchema['title'] ?? '', name, []);
+        const name = this.jsonSchema.name ?? '';
+        const group = new ConfigurationControlGroup(
+          name,
+          {
+            title: this.jsonSchema.title ?? '',
+            textBottom: this.jsonSchema.textBottom,
+            textAbove: this.jsonSchema.textAbove,
+          },
+          [],
+        );
         group.description = this.jsonSchema.description;
         this.form = group;
         group.controls = this.parse(this.jsonSchema, name, undefined, this.json);

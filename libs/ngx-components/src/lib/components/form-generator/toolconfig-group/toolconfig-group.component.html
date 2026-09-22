@@ -18,6 +18,7 @@
     @if (group?.description) {
       <p class="ocf-group-description">{{ group.description }}</p>
     }
+    <p class="py-2 my-0" [innerHTML]="group.textAbove"></p>
     <div class="list-group">
       @if (group !== undefined) {
         @for (control of group!.controls; track control.id) {
@@ -187,6 +188,7 @@
             ></octra-toolconfig-group>
           }
         }
+        <p class="py-2 my-0" [innerHTML]="group.textBottom"></p>
       }
 
       <ng-template
@@ -256,6 +258,17 @@
                 </div>
                 <div class="col">
                   <ng-container *ngTemplateOutlet="content; context: { control: control }"></ng-container>
+                  @if (control.textAbove) {
+                    <div class="ocf-control-above-text mb-3" [innerHTML]="control.textAbove"></div>
+                  }
+                  @if (control.examples) {
+                    <div class="ocf-control-examples">
+                      <code>{{ control.examples }}</code>
+                    </div>
+                  }
+                  @if (control.textBottom) {
+                    <div class="ocf-control-bottom-text mt-3" [innerHTML]="control.textBottom"></div>
+                  }
                 </div>
                 <div class="col-auto text-center px-2">
                   <octra-question-mark

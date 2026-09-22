@@ -6,10 +6,13 @@ import { Converter, ExportResult, IFile, ImportResult, OctraAnnotationFormatType
 import { AnyTextEditor, BASWebservicesApplication, OctraApplication, WordApplication } from './SupportedApplications';
 
 export class TextConverterExportOptions {
-  levelNum!: number;
-  showTimestampSamples? = false;
-  showTimestampString? = false;
-  addNewLineString? = false;
+  exportLevel!: string;
+  // Add a line break after each transcription unit.
+  addLineBreak? = false;
+  // Split transcription units by timestamps in readable format (HH:MM:SS.s
+  addTimestampsReadableFormat? = false;
+  // Split transcription units by timestamps in sample format (e.g. 372890428)
+  addTimestampsSampleFormat? = false;
 
   constructor(partial?: Partial<TextConverterExportOptions>) {
     if (partial) Object.assign(this, partial);
@@ -59,59 +62,63 @@ export class TextConverter extends Converter<any, TextConverterExportOptions> {
     let result = '';
     let filename = '';
 
-    if (options.levelNum === undefined || options.levelNum < 0 || options.levelNum > annotation.levels.length) {
+    if (!options.exportLevel) {
       return {
-        error: 'Missing level number',
+        error: 'Missing level name',
       };
     }
 
-    if (options.levelNum < annotation.levels.length) {
-      const level = annotation.levels[options.levelNum];
+    const level = annotation.levels.find((a) => a.name === options.exportLevel);
 
-      if (level.type === 'SEGMENT') {
-        for (let j = 0; j < level.items.length; j++) {
-          const item = level.items[j] as OSegment;
-          const transcript = item.getFirstLabelWithoutName('Speaker')?.value ?? '';
+    if (!level) {
+      return {
+        error: "Can't find level by given name.",
+      };
+    }
 
-          result += transcript;
-          if (j < level.items.length - 1) {
-            const sampleEnd = item.sampleStart + item.sampleDur;
-            const unixTimestamp = Math.ceil((sampleEnd * 1000) / audiofile.sampleRate);
+    if (level.type === 'SEGMENT') {
+      for (let j = 0; j < level.items.length; j++) {
+        const item = level.items[j] as OSegment;
+        const transcript = item.getFirstLabelWithoutName('Speaker')?.value ?? '';
 
-            if (options) {
-              if (options.showTimestampString || options.showTimestampSamples) {
-                result += ` <`;
-                if (options.showTimestampString) {
-                  const endTime = this.convertToTimeString(unixTimestamp, {
-                    showHour: true,
-                    showMilliSeconds: true,
-                  });
-                  result += `ts="${endTime}"`;
-                }
-                if (options.showTimestampSamples) {
-                  result += options.showTimestampString ? ' ' : '';
-                  result += `sp="${sampleEnd}"`;
-                }
-                result += `>`;
+        result += transcript;
+        if (j < level.items.length - 1) {
+          const sampleEnd = item.sampleStart + item.sampleDur;
+          const unixTimestamp = Math.ceil((sampleEnd * 1000) / audiofile.sampleRate);
+
+          if (options) {
+            if (options.addTimestampsSampleFormat || options.addTimestampsReadableFormat) {
+              result += ` <`;
+              if (options.addTimestampsReadableFormat) {
+                const endTime = this.convertToTimeString(unixTimestamp, {
+                  showHour: true,
+                  showMilliSeconds: true,
+                });
+                result += `ts="${endTime}"`;
               }
-
-              if (options.addNewLineString) {
-                result += '\n';
-              } else {
-                result += ' ';
+              if (options.addTimestampsSampleFormat) {
+                result += options.addTimestampsReadableFormat ? ' ' : '';
+                result += `sp="${sampleEnd}"`;
               }
+              result += `>`;
+            }
+
+            if (options.addLineBreak) {
+              result += '\n';
+            } else {
+              result += ' ';
             }
           }
         }
-        result += '';
       }
-
-      filename = `${annotation.name}`;
-      if (annotation.levels.length > 1) {
-        filename += `-${level.name}`;
-      }
-      filename += `${this._extensions[0]}`;
+      result += '';
     }
+
+    filename = `${annotation.name}`;
+    if (annotation.levels.length > 1) {
+      filename += `-${level.name}`;
+    }
+    filename += `${this._extensions[0]}`;
 
     result = result.replace(/ +/g, ' ');
     return {
@@ -124,68 +131,42 @@ export class TextConverter extends Converter<any, TextConverterExportOptions> {
     };
   }
 
-  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): FormGeneratorJSONSchema {
-    return {
-      $gui_support: true,
-      type: 'object',
-      properties: {
-        speakerIdentifierPattern: {
-          title: 'speakerIdentifierPattern',
-          toggleable: true,
-          type: 'string',
-          default: '\\[(SPEAKER_[0-9]+)] *: *',
-          description: 'Defines the pattern to recognize the speaker from a given transcript text.',
-        },
-        sortSpeakerSegments: {
-          title: 'sortSpeakerSegments',
-          dependsOn: ['speakerIdentifierPattern'],
-          type: 'boolean',
-          default: false,
-          description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
-        },
-        combineSegmentsWithSameSpeakerThreshold: {
-          title: 'combineSegmentsWithSameSpeakerThreshold',
-          dependsOn: ['speakerIdentifierPattern'],
-          toggleable: true,
-          type: 'number',
-          default: 2000,
-          description: 'Defines max. duration an empty segment between two segments may have to be combined together. Set empty to deactivate it.',
-        },
-      },
-    };
+  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): FormGeneratorJSONSchema | undefined {
+    return undefined;
   }
 
-  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): FormGeneratorJSONSchema {
+  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): FormGeneratorJSONSchema | undefined {
     return {
       $gui_support: true,
       type: 'object',
       title: '',
-      required: ['exportLevels', 'transformTranscriptionUnit'],
+      required: ['exportLevel'],
       properties: {
-        exportLevels: {
+        exportLevel: {
           title: 'Export levels',
-          type: 'array',
-          default: [...annotation.levels.map((a) => a.name)],
-          items: {
-            type: 'string',
-            enum: [...annotation.levels.map((a) => a.name)],
-            title: 'Level Name',
-          },
+          type: 'string',
+          default: annotation.levels.map((a) => a.name)[0],
+          enum: [...annotation.levels.map((a) => a.name)],
           description: 'Defines a list of level names that should be exported.',
         },
-        transformTranscriptionUnit: {
-          title: 'Transform Transcripts',
-          type: 'string',
-          dependsOn: ['exportLevels'],
-          default: '[{{LEVEL_NAME}}]: {{TRANSCRIPT}}',
-          pattern: '(\\{\\{LEVEL_NAME\\}\\})|(\\{\\{TRANSCRIPT\\}\\})',
-          description:
-            'Defines how the transcript of each unit should be transformed using placeholders. Supported placeholders: {{LEVEL_NAME}}, {{TRANSCRIPT}}.',
+        addLineBreak: {
+          title: 'Line Break',
+          type: 'boolean',
+          description: 'Add a line break after each transcription unit.',
         },
-        test: {
-          title: 'test',
-          type: 'string',
-          placeholder: 'HAllo, das ist ein test',
+        addTimestampsReadableFormat: {
+          title: 'Add time stamps in readable format.',
+          type: 'boolean',
+          description: 'Split transcription units by timestamps in readable format (HH:MM:SS.s)',
+          examples: ['This is an example <ts="00:00:03.222"> of a transcript with timestamps.'],
+        },
+        addTimestampsSampleFormat: {
+          title: 'Add time stamps in sample format.',
+          type: 'boolean',
+          description: 'Split transcription units by timestamps in sample format (e.g. 372890428)',
+          examples: ['This is an example <sp="379736"> of a transcript with timestamps.'],
+          textBottom:
+            'Wenn Du beide Optionen aktivierst, werden beide Formate eingefügt:<br/><code>This is an example &lt;ts="00:00:03.222" sp="379736"&gt; of a transcript with timestamps.</code>',
         },
       },
     };

@@ -85,7 +85,7 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
     for (let i = 0; i < annotation.levels.length; i++) {
       const level = annotation.levels[i];
 
-      if ((options?.exportLevels ?? []).includes(level.name))
+      if ((options?.exportLevels ?? []).includes(level.name)) {
         if (level.type === 'SEGMENT' && !this.EXPORT_EXCLUDED_LEVEL_NAMES.includes(level.name.toLowerCase())) {
           for (const item of level.items as OSegment[]) {
             const speaker = item.labels.find((a) => a.name.toLowerCase() === 'speaker')?.value || level.name;
@@ -101,6 +101,7 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
             }
           }
         }
+      }
     }
 
     transcripts.sort((a, b) => a.sampleStart - b.sampleStart);
@@ -131,6 +132,7 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
     return {
       $gui_support: true,
       type: 'object',
+      description: 'The following set of options is related to speakers.',
       properties: {
         speakerIdentifierPattern: {
           title: 'some title',
@@ -162,7 +164,7 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
     return {
       $gui_support: true,
       type: 'object',
-      required: ['exportLevels'],
+      required: ['exportLevels', 'transformPattern'],
       properties: {
         exportLevels: {
           title: 'exportLevels',

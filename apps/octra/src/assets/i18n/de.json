@@ -54,7 +54,7 @@
   },
   "converters": {
     "SRT": {
-      "options": {
+      "importOptions": {
         "combineSegmentsWithSameSpeakerThreshold": {
           "description": "Führt eine leere Einheit zwischen zwei Einheiten des gleichen Sprechers zusammen, wenn diese eine maximale Dauer (ms) besitzt.",
           "title": "Leere Segmente mit max. Dauer (ms) vom gleichen Sprecher zusammenführen"
@@ -66,6 +66,16 @@
         "speakerIdentifierPattern": {
           "description": "Regulärer Ausdruck, mit dem der Sprecher einer Transkriptionseinheit erkannt werden kann.",
           "title": "Regulärer Ausdruck für Sprecheridentifikation"
+        }
+      },
+      "exportOptions": {
+        "exportLevels": {
+          "title": "Ausgewählte Ebenen",
+          "description": "Wähle aus, welche Ebenen exportiert werden sollen. ´"
+        },
+        "transformPattern": {
+          "title": "Transkript anpassen",
+          "description": "Definiere, wie die Transkriptzeilen für den Export geändert werden sollen. Unterstützte Platzhaltern: LEVEL_NAME, TRANSCRIPT."
         }
       }
     }
@@ -635,6 +645,12 @@
     },
     "close": {
       "popover": "OCTRA beenden"
+    }
+  },
+  "forms": {
+    "errors found": "Fehler gefunden. Bitte prüfe das Formular.",
+    "export": {
+      "introduction": "Für den Datenexport stehen ggf. weitere Optionen zur Verfügung. Falls eine Checkbox links neben einer Option angezeigt wird, wird diese Option nur dann verwendet, wenn die Checkbox aktiviert ist."
     }
   }
 }

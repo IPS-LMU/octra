@@ -6,27 +6,44 @@ function nextControlId(): number {
   return idCounter++;
 }
 
-export class ConfigurationControlOptions<R, S = any> {
-  type?: 'switch' | 'select' | 'number' | 'integer' | 'multiple-choice' | 'text' | 'textarea' | 'array';
+export class ConfigurationItem {
+  type?: 'switch' | 'select' | 'number' | 'integer' | 'multiple-choice' | 'text' | 'textarea' | 'array' | 'group';
   title?: string;
   description?: string;
+  ignore = false;
+  textAbove?: string;
+  textBottom?: string;
+  schema: JSONSchema7;
+}
+
+export class ConfigurationControlOptions<R, S = any> extends ConfigurationItem {
+  override type?: 'switch' | 'select' | 'number' | 'integer' | 'multiple-choice' | 'text' | 'textarea' | 'array';
   placeholder?: string;
   value?: R;
   defaultValue?: R;
-  ignore = false;
+  examples?: any;
   toggleable = false;
   required = false;
   dependsOn: string[] = [];
   context?: S;
-  schema: JSONSchema7;
+
+  constructor(partial?: Partial<ConfigurationControlOptions<R, S>>) {
+    super();
+    Object.assign(this, partial);
+  }
+}
+
+export class ConfigurationGroupOptions extends ConfigurationItem {
+  override type = 'group' as const;
+
+  constructor(partial?: Partial<ConfigurationGroupOptions>) {
+    super();
+    Object.assign(this, partial);
+  }
 }
 
 export class FixedConfigurationControlOptions<R, S = any> extends ConfigurationControlOptions<R, S> {
   declare type: 'switch' | 'select' | 'number' | 'integer' | 'multiple-choice' | 'text' | 'textarea' | 'array';
-
-  constructor() {
-    super();
-  }
 }
 
 export class ConfigurationControl<R = any, S = any> {
@@ -74,6 +91,10 @@ export class ConfigurationControl<R = any, S = any> {
     return this._options.schema;
   }
 
+  get examples(): any {
+    return this._options.examples;
+  }
+
   get ignore(): boolean {
     return this._options.ignore;
   }
@@ -84,6 +105,14 @@ export class ConfigurationControl<R = any, S = any> {
 
   get id(): any {
     return this._id;
+  }
+
+  get textAbove(): string {
+    return this._options.textAbove;
+  }
+
+  get textBottom(): string {
+    return this._options.textBottom;
   }
 
   private _id: number;
@@ -281,25 +310,27 @@ export class ConfigurationTextareaControl extends ConfigurationControl<string> {
 
 export class ConfigurationControlGroup {
   private _type = 'group';
+  protected _options: ConfigurationGroupOptions;
+  protected _name: string;
 
   get type(): string {
     return this._type;
   }
 
   get title(): string {
-    return this._title;
+    return this._options.title;
   }
 
   get name(): string {
     return this._name;
   }
 
-  get toggleable(): boolean {
-    return this._toggleable;
+  get textAbove(): string {
+    return this._options.textAbove;
   }
 
-  get dependsOn(): string[] {
-    return this._dependsOn;
+  get textBottom(): string {
+    return this._options.textBottom;
   }
 
   // ignore
@@ -313,13 +344,14 @@ export class ConfigurationControlGroup {
   public itemsType: any = undefined;
 
   constructor(
-    protected _title: string,
-    protected _name: string,
+    name: string,
+    options: Partial<ConfigurationGroupOptions>,
     public controls: (ConfigurationControl | ConfigurationControlGroup)[] = [],
-    protected _toggleable = false,
-    protected _dependsOn: string[] = [],
     public readonly root?: ConfigurationControlGroup,
-  ) {}
+  ) {
+    this._options = new ConfigurationGroupOptions(options);
+    this._name = name;
+  }
 
   toObj(): any {
     let result: any = {};
@@ -337,39 +369,5 @@ export class ConfigurationControlGroup {
       return returnValue;
     }
     return result;
-  }
-
-  checkToggleStateOfControl() {
-    if (this.toggleable && !this.toggled) {
-      return false;
-    } else if (this.dependsOn.length > 0) {
-      for (const dependsOnAttributePath of this.dependsOn) {
-        const found = this.findControlOfAttributeName(dependsOnAttributePath);
-        if (!found?.toggled || !found?.value) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    return this.toggled;
-  }
-
-  private findControlOfAttributeName(path: string): ConfigurationControl | ConfigurationControlGroup | undefined {
-    const splitted = path.split('.').filter((a) => a !== '');
-    let pointer: ConfigurationControlGroup = this.root as any;
-    for (let i = 0; i < splitted.length; i++) {
-      const searchPart = splitted[i];
-      const index = (pointer?.controls ?? []).findIndex((a) => a.name === searchPart);
-
-      if (index > -1) {
-        if (i === splitted.length - 1) {
-          return pointer.controls[index];
-        } else {
-          pointer = pointer.controls[index] as ConfigurationControlGroup;
-        }
-      }
-    }
-    return undefined;
   }
 }

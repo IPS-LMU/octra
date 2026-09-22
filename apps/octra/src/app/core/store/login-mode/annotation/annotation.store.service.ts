@@ -203,7 +203,7 @@ export class AnnotationStoreService {
         );
 
         const result = new TextConverter().export(annotation, this.audio.audioManager.resource.getOAudioFile(), {
-          levelNum: transcript.selectedLevelIndex!,
+          exportLevel: transcript.currentLevel!.name,
         })!.file!;
 
         return result.content;

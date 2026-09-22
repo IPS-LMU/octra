@@ -4,6 +4,7 @@ import { NgbActiveModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { Converter } from '@octra/annotation';
 import { OctraFormGeneratorModule } from '@octra/ngx-components';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
+import { translateOrUndefined } from '../../shared';
 import { OctraModal } from '../types';
 
 @Component({
@@ -45,10 +46,10 @@ export class ImportOptionsModalComponent extends OctraModal implements OnInit {
         const propertyDefinition = this.schema.properties[key];
         if (propertyDefinition.title) {
           propertyDefinition.title =
-            this.transloco.translate(`${root}.${key}.title`) ??
+            translateOrUndefined(this.transloco, `${root}.${key}.title`) ??
             propertyDefinition.title;
           propertyDefinition.description =
-            this.transloco.translate(`${root}.${key}.description`) ??
+            translateOrUndefined(this.transloco, `${root}.${key}.description`) ??
             propertyDefinition.description;
         }
       }

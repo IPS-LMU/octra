@@ -1,19 +1,10 @@
 import { OAudiofile } from '@octra/media';
+import { FormGeneratorJSONSchema } from '@octra/utilities';
 import { OAnnotJSON } from '../annotjson';
 import { SupportedApplication } from './SupportedApplications';
 
 export type OctraAnnotationFormatType =
-  | 'AnnotJSON'
-  | 'BundleJSON'
-  | 'CTM'
-  | 'ELAN'
-  | 'BASPartitur'
-  | 'PraatTextTable'
-  | 'SRT'
-  | 'PlainText'
-  | 'TextGrid'
-  | 'WhisperJSON'
-  | 'WebVTT';
+  'AnnotJSON' | 'BundleJSON' | 'CTM' | 'ELAN' | 'BASPartitur' | 'PraatTextTable' | 'SRT' | 'PlainText' | 'TextGrid' | 'WhisperJSON' | 'WebVTT';
 
 export interface IFile {
   name: string;
@@ -109,12 +100,12 @@ export abstract class Converter<I extends object = object, O extends object = ob
    * @param file the transcript file
    * @param audiofile information about the audio file.
    */
-  public abstract needsOptionsForImport(file: IFile, audiofile: OAudiofile): any | undefined;
+  public abstract needsOptionsForImport(file: IFile, audiofile: OAudiofile): FormGeneratorJSONSchema | undefined;
 
   /**
    * checks if the converter needs further options to export a file.
    * @param file the transcript file
    * @param audiofile information about the audio file.
    */
-  public abstract needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any | undefined;
+  public abstract needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): FormGeneratorJSONSchema | undefined;
 }

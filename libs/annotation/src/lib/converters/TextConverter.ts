@@ -1,4 +1,5 @@
 import { OAudiofile } from '@octra/media';
+import { FormGeneratorJSONSchema } from '@octra/utilities';
 import { FileInfo } from '@octra/web-media';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import { Converter, ExportResult, IFile, ImportResult, OctraAnnotationFormatType } from './Converter';
@@ -123,37 +124,68 @@ export class TextConverter extends Converter<any, TextConverterExportOptions> {
     };
   }
 
-  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): any | undefined {
-    return undefined;
-  }
-
-  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any {
+  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): FormGeneratorJSONSchema {
     return {
       $gui_support: true,
       type: 'object',
       properties: {
-        levelNum: {
-          title: 'levelNum',
+        speakerIdentifierPattern: {
+          title: 'speakerIdentifierPattern',
+          toggleable: true,
+          type: 'string',
+          default: '\\[(SPEAKER_[0-9]+)] *: *',
+          description: 'Defines the pattern to recognize the speaker from a given transcript text.',
+        },
+        sortSpeakerSegments: {
+          title: 'sortSpeakerSegments',
+          dependsOn: ['speakerIdentifierPattern'],
+          type: 'boolean',
+          default: false,
+          description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
+        },
+        combineSegmentsWithSameSpeakerThreshold: {
+          title: 'combineSegmentsWithSameSpeakerThreshold',
+          dependsOn: ['speakerIdentifierPattern'],
+          toggleable: true,
           type: 'number',
-          required: true,
+          default: 2000,
+          description: 'Defines max. duration an empty segment between two segments may have to be combined together. Set empty to deactivate it.',
         },
-        showTimestampSamples: {
-          title: 'showTimestampSamples',
-          type: 'boolean',
-          required: false,
-          default: false,
+      },
+    };
+  }
+
+  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): FormGeneratorJSONSchema {
+    return {
+      $gui_support: true,
+      type: 'object',
+      title: '',
+      required: ['exportLevels', 'transformTranscriptionUnit'],
+      properties: {
+        exportLevels: {
+          title: 'Export levels',
+          type: 'array',
+          default: [...annotation.levels.map((a) => a.name)],
+          items: {
+            type: 'string',
+            enum: [...annotation.levels.map((a) => a.name)],
+            title: 'Level Name',
+          },
+          description: 'Defines a list of level names that should be exported.',
         },
-        showTimestampString: {
-          title: 'showTimestampString',
-          type: 'boolean',
-          required: false,
-          default: false,
+        transformTranscriptionUnit: {
+          title: 'Transform Transcripts',
+          type: 'string',
+          dependsOn: ['exportLevels'],
+          default: '[{{LEVEL_NAME}}]: {{TRANSCRIPT}}',
+          pattern: '(\\{\\{LEVEL_NAME\\}\\})|(\\{\\{TRANSCRIPT\\}\\})',
+          description:
+            'Defines how the transcript of each unit should be transformed using placeholders. Supported placeholders: {{LEVEL_NAME}}, {{TRANSCRIPT}}.',
         },
-        addNewLineString: {
-          title: 'addNewLineString',
-          type: 'boolean',
-          required: false,
-          default: false,
+        test: {
+          title: 'test',
+          type: 'string',
+          placeholder: 'HAllo, das ist ein test',
         },
       },
     };

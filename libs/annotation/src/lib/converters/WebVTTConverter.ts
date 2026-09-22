@@ -17,7 +17,7 @@ export class WebVTTConverterImportOptions {
 
 export class WebVTTConverterExportOptions {
   exportLevels?: string[];
-  transformTranscriptionUnit?: string;
+  transformPattern?: string;
 
   constructor(partial?: Partial<WebVTTConverterExportOptions>) {
     if (partial) Object.assign(this, partial);
@@ -76,8 +76,8 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
     }[] = [];
 
     const transform = (speaker: string, transcript: string) => {
-      return options?.transformTranscriptionUnit
-        ? options.transformTranscriptionUnit.replace(`{{LEVEL_NAME}}`, speaker).replace('{{TRANSCRIPT}}', transcript)
+      return options?.transformPattern
+        ? options.transformPattern.replace(`{{LEVEL_NAME}}`, speaker).replace('{{TRANSCRIPT}}', transcript)
         : transcript;
     };
 
@@ -127,13 +127,13 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
     };
   }
 
-  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): any | undefined {
+  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): FormGeneratorJSONSchema {
     return {
       $gui_support: true,
       type: 'object',
       properties: {
         speakerIdentifierPattern: {
-          title: 'speakerIdentifierPattern',
+          title: 'some title',
           toggleable: true,
           type: 'string',
           default: '\\[(SPEAKER_[0-9]+)] *: *',
@@ -158,42 +158,32 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
     };
   }
 
-  // TODO add option for i18n
-
-  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any {
+  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): FormGeneratorJSONSchema {
     return {
       $gui_support: true,
       type: 'object',
-      title: '',
-      required: ['exportLevels', 'transformTranscriptionUnit'],
+      required: ['exportLevels'],
       properties: {
         exportLevels: {
-          title: 'Export levels',
+          title: 'exportLevels',
+          toggleable: false,
           type: 'array',
-          default: [...annotation.levels.map((a) => a.name)],
           items: {
             type: 'string',
-            enum: [...annotation.levels.map((a) => a.name)],
-            title: 'Level Name',
+            enum: annotation.levels.map((a) => a.name),
           },
-          description: 'Defines a list of level names that should be exported.',
+          description: 'Defines an array of level indices for export.',
+          default: annotation.levels.map((a) => a.name),
         },
-        transformTranscriptionUnit: {
-          title: 'Transform Transcripts',
+        transformPattern: {
+          title: 'transformTranscriptionUnit',
           type: 'string',
-          dependsOn: ['exportLevels'],
           default: '[{{LEVEL_NAME}}]: {{TRANSCRIPT}}',
-          pattern: '(\\{\\{LEVEL_NAME\\}\\})|(\\{\\{TRANSCRIPT\\}\\})',
-          description:
-            'Defines how the transcript of each unit should be transformed using placeholders. Supported placeholders: {{LEVEL_NAME}}, {{TRANSCRIPT}}.',
+          dependsOn: ['exportLevels'],
+          description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
         },
-        test: {
-          title: "test",
-          type: "string",
-          placeholder: "HAllo, das ist ein test"
-        }
       },
-    } as FormGeneratorJSONSchema;
+    };
   }
 
   public import(file: IFile, audiofile: OAudiofile, options: WebVTTConverterImportOptions = new WebVTTConverterImportOptions()): ImportResult {

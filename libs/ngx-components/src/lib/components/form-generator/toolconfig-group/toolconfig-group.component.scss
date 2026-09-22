@@ -2,12 +2,15 @@
 
 .ocf-control-group {
   display: block;
-  border-top: 1px solid lightgrey;
-  border-collapse: collapse;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  margin-top: 15px;
 }
 
 .ocf-control-title {
   font-weight: 500;
+}
+
+.ocf-group-title {
+  margin-top: 3px;
+  margin-bottom: 3px;
+  font-size: 18px;
 }

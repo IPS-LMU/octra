@@ -87,7 +87,9 @@
               >
                 <td colspan="5" style="padding-left: 20px;padding-right:0;">
                   <div class="p-1 p-md-3">
-                    <p class="mb-0">Klicke auf eine der Checkboxen, um Einstellungen zu überschreiben</p>
+                    <p class="mb-0">
+                      Für den Datenexport stehen ggf. weitere Optionen zur Verfügung. Falls eine Checkbox links neben einer Option angezeigt wird, wird diese Option nur dann verwendet, wenn die Checkbox aktiviert ist.
+                    </p>
                     @if (exportStates[i].options) {
                       <octra-form-configurator #form
                         [jsonSchema]="exportStates[i].options"
@@ -101,7 +103,7 @@
                         }"
                         (jsonTextChange)="updateParentFormat(converter, $event)"
                       >
-                        <div footer>
+                        <div footer class="pt-3">
                           @if (exportStates[i].validOptions) {
                             <a
                               class="btn btn-info"

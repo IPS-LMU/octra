@@ -1,4 +1,5 @@
 import { OAudiofile } from '@octra/media';
+import { FormGeneratorJSONSchema } from '@octra/utilities';
 import { FileInfo } from '@octra/web-media';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import { Converter, ExportResult, IFile, ImportResult, OctraAnnotationFormatType } from './Converter';
@@ -146,55 +147,65 @@ export class SRTConverter extends Converter<SRTConverterImportOptions, SRTConver
     };
   }
 
-  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): any | undefined {
+  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): FormGeneratorJSONSchema | undefined {
     return {
       $gui_support: true,
       type: 'object',
       properties: {
-        speakerIdentifierPattern: {
-          title: 'speakerIdentifierPattern',
-          toggleable: true,
-          type: 'string',
-          default: '\\[(SPEAKER_[0-9]+)] *: *',
-          description: 'Defines the pattern to recognize the speaker from a given transcript text.',
-        },
-        sortSpeakerSegments: {
-          title: 'sortSpeakerSegments',
-          dependsOn: ['speakerIdentifierPattern'],
-          type: 'boolean',
-          default: false,
-          description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
-        },
-        combineSegmentsWithSameSpeakerThreshold: {
-          title: 'combineSegmentsWithSameSpeakerThreshold',
-          dependsOn: ['speakerIdentifierPattern'],
-          toggleable: true,
-          type: 'number',
-          default: 2000,
-          description: 'Defines max. duration an empty segment between two segments may have to be combined together. Set empty to deactivate it.',
+        speakers: {
+          type: 'object',
+          title: 'Speakers',
+          description: 'The following set of options is related to speakers.',
+          properties: {
+            speakerIdentifierPattern: {
+              title: 'some title',
+              type: 'string',
+              default: '\\[(SPEAKER_[0-9]+)] *: *',
+              description: 'Defines the pattern to recognize the speaker from a given transcript text.',
+              toggleable: true,
+            },
+            sortSpeakerSegments: {
+              title: 'sortSpeakerSegments',
+              dependsOn: ['speakers.speakerIdentifierPattern'],
+              type: 'boolean',
+              default: false,
+              description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
+            },
+            combineSegmentsWithSameSpeakerThreshold: {
+              title: 'combineSegmentsWithSameSpeakerThreshold',
+              dependsOn: ['speakers.speakerIdentifierPattern'],
+              type: 'number',
+              default: 2000,
+              toggleable: true,
+              description:
+                'Defines max. duration an empty segment between two segments may have to be combined together. Set empty to deactivate it.',
+            },
+          },
         },
       },
     };
   }
 
-  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any {
+  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): FormGeneratorJSONSchema {
     return {
       $gui_support: true,
       type: 'object',
+      required: ['exportLevels'],
       properties: {
         exportLevels: {
           title: 'exportLevels',
           toggleable: false,
           type: 'array',
           items: {
-            type: 'number',
+            type: 'string',
+            enum: annotation.levels.map((a) => a.name),
           },
           description: 'Defines an array of level indices for export.',
+          default: annotation.levels.map((a) => a.name),
         },
         transformPattern: {
           title: 'transformTranscriptionUnit',
           type: 'string',
-          toggleable: true,
           default: '[{{LEVEL_NAME}}]: {{TRANSCRIPT}}',
           dependsOn: ['exportLevels'],
           description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',

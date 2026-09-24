@@ -1,5 +1,5 @@
 import { OAudiofile } from '@octra/media';
-import { contains } from '@octra/utilities';
+import { contains, FormGeneratorJSONSchema } from '@octra/utilities';
 import { FileInfo } from '@octra/web-media';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import { Converter, ExportResult, IFile, ImportResult, OctraAnnotationFormatType } from './Converter';
@@ -7,7 +7,7 @@ import { OctraApplication } from './SupportedApplications';
 
 
 export class CTMConverterExportOptions {
-  levelNum!: number;
+  levelName!: string;
 
   constructor(partial?: Partial<CTMConverterExportOptions>) {
     if (partial) Object.assign(this, partial);
@@ -39,9 +39,9 @@ export class CTMConverter extends Converter<any, CTMConverterExportOptions> {
     let result = '';
     let filename = '';
 
-    if (options.levelNum === undefined || options.levelNum < 0 || options.levelNum > annotation.levels.length) {
+    if (options.levelName === undefined) {
       return {
-        error: `CTMConverter needs a levelnumber`,
+        error: `CTMConverter needs a level name`,
       };
     }
 
@@ -57,7 +57,13 @@ export class CTMConverter extends Converter<any, CTMConverterExportOptions> {
       };
     }
 
-    const level = annotation.levels[options.levelNum];
+    const level = annotation.levels.find(a => a.name === options.levelName);
+
+    if(!level) {
+      return {
+        error: `Can't find level with name ${options.levelName}`
+      }
+    }
 
     for (const levelItem of level.items as OSegment[]) {
       const transcript = levelItem.getFirstLabelWithoutName('Speaker')?.value ?? '';
@@ -82,15 +88,17 @@ export class CTMConverter extends Converter<any, CTMConverterExportOptions> {
     return undefined;
   }
 
-  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any {
+  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): FormGeneratorJSONSchema {
     return {
       $gui_support: true,
       type: 'object',
+      required: ['levelName'],
       properties: {
-        levelNum: {
-          title: 'levelNum',
-          type: 'number',
-          required: true,
+        levelName: {
+          title: 'Level name',
+          type: 'string',
+          enum: annotation.levels.map(a => a.name),
+          description: "Defines the name of the level that should be exported."
         },
       },
     };

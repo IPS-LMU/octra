@@ -276,6 +276,10 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
             preparing: false,
           };
         } else {
+          this.preparing = {
+            name: converter.name,
+            preparing: false,
+          };
           console.error(`Annotation conversion error: ${result.error}`);
         }
         this.cd.markForCheck();

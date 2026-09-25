@@ -98,6 +98,7 @@ export class CTMConverter extends Converter<any, CTMConverterExportOptions> {
           title: 'Level name',
           type: 'string',
           enum: annotation.levels.map(a => a.name),
+          default: annotation.levels.map(a => a.name)[0],
           description: "Defines the name of the level that should be exported."
         },
       },

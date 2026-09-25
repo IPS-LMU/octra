@@ -206,80 +206,79 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
         );
         control.toggled = this.options.showToggles === 'hide' || !control.toggleable || (json && Object.keys(json).includes(name));
         result.push(control);
-      } else if (schema.type === 'number') {
-        const control = new ConfigurationNumberControl(
-          name,
-          {
-            title: title ?? name,
-            type: 'number',
-            value: jsonValue ?? defaultValue,
-            defaultValue: defaultValue as number,
-            examples: schema.examples,
-            textAbove: schema.textAbove,
-            textBottom: schema.textBottom,
-            description,
-            dependsOn,
-            toggleable,
-            ignore,
-            required: this.checkIfRequired(name, parent.required),
-            schema,
-          },
-          this.form,
-        );
-        control.toggled = this.options.showToggles === 'hide' || !control.toggleable || (json && Object.keys(json).includes(name));
-        result.push(control);
-      } else if (schema.type === 'integer') {
-        const control = new ConfigurationNumberControl(
-          name,
-          {
-            title: title ?? name,
-            type: 'integer',
-            value: jsonValue ?? defaultValue,
-            defaultValue: defaultValue as number,
-            examples: schema.examples,
-            textAbove: schema.textAbove,
-            textBottom: schema.textBottom,
-            description,
-            ignore,
-            toggleable,
-            dependsOn,
-            required: this.checkIfRequired(name, parent.required),
-            schema,
-          },
-          this.form,
-        );
-        control.toggled = this.options.showToggles === 'hide' || !control.toggleable || (json && Object.keys(json).includes(name));
-        result.push(control);
-      } else if (schema.type === 'string') {
-        let control: ConfigurationControl = new ConfigurationSelectControl(
-          name,
-          {
-            title: title ?? name,
-            value: jsonValue ?? defaultValue,
-            defaultValue: defaultValue as string,
-            examples: schema.examples,
-            textAbove: schema.textAbove,
-            textBottom: schema.textBottom,
-            description,
-            ignore,
-            toggleable,
-            dependsOn,
-            context: enumValues?.map((a) => ({
-              label: a,
-              value: a,
-            })),
-            required: this.checkIfRequired(name, parent.required),
-            schema,
-          },
-          this.form,
-        );
-        control.toggled = this.options.showToggles === 'hide' || !control.toggleable || (json && Object.keys(json).includes(name));
-
-        if (enumValues) {
-          // select
+      } else {
+        if (enumValues && enumValues.length > 0) {
+          const control: ConfigurationControl = new ConfigurationSelectControl(
+            name,
+            {
+              title: title ?? name,
+              value: jsonValue ?? defaultValue,
+              defaultValue: defaultValue as string,
+              examples: schema.examples,
+              textAbove: schema.textAbove,
+              textBottom: schema.textBottom,
+              transformValue: schema.type as any,
+              description,
+              ignore,
+              toggleable,
+              dependsOn,
+              context: enumValues?.map((a) => ({
+                label: a,
+                value: a,
+              })),
+              required: this.checkIfRequired(name, parent.required),
+              schema,
+            },
+            this.form,
+          );
+          control.toggled = this.options.showToggles === 'hide' || !control.toggleable || (json && Object.keys(json).includes(name));
           result.push(control);
-        } else {
-          control = new ConfigurationTextControl(
+        } else if (schema.type === 'number') {
+          const control = new ConfigurationNumberControl(
+            name,
+            {
+              title: title ?? name,
+              type: 'number',
+              value: jsonValue ?? defaultValue,
+              defaultValue: defaultValue as number,
+              examples: schema.examples,
+              textAbove: schema.textAbove,
+              textBottom: schema.textBottom,
+              description,
+              dependsOn,
+              toggleable,
+              ignore,
+              required: this.checkIfRequired(name, parent.required),
+              schema,
+            },
+            this.form,
+          );
+          control.toggled = this.options.showToggles === 'hide' || !control.toggleable || (json && Object.keys(json).includes(name));
+          result.push(control);
+        } else if (schema.type === 'integer') {
+          const control = new ConfigurationNumberControl(
+            name,
+            {
+              title: title ?? name,
+              type: 'integer',
+              value: jsonValue ?? defaultValue,
+              defaultValue: defaultValue as number,
+              examples: schema.examples,
+              textAbove: schema.textAbove,
+              textBottom: schema.textBottom,
+              description,
+              ignore,
+              toggleable,
+              dependsOn,
+              required: this.checkIfRequired(name, parent.required),
+              schema,
+            },
+            this.form,
+          );
+          control.toggled = this.options.showToggles === 'hide' || !control.toggleable || (json && Object.keys(json).includes(name));
+          result.push(control);
+        } else if (schema.type === 'string') {
+          const control = new ConfigurationTextControl(
             name,
             {
               title: title ?? name,
@@ -391,7 +390,6 @@ export class ToolConfiguratorComponent extends SubscriberComponent implements On
 
       this.subscribe(timer(0), {
         next: () => {
-          console.log('form errors');
           const jsonValid = this.validateJSON(json, this.jsonSchema);
           this.validationChange.next(jsonValid);
         },

@@ -8,6 +8,7 @@
   [required]="required"
   [ngModel]="value"
   (ngModelChange)="onValueChange($event)"
+  [ngModelOptions]="{ standalone: true }"
   (blur)="markAsTouched()"
   [ngbPopover]="popover"
   [disablePopover]="!touched || errorMessages.length === 0"

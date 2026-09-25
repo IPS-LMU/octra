@@ -12,16 +12,17 @@ import {
   SimpleChanges,
   ViewEncapsulation,
 } from '@angular/core';
-import { ControlContainer, FormsModule } from '@angular/forms';
+import { ControlContainer, FormsModule, NgForm } from '@angular/forms';
 import { SubscriberComponent } from '@octra/ngx-utilities';
+import { isNumber } from '@octra/utilities';
 import { QuestionMarkComponent } from '../../question-mark/question-mark.component';
 import { ToolconfigArrayControlComponent } from '../array-control/toolconfig-array-control.component';
 import { ToolconfigNumberControlComponent } from '../number-control/toolconfig-number-control.component';
+import { ConfigurationControl, ConfigurationControlGroup } from '../objects';
 import { ToolconfigSelectControlComponent } from '../select-control/toolconfig-select-control.component';
 import { ToolconfigSwitchControlComponent } from '../switch-control/toolconfig-switch-control.component';
 import { ToolconfigTextControlComponent } from '../text-control/toolconfig-text-control.component';
 import { OctraToolConfiguratorOptions } from '../tool-configurator.component';
-import { ConfigurationControlGroup } from '../objects';
 
 @Component({
   selector: 'octra-toolconfig-group',
@@ -47,7 +48,7 @@ import { ConfigurationControlGroup } from '../objects';
   viewProviders: [
     {
       provide: ControlContainer,
-      useFactory: () => inject(ControlContainer, { skipSelf: true }),
+      useExisting: NgForm,
     },
   ],
 })
@@ -73,7 +74,25 @@ export class ToolconfigGroupComponent extends SubscriberComponent implements OnC
     const group = changes.group;
     if (group && group.currentValue) {
       this.firstVisibleControl = group.currentValue.controls.findIndex((a) => !a.ignore && a.type !== 'group');
-      console.log(group);
+    }
+  }
+
+  onSelectChanged(value: string, control: ConfigurationControl) {
+    if (control.transformValue) {
+      try {
+        if (typeof control.transformValue === 'function') {
+          control.value = control.transformValue(value);
+        } else {
+          if (['number', 'integer'].includes(control.transformValue)) {
+            control.value = isNumber(value) ? Number(value) : undefined;
+          } else {
+            control.value = value;
+          }
+        }
+      } catch (e) {
+        control.value = value;
+        console.error(e);
+      }
     }
   }
 }

@@ -1,4 +1,4 @@
-import { NgClass } from '@angular/common';
+import { JsonPipe, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
@@ -21,7 +21,17 @@ import { OctraModal } from '../types';
   selector: 'octra-export-files-modal',
   templateUrl: './export-files-modal.component.html',
   styleUrls: ['./export-files-modal.component.scss'],
-  imports: [NgClass, NgbPopover, NgbTooltip, FormsModule, TableConfiguratorComponent, TranslocoPipe, NgbCollapse, ToolConfiguratorComponent],
+  imports: [
+    NgClass,
+    NgbPopover,
+    NgbTooltip,
+    FormsModule,
+    TableConfiguratorComponent,
+    TranslocoPipe,
+    NgbCollapse,
+    ToolConfiguratorComponent,
+    JsonPipe,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExportFilesModalComponent extends OctraModal implements OnInit {

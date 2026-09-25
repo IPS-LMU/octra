@@ -181,6 +181,7 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
           title: 'transformTranscriptionUnit',
           type: 'string',
           default: '[{{LEVEL_NAME}}]: {{TRANSCRIPT}}',
+          pattern: '(\\{\\{TRANSCRIPT\\}\\})',
           dependsOn: ['exportLevels'],
           description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
         },

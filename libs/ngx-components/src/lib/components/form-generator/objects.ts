@@ -19,6 +19,7 @@ export class ConfigurationItem {
 export class ConfigurationControlOptions<R, S = any> extends ConfigurationItem {
   override type?: 'switch' | 'select' | 'number' | 'integer' | 'multiple-choice' | 'text' | 'textarea' | 'array';
   placeholder?: string;
+  transformValue?: 'string' | 'boolean' | 'number' | 'integer' | ((value: unknown) => unknown);
   value?: R;
   defaultValue?: R;
   examples?: any;
@@ -101,6 +102,10 @@ export class ConfigurationControl<R = any, S = any> {
 
   get required(): boolean | undefined {
     return this._options.required;
+  }
+
+  get transformValue(): 'string' | 'boolean' | 'number' | 'integer' | ((value: unknown) => unknown) | undefined {
+    return this._options.transformValue;
   }
 
   get id(): any {

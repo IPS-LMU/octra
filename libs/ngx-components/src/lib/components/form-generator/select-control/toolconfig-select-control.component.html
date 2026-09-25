@@ -1,8 +1,12 @@
 <select
   class="form-select"
+  [ngStyle]="{
+    color: value === undefined ? '#616466': 'unset'
+  }"
   [name]="'ocf-select-' + id"
   [ngModel]="value"
   (ngModelChange)="onValueChange($event)"
+  [ngModelOptions]="{ standalone: true }"
   (blur)="markAsTouched()"
   [disabled]="disabled"
   [required]="required"
@@ -10,7 +14,7 @@
   [disablePopover]="!touched || errorMessages.length === 0"
   triggers="mouseover:mouseleave"
 >
-  <option value="">Nothing selected</option>
+  <option [value]="undefined">Nothing selected</option>
   @for (item of items; track item) {
     <option [value]="item.value">{{ item.label }}</option>
   }

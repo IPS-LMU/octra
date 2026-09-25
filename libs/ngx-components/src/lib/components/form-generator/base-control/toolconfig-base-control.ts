@@ -56,21 +56,22 @@ export abstract class ToolconfigBaseControlComponent<T> implements ControlValueA
 
   validate(control: AbstractControl): ValidationErrors | null {
     this.touched = this.touched || control.touched;
-    this.errors =
-      this.required && this.isEmpty(control.value)
+    this.errors = this.isEmpty(this.value)
+      ? this.required
         ? {
             required: {
               message: 'This field is required',
             },
           }
-        : this.validateJSONSchema();
+        : null
+      : this.validateJSONSchema();
     this.onValidationStateChange();
 
     return this.errors;
   }
 
   protected onValueChange(value: T | undefined): void {
-    this.value = value;
+    this.value = value === 'undefined' ? undefined : value;
     this.onChange(this.value);
     this.onTouched();
   }

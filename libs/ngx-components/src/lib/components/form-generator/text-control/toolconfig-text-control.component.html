@@ -6,6 +6,7 @@
   [disabled]="disabled"
   [required]="required"
   [ngModel]="value"
+  [ngModelOptions]="{ standalone: true }"
   (ngModelChange)="onValueChange($event)"
   (blur)="markAsTouched()"
   [ngbPopover]="popover"

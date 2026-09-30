@@ -1,23 +1,11 @@
 import { OAudiofile } from '@octra/media';
 import { last } from '@octra/utilities';
 import { FileInfo } from '@octra/web-media';
-import {
-  OAnnotJSON,
-  OLabel,
-  OLevel,
-  OSegment,
-  OSegmentLevel,
-} from '../annotjson';
-import {
-  Converter,
-  ExportResult,
-  IFile,
-  ImportResult,
-  OctraAnnotationFormatType,
-} from './Converter';
+import { OAnnotJSON, OLabel, OLevel, OSegment, OSegmentLevel } from '../annotjson';
+import { Converter, ExportResult, IFile, ImportResult, OctraAnnotationFormatType } from './Converter';
 import { OctraApplication, WhisperXApplication } from './SupportedApplications';
 
-export class WhisperJSONConverter extends Converter {
+export class WhisperJSONConverter extends Converter<any, any> {
   override _name: OctraAnnotationFormatType = 'WhisperJSON';
 
   public constructor() {
@@ -35,18 +23,18 @@ export class WhisperJSONConverter extends Converter {
     this._conversion.import = true;
     this._encoding = 'UTF-8';
     this._multitiers = true;
-    this._notice =
-      'OCTRA imports only segment related data (timestamps and text). Other attributes wil be ignored.';
+    this._notice = 'OCTRA imports only segment related data (timestamps and text). Other attributes wil be ignored.';
   }
 
   public export(annotation: OAnnotJSON, audiofile: OAudiofile): ExportResult {
     throw new Error('not implemented');
   }
 
-  override needsOptionsForImport(
-    file: IFile,
-    audiofile: OAudiofile,
-  ): any | undefined {
+  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): any | undefined {
+    return undefined;
+  }
+
+  public override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile) {
     return undefined;
   }
 
@@ -66,11 +54,7 @@ export class WhisperJSONConverter extends Converter {
       error: '',
     };
 
-    result.annotjson = new OAnnotJSON(
-      audiofile.name,
-      FileInfo.extractFileName(file.name).name,
-      audiofile.sampleRate,
-    );
+    result.annotjson = new OAnnotJSON(audiofile.name, FileInfo.extractFileName(file.name).name, audiofile.sampleRate);
 
     const convertSecondsToSamples = (seconds: number) => {
       return Math.round(seconds * audiofile.sampleRate);
@@ -98,77 +82,46 @@ export class WhisperJSONConverter extends Converter {
 
       let id = 1;
       for (const segment of json.segments) {
-        if (
-          segment.start === undefined ||
-          segment.end === undefined ||
-          segment.end < segment.start
-        ) {
+        if (segment.start === undefined || segment.end === undefined || segment.end < segment.start) {
           // skip segment because of invalid time stamps
           continue;
         }
 
         let speaker = segment.speaker ?? 'OCTRA_1';
-        const oSegment = new OSegment(
-          id++,
-          convertSecondsToSamples(segment.start),
-          convertSecondsToSamples(segment.end - segment.start),
-          [new OLabel(speaker, segment.text)],
-        );
+        const oSegment = new OSegment(id++, convertSecondsToSamples(segment.start), convertSecondsToSamples(segment.end - segment.start), [
+          new OLabel(speaker, segment.text),
+        ]);
 
         if (segment.speaker) {
           oSegment.labels.push(new OLabel('Speaker', segment.speaker));
         }
 
-        this.addSegment(
-          result.annotjson.levels as OSegmentLevel<OSegment>[],
-          speakers,
-          segment.speaker,
-          oSegment,
-        );
+        this.addSegment(result.annotjson.levels as OSegmentLevel<OSegment>[], speakers, segment.speaker, oSegment);
 
         // add words
         if (segment.words && segment.words.length) {
           for (const word of segment.words) {
-            if (
-              word.start === undefined ||
-              word.end === undefined ||
-              word.end < word.start
-            ) {
+            if (word.start === undefined || word.end === undefined || word.end < word.start) {
               // skip segment because of invalid time stamps
               continue;
             }
 
-            speaker =
-              speakers.length > 0
-                ? `${word.speaker ?? 'OCTRA_1'}_WORD`
-                : `WORD`;
-            const oWordSegment = new OSegment(
-              id++,
-              convertSecondsToSamples(word.start),
-              convertSecondsToSamples(word.end - word.start),
-              [new OLabel(speaker, word.word)],
-            );
+            speaker = speakers.length > 0 ? `${word.speaker ?? 'OCTRA_1'}_WORD` : `WORD`;
+            const oWordSegment = new OSegment(id++, convertSecondsToSamples(word.start), convertSecondsToSamples(word.end - word.start), [
+              new OLabel(speaker, word.word),
+            ]);
 
             if (word.speaker) {
               oWordSegment.labels.push(new OLabel('Speaker', word.speaker));
             }
 
-            this.addSegment(
-              result.annotjson.levels as OSegmentLevel<OSegment>[],
-              speakers,
-              speaker,
-              oWordSegment,
-            );
+            this.addSegment(result.annotjson.levels as OSegmentLevel<OSegment>[], speakers, speaker, oWordSegment);
           }
         }
       }
 
       // cleanup
-      if (
-        speakers.length > 0 &&
-        result.annotjson.levels[result.annotjson.levels.length - 1].items
-          .length === 0
-      ) {
+      if (speakers.length > 0 && result.annotjson.levels[result.annotjson.levels.length - 1].items.length === 0) {
         // OCTRA_1 is empty
         result.annotjson.levels.pop();
       } else if (speakers.length === 0) {
@@ -179,9 +132,7 @@ export class WhisperJSONConverter extends Converter {
       }
 
       // filter empty levels
-      result.annotjson.levels = result.annotjson.levels.filter(
-        (a) => a.items.length > 0,
-      );
+      result.annotjson.levels = result.annotjson.levels.filter((a) => a.items.length > 0);
 
       // make sure that ids are sequences
       let id2 = 1;
@@ -204,30 +155,19 @@ export class WhisperJSONConverter extends Converter {
 
         if (!lastSegment) {
           // fill gap
-          segmentLevel.items.push(
-            new OSegment(1, 0, audiofile.duration, [
-              new OLabel(segmentLevel.name, ''),
-            ]),
-          );
+          segmentLevel.items.push(new OSegment(1, 0, audiofile.duration, [new OLabel(segmentLevel.name, '')]));
         } else {
-          if (
-            lastSegment.sampleStart + lastSegment.sampleDur <
-            audiofile.duration
-          ) {
+          if (lastSegment.sampleStart + lastSegment.sampleDur < audiofile.duration) {
             // fill gap
             segmentLevel.items.push(
               new OSegment(
                 lastSegment.id + 1,
                 lastSegment.sampleStart + lastSegment.sampleDur,
-                audiofile.duration -
-                  (lastSegment.sampleStart + lastSegment.sampleDur),
+                audiofile.duration - (lastSegment.sampleStart + lastSegment.sampleDur),
                 [new OLabel(segmentLevel.name, '')],
               ),
             );
-          } else if (
-            lastSegment.sampleStart + lastSegment.sampleDur >
-            audiofile.duration
-          ) {
+          } else if (lastSegment.sampleStart + lastSegment.sampleDur > audiofile.duration) {
             return {
               error: `Last boundary of level ${level.name} is bigger than audio duration.`,
             };
@@ -239,54 +179,33 @@ export class WhisperJSONConverter extends Converter {
     return result;
   }
 
-  private addSegment(
-    levels: OLevel<OSegment>[],
-    speakers: string[],
-    speaker: string | undefined,
-    oSegment: OSegment,
-  ) {
+  private addSegment(levels: OLevel<OSegment>[], speakers: string[], speaker: string | undefined, oSegment: OSegment) {
     // find correct speaker level
     let index = levels.findIndex((a) => a.name === speaker);
 
     // fallback to OCTRA_1 tier
     index = index < 0 ? levels.findIndex((a) => a.name === 'OCTRA_1') : index;
-    const currentLevel: OSegmentLevel<OSegment> = levels[
-      index
-    ] as OSegmentLevel<OSegment>;
+    const currentLevel: OSegmentLevel<OSegment> = levels[index] as OSegmentLevel<OSegment>;
 
-    const previousSegment =
-      currentLevel.items.length > 0
-        ? currentLevel.items[currentLevel.items.length - 1]
-        : undefined;
+    const previousSegment = currentLevel.items.length > 0 ? currentLevel.items[currentLevel.items.length - 1] : undefined;
 
     if (previousSegment) {
-      if (
-        previousSegment.sampleStart + previousSegment.sampleDur <
-        oSegment.sampleStart
-      ) {
+      if (previousSegment.sampleStart + previousSegment.sampleDur < oSegment.sampleStart) {
         // fill gap
         currentLevel.items.push(
           new OSegment(
             1,
             previousSegment.sampleStart + previousSegment.sampleDur,
-            oSegment.sampleStart -
-              (previousSegment.sampleStart + previousSegment.sampleDur),
+            oSegment.sampleStart - (previousSegment.sampleStart + previousSegment.sampleDur),
             [new OLabel(currentLevel.name, '')],
           ),
         );
-      } else if (
-        previousSegment.sampleStart + previousSegment.sampleDur >
-        oSegment.sampleStart
-      ) {
+      } else if (previousSegment.sampleStart + previousSegment.sampleDur > oSegment.sampleStart) {
         console.error('previous segment greater than current');
         return;
       }
     } else if (oSegment.sampleStart > 0) {
-      currentLevel.items.push(
-        new OSegment(1, 0, oSegment.sampleStart, [
-          new OLabel(currentLevel.name, ''),
-        ]),
-      );
+      currentLevel.items.push(new OSegment(1, 0, oSegment.sampleStart, [new OLabel(currentLevel.name, '')]));
     }
 
     currentLevel.items.push(oSegment as any);
@@ -294,15 +213,11 @@ export class WhisperJSONConverter extends Converter {
 
   private validateJSONFile(json: WhisperJSON) {
     if (!json.segments || !json.language) {
-      throw new Error(
-        'Invalid format. Missing segments and language attribute.',
-      );
+      throw new Error('Invalid format. Missing segments and language attribute.');
     }
 
     if (!Array.isArray(json.segments)) {
-      throw new Error(
-        'Invalid format. Attribute segments is not of type array.',
-      );
+      throw new Error('Invalid format. Attribute segments is not of type array.');
     }
   }
 

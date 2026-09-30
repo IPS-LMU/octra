@@ -12,6 +12,11 @@
       <octra-form-configurator
         [jsonSchema]="schema"
         [jsonText]="jsonText"
+        [options]="{
+          labelPlacement: 'top',
+          questionMarkVisibility: 'onhover',
+          showToggles: 'static',
+        }"
         (jsonTextChange)="onJsonTextChange($event)"
       ></octra-form-configurator>
     }
@@ -19,22 +24,12 @@
   <div class="modal-footer">
     <div class="row">
       <div class="col">
-        <button
-          (click)="close('abort')"
-          class="btn btn-secondary"
-          data-dismiss="modal"
-          type="button"
-        >
+        <button (click)="close('abort')" class="btn btn-secondary" data-dismiss="modal" type="button">
           {{ 'g.abort' | transloco }}
         </button>
       </div>
       <div class="col">
-        <button
-          (click)="close('apply')"
-          class="btn btn-secondary"
-          data-dismiss="modal"
-          type="button"
-        >
+        <button (click)="close('apply')" class="btn btn-primary" data-dismiss="modal" type="button">
           {{ 'g.apply' | transloco }}
         </button>
       </div>

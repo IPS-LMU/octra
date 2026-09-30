@@ -1,29 +1,27 @@
 import { OAudiofile } from '@octra/media';
+import { FormGeneratorJSONSchema } from '@octra/utilities';
 import { FileInfo } from '@octra/web-media';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
-import {
-  Converter,
-  ExportResult,
-  IFile,
-  ImportResult,
-  OctraAnnotationFormatType,
-} from './Converter';
-import {
-  AnyTextEditor,
-  BASWebservicesApplication,
-  OctraApplication,
-  WordApplication,
-} from './SupportedApplications';
+import { Converter, ExportResult, IFile, ImportResult, OctraAnnotationFormatType } from './Converter';
+import { AnyTextEditor, BASWebservicesApplication, OctraApplication, WordApplication } from './SupportedApplications';
+
+export class TextConverterExportOptions {
+  exportLevel!: string;
+  // Add a line break after each transcription unit.
+  addLineBreak? = false;
+  // Split transcription units by timestamps in readable format (HH:MM:SS.s
+  addTimestampsReadableFormat? = false;
+  // Split transcription units by timestamps in sample format (e.g. 372890428)
+  addTimestampsSampleFormat? = false;
+
+  constructor(partial?: Partial<TextConverterExportOptions>) {
+    if (partial) Object.assign(this, partial);
+  }
+}
 
 // https://clarin.phonetik.uni-muenchen.de/BASWebServices/#/services/WebMAUSBasic
-export class TextConverter extends Converter {
+export class TextConverter extends Converter<any, TextConverterExportOptions> {
   override _name: OctraAnnotationFormatType = 'PlainText';
-
-  public override options = {
-    showTimestampSamples: false,
-    showTimestampString: false,
-    addNewLineString: false,
-  };
 
   public constructor() {
     super();
@@ -48,11 +46,7 @@ export class TextConverter extends Converter {
     this._multitiers = false;
   }
 
-  public export(
-    annotation: OAnnotJSON,
-    audiofile: OAudiofile,
-    levelnum: number,
-  ): ExportResult {
+  public override export(annotation: OAnnotJSON, audiofile: OAudiofile, options: TextConverterExportOptions): ExportResult {
     if (!annotation) {
       return {
         error: 'Annotation is undefined or null',
@@ -68,69 +62,63 @@ export class TextConverter extends Converter {
     let result = '';
     let filename = '';
 
-    if (
-      levelnum === undefined ||
-      levelnum < 0 ||
-      levelnum > annotation.levels.length
-    ) {
+    if (!options.exportLevel) {
       return {
-        error: 'Missing level number',
+        error: 'Missing level name',
       };
     }
 
-    if (levelnum < annotation.levels.length) {
-      const level = annotation.levels[levelnum];
+    const level = annotation.levels.find((a) => a.name === options.exportLevel);
 
-      if (level.type === 'SEGMENT') {
-        for (let j = 0; j < level.items.length; j++) {
-          const item = level.items[j] as OSegment;
-          const transcript =
-            item.getFirstLabelWithoutName('Speaker')?.value ?? '';
+    if (!level) {
+      return {
+        error: "Can't find level by given name.",
+      };
+    }
 
-          result += transcript;
-          if (j < level.items.length - 1) {
-            const sampleEnd = item.sampleStart + item.sampleDur;
-            const unixTimestamp = Math.ceil(
-              (sampleEnd * 1000) / audiofile.sampleRate,
-            );
+    if (level.type === 'SEGMENT') {
+      for (let j = 0; j < level.items.length; j++) {
+        const item = level.items[j] as OSegment;
+        const transcript = item.getFirstLabelWithoutName('Speaker')?.value ?? '';
 
-            if (this.options) {
-              if (
-                this.options.showTimestampString ||
-                this.options.showTimestampSamples
-              ) {
-                result += ` <`;
-                if (this.options.showTimestampString) {
-                  const endTime = this.convertToTimeString(unixTimestamp, {
-                    showHour: true,
-                    showMilliSeconds: true,
-                  });
-                  result += `ts="${endTime}"`;
-                }
-                if (this.options.showTimestampSamples) {
-                  result += this.options.showTimestampString ? ' ' : '';
-                  result += `sp="${sampleEnd}"`;
-                }
-                result += `>`;
+        result += transcript;
+        if (j < level.items.length - 1) {
+          const sampleEnd = item.sampleStart + item.sampleDur;
+          const unixTimestamp = Math.ceil((sampleEnd * 1000) / audiofile.sampleRate);
+
+          if (options) {
+            if (options.addTimestampsSampleFormat || options.addTimestampsReadableFormat) {
+              result += ` <`;
+              if (options.addTimestampsReadableFormat) {
+                const endTime = this.convertToTimeString(unixTimestamp, {
+                  showHour: true,
+                  showMilliSeconds: true,
+                });
+                result += `ts="${endTime}"`;
               }
-
-              if (this.options.addNewLineString) {
-                result += '\n';
-              } else {
-                result += ' ';
+              if (options.addTimestampsSampleFormat) {
+                result += options.addTimestampsReadableFormat ? ' ' : '';
+                result += `sp="${sampleEnd}"`;
               }
+              result += `>`;
+            }
+
+            if (options.addLineBreak) {
+              result += '\n';
+            } else {
+              result += ' ';
             }
           }
         }
-        result += '';
       }
-
-      filename = `${annotation.name}`;
-      if (annotation.levels.length > 1) {
-        filename += `-${level.name}`;
-      }
-      filename += `${this._extensions[0]}`;
+      result += '';
     }
+
+    filename = `${annotation.name}`;
+    if (annotation.levels.length > 1) {
+      filename += `-${level.name}`;
+    }
+    filename += `${this._extensions[0]}`;
 
     result = result.replace(/ +/g, ' ');
     return {
@@ -143,11 +131,45 @@ export class TextConverter extends Converter {
     };
   }
 
-  override needsOptionsForImport(
-    file: IFile,
-    audiofile: OAudiofile,
-  ): any | undefined {
+  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): FormGeneratorJSONSchema | undefined {
     return undefined;
+  }
+
+  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): FormGeneratorJSONSchema | undefined {
+    return {
+      $gui_support: true,
+      type: 'object',
+      title: '',
+      required: ['exportLevel'],
+      properties: {
+        exportLevel: {
+          title: 'Export levels',
+          type: 'string',
+          default: annotation.levels.map((a) => a.name)[0],
+          enum: [...annotation.levels.map((a) => a.name)],
+          description: 'Defines a list of level names that should be exported.',
+        },
+        addLineBreak: {
+          title: 'Line Break',
+          type: 'boolean',
+          description: 'Add a line break after each transcription unit.',
+        },
+        addTimestampsReadableFormat: {
+          title: 'Add time stamps in readable format.',
+          type: 'boolean',
+          description: 'Split transcription units by timestamps in readable format (HH:MM:SS.s)',
+          examples: ['This is an example <ts="00:00:03.222"> of a transcript with timestamps.'],
+        },
+        addTimestampsSampleFormat: {
+          title: 'Add time stamps in sample format.',
+          type: 'boolean',
+          description: 'Split transcription units by timestamps in sample format (e.g. 372890428)',
+          examples: ['This is an example <sp="379736"> of a transcript with timestamps.'],
+          textBottom:
+            'Wenn Du beide Optionen aktivierst, werden beide Formate eingefügt:<br/><code>This is an example &lt;ts="00:00:03.222" sp="379736"&gt; of a transcript with timestamps.</code>',
+        },
+      },
+    };
   }
 
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
@@ -173,13 +195,7 @@ export class TextConverter extends Converter {
       };
     }
 
-    const result = new OAnnotJSON(
-      audiofile.name,
-      FileInfo.extractFileName(file.name).name,
-      audiofile.sampleRate,
-      [],
-      [],
-    );
+    const result = new OAnnotJSON(audiofile.name, FileInfo.extractFileName(file.name).name, audiofile.sampleRate, [], []);
     const olevel = new OSegmentLevel('OCTRA_1');
 
     if (file.content.indexOf('<ts') > -1 || file.content.indexOf('<sp') > -1) {
@@ -199,7 +215,7 @@ export class TextConverter extends Converter {
 
         while (match !== null) {
           const olabels: OLabel[] = [];
-          let samplePoint = 0;
+          let samplePoint;
           const samplePointIndex = match.findIndex((a) => a === 'sp');
 
           if (samplePointIndex > -1 && samplePointIndex + 1 < match.length) {
@@ -210,37 +226,24 @@ export class TextConverter extends Converter {
             if (timeStringIndex > -1 && timeStringIndex + 1 < match.length) {
               // use time string
               const timeString = match[timeStringIndex + 1];
-              samplePoint = this.timeStringToSamples(
-                timeString,
-                audiofile.sampleRate,
-              );
+              samplePoint = this.timeStringToSamples(timeString, audiofile.sampleRate);
 
               if (samplePoint < 1) {
                 return {
-                  error:
-                    "`can't convert time string to samples. Invalid format.",
+                  error: "`can't convert time string to samples. Invalid format.",
                 };
               }
             } else {
-              console.error(
-                `can't convert time string to samples. Invalid format.`,
-              );
+              console.error(`can't convert time string to samples. Invalid format.`);
               return {
                 error: "`can't convert time string to samples. Invalid format.",
               };
             }
           }
 
-          olabels.push(
-            new OLabel('OCTRA_1', this.cleanTranscript(transcripts[i])),
-          );
+          olabels.push(new OLabel('OCTRA_1', this.cleanTranscript(transcripts[i])));
           const sampleDuration = samplePoint - sampleStart;
-          const osegment = new OSegment(
-            1 + i,
-            sampleStart,
-            sampleDuration,
-            olabels,
-          );
+          const osegment = new OSegment(1 + i, sampleStart, sampleDuration, olabels);
           olevel.items.push(osegment);
           sampleStart += sampleDuration;
 
@@ -250,15 +253,8 @@ export class TextConverter extends Converter {
 
         if (i < transcripts.length) {
           const olabels: OLabel[] = [];
-          olabels.push(
-            new OLabel('OCTRA_1', this.cleanTranscript(transcripts[i])),
-          );
-          const osegment = new OSegment(
-            1 + i,
-            sampleStart,
-            audiofile.duration - sampleStart,
-            olabels,
-          );
+          olabels.push(new OLabel('OCTRA_1', this.cleanTranscript(transcripts[i])));
+          const osegment = new OSegment(1 + i, sampleStart, audiofile.duration - sampleStart, olabels);
           olevel.items.push(osegment);
         }
       } else {
@@ -270,12 +266,7 @@ export class TextConverter extends Converter {
       // text only
       const olabels: OLabel[] = [];
       olabels.push(new OLabel('OCTRA_1', this.cleanTranscript(file.content)));
-      const osegment = new OSegment(
-        1,
-        0,
-        Math.round(audiofile.duration),
-        olabels,
-      );
+      const osegment = new OSegment(1, 0, Math.round(audiofile.duration), olabels);
 
       olevel.items.push(osegment);
     }
@@ -289,19 +280,14 @@ export class TextConverter extends Converter {
   }
 
   private timeStringToSamples(timeString: string, sampleRate: number): number {
-    let hours = 0;
-    let minutes = 0;
-    let seconds = 0;
-    let milliseconds = 0;
-
     const regex = new RegExp(/([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{1,3})/g);
     const match = regex.exec(timeString);
 
     if (match !== null && match.length > 4) {
-      hours = Number(match[1]);
-      minutes = Number(match[2]);
-      seconds = Number(match[3]);
-      milliseconds = Number(match[4]);
+      const hours = Number(match[1]);
+      const minutes = Number(match[2]);
+      let seconds = Number(match[3]);
+      const milliseconds = Number(match[4]);
 
       seconds += milliseconds / 1000 + minutes * 60 + hours * 3600;
       return Math.ceil(seconds * sampleRate);
@@ -345,15 +331,10 @@ export class TextConverter extends Converter {
 
     let result = '';
 
-    const milliSeconds: string = this.formatNumber(
-      this.getMilliSeconds(timespan),
-      3,
-    );
+    const milliSeconds: string = this.formatNumber(this.getMilliSeconds(timespan), 3);
     const minutes: string = this.formatNumber(this.getMinutes(timespan), 2);
     const seconds: string = this.formatNumber(this.getSeconds(timespan), 2);
-    const hours: string = args.showHour
-      ? this.formatNumber(this.getHours(timespan), 2) + ':'
-      : '';
+    const hours: string = args.showHour ? this.formatNumber(this.getHours(timespan), 2) + ':' : '';
 
     result += hours + minutes + ':' + seconds;
     if (args.showMilliSeconds) {

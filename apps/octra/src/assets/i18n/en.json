@@ -54,18 +54,62 @@
   },
   "converters": {
     "SRT": {
-      "options": {
+      "importOptions": {
         "combineSegmentsWithSameSpeakerThreshold": {
-          "description": "Merges an empty unit between two units of the same speaker if it has a maximum duration (ms). Set empty to deactivate it.",
-          "title": "Combine empty units with max duration (ms) between units of the same speaker"
+          "description": "Merges an empty unit between two units of the same speaker if it has a maximum duration (ms).",
+          "title": "Merge empty segments with max. duration (ms) from the same speaker"
         },
         "sortSpeakerSegments": {
-          "description": "Moves all units with label \"SPEAKER_<NUM>\" to separate levels. Units without speaker are going to be moved to OCTRA_1.",
-          "title": "Move units with speaker label to separate levels"
+          "description": "Moves all units with the specified speaker label to separate levels. Units without a speaker are moved to level OCTRA_1.",
+          "title": "One transcription track per speaker"
         },
         "speakerIdentifierPattern": {
           "description": "Regular expression with which the speaker of a transcription unit can be recognized.",
           "title": "Regular expression for speaker identification"
+        }
+      },
+      "exportOptions": {
+        "exportLevels": {
+          "title": "Selected levels",
+          "description": "Select which levels should be exported."
+        },
+        "transformPattern": {
+          "title": "Adjust transcript",
+          "description": "Define how the transcript lines should be modified for export. Supported placeholders: LEVEL_NAME, TRANSCRIPT."
+        }
+      }
+    },
+    "WebVTT": {
+      "importOptions": {
+        "combineSegmentsWithSameSpeakerThreshold": {
+          "description": "Merges an empty unit between two units of the same speaker if it has a maximum duration (ms).",
+          "title": "Merge empty segments with max. duration (ms) from the same speaker"
+        },
+        "sortSpeakerSegments": {
+          "description": "Moves all units with the specified speaker label to separate levels. Units without a speaker are moved to level OCTRA_1.",
+          "title": "One transcription track per speaker"
+        },
+        "speakerIdentifierPattern": {
+          "description": "Regular expression with which the speaker of a transcription unit can be recognized.",
+          "title": "Regular expression for speaker identification"
+        }
+      },
+      "exportOptions": {
+        "exportLevels": {
+          "title": "Selected levels",
+          "description": "Select which levels should be exported."
+        },
+        "transformPattern": {
+          "title": "Adjust transcript",
+          "description": "Define how the transcript lines should be modified for export. Supported placeholders: LEVEL_NAME, TRANSCRIPT."
+        }
+      }
+    },
+    "CTM": {
+      "exportOptions": {
+        "levelName": {
+          "title": "Selected level",
+          "description": "Level to be exported."
         }
       }
     }
@@ -464,6 +508,7 @@
     "language and provider": "Language and Provider",
     "manage account": "Manage account",
     "nothing found": "Nothing found",
+    "nothing selected": "Nothing selected",
     "repeat password": "Repeat password",
     "reset password": "Reset password",
     "select country": "Select country",
@@ -634,6 +679,12 @@
     },
     "close": {
       "popover": "Quit OCTRA"
+    }
+  },
+  "forms": {
+    "errors found": "Errors found. Please check the form.",
+    "export": {
+      "introduction": "Additional options may be available for the data export. If a checkbox is displayed to the left of an option, that option is only used when the checkbox is activated."
     }
   }
 }

@@ -1,12 +1,6 @@
 import { OAudiofile } from '@octra/media';
 import { IAnnotJSON, OAnnotJSON } from '../annotjson';
-import {
-  Converter,
-  ExportResult,
-  IFile,
-  ImportResult,
-  OctraAnnotationFormatType,
-} from './Converter';
+import { Converter, ExportResult, IFile, ImportResult, OctraAnnotationFormatType } from './Converter';
 
 export interface Bundle {
   ssffFiles: {
@@ -53,12 +47,7 @@ export class BundleJSONConverter extends Converter {
       ssffFiles: [],
       mediaFile: {
         encoding: 'BASE654',
-        data: btoa(
-          new Uint8Array(audiofile.arraybuffer).reduce(
-            (data, byte) => data + String.fromCharCode(byte),
-            '',
-          ),
-        ),
+        data: btoa(new Uint8Array(audiofile.arraybuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')),
       },
       annotation,
     };
@@ -75,10 +64,11 @@ export class BundleJSONConverter extends Converter {
     };
   }
 
-  override needsOptionsForImport(
-    file: IFile,
-    audiofile: OAudiofile,
-  ): any | undefined {
+  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): any | undefined {
+    return undefined;
+  }
+
+  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any | undefined {
     return undefined;
   }
 

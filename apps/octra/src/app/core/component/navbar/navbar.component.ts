@@ -1,5 +1,5 @@
 import { AsyncPipe, NgClass, NgStyle, UpperCasePipe } from '@angular/common';
-import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit, TemplateRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RouterLink, RouterLinkActive } from '@angular/router';
@@ -29,6 +29,10 @@ import { ExportFilesModalComponent } from '../../modals/export-files-modal/expor
 import { OctraModalService } from '../../modals/octra-modal.service';
 import { StatisticsModalComponent } from '../../modals/statistics-modal/statistics-modal.component';
 import { CombinePhrasesModalComponent } from '../../modals/tools/combine-phrases-modal/combine-phrases-modal.component';
+import {
+  TranscriptionStopModalAnswer,
+  TranscriptionStopModalComponent,
+} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 import { YesNoModalComponent } from '../../modals/yes-no-modal/yes-no-modal.component';
 import { AudioService, SettingsService, UserInteractionsService } from '../../shared/service';
 import { AppStorageService } from '../../shared/service/appstorage.service';
@@ -41,10 +45,6 @@ import { AnnotationStoreService } from '../../store/login-mode/annotation/annota
 import { AsrOptionsComponent } from '../asr-options/asr-options.component';
 import { DefaultComponent } from '../default.component';
 import { NavbarService } from './navbar.service';
-import {
-  TranscriptionStopModalAnswer,
-  TranscriptionStopModalComponent,
-} from '../../modals/transcription-stop-modal/transcription-stop-modal.component';
 
 @Component({
   selector: 'octra-navigation',
@@ -186,6 +186,14 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
             navbarService: this,
             uiService: this.uiService,
           });
+          this.appStoreService.setShortcutsEnabled(false);
+          this.modalexport.result
+            .then(() => {
+              this.appStoreService.setShortcutsEnabled(true);
+            })
+            .catch(() => {
+              this.appStoreService.setShortcutsEnabled(true);
+            });
           break;
       }
     });
@@ -337,6 +345,14 @@ export class NavigationComponent extends DefaultComponent implements OnInit, OnD
       navbarService: this,
       uiService: this.uiService,
     });
+    this.appStoreService.setShortcutsEnabled(false);
+    this.modalexport.result
+      .then(() => {
+        this.appStoreService.setShortcutsEnabled(true);
+      })
+      .catch(() => {
+        this.appStoreService.setShortcutsEnabled(true);
+      });
   }
 
   openCombinePhrases() {

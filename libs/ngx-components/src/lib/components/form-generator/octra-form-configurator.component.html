@@ -1,0 +1,15 @@
+<div class="container-fluid px-0">
+  @if (jsonSchema.$gui_support) {
+    <form class="ocf-form" #ngForm=ngForm (ngSubmit)="ngSubmit.next($event)">
+      <octra-form-group
+        [group]="form"
+        [showToggles]="(showToggles && options.showToggles !== 'hide') || options.showToggles === 'static'"
+        [options]="options"
+        (somethingChanged)="onSomethingChanged()"
+      ></octra-form-group>
+      <ng-content select="[footer]"></ng-content>
+    </form>
+  } @else {
+    <p class="text-center">Form not supported by tool.</p>
+  }
+</div>

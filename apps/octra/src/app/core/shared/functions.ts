@@ -9,7 +9,26 @@ import {
   TaskStatus,
 } from '@octra/api-types';
 import { FileInfo } from '@octra/web-media';
+import { TranslocoService } from '@jsverse/transloco';
 import { AppInfo } from '../../app.info';
+
+/**
+ * Like TranslocoService.translate(), but returns undefined instead of the
+ * key itself when no translation was found, without changing the global
+ * missing-key behavior (which still shows the raw key everywhere else).
+ */
+export function translateOrUndefined(
+  transloco: TranslocoService,
+  key: string,
+  params?: Record<string, unknown>,
+  lang = transloco.getActiveLang(),
+): string | undefined {
+  const translation = transloco.getTranslation(lang);
+  if (!translation[key]) {
+    return undefined;
+  }
+  return transloco.translate(key, params, lang);
+}
 
 export function createSampleProjectDto(projectID: string, dto?: Partial<ProjectDto>): ProjectDto {
   return {

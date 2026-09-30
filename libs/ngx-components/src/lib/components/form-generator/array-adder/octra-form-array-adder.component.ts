@@ -1,13 +1,7 @@
 import { NgClass } from '@angular/common';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  ViewChild,
-  ChangeDetectionStrategy
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { SubscriberComponent } from '@octra/ngx-utilities';
 
@@ -19,13 +13,13 @@ export class PreparedItem {
 }
 
 @Component({
-  selector: 'octra-toolconfig-array-adder',
-  templateUrl: './toolconfig-array-adder.component.html',
-  styleUrls: ['./toolconfig-array-adder.component.scss'],
+  selector: 'octra-form-array-adder',
+  templateUrl: './octra-form-array-adder.component.html',
+  styleUrls: ['./octra-form-array-adder.component.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [FormsModule, NgbPopover, NgClass],
+  imports: [FormsModule, NgbPopover, NgClass, TranslocoPipe],
 })
-export class ToolConfigArrayAdderComponent extends SubscriberComponent {
+export class OctraFormArrayAdderComponent extends SubscriberComponent {
   @Input() items: any[] = [];
   @Input() uniqueItems = false;
   @Input() values: any[] = [];
@@ -39,10 +33,12 @@ export class ToolConfigArrayAdderComponent extends SubscriberComponent {
   protected _items: PreparedItem[] = [];
 
   add() {
+    if (this.disabled) {
+      return;
+    }
+
     if (!this.inputValue) {
-      this.itemsAdd.emit(
-        this._items.filter((a) => a.selected).map((a) => a.value),
-      );
+      this.itemsAdd.emit(this._items.filter((a) => a.selected).map((a) => a.value));
     } else {
       this.itemsAdd.emit([this.inputValue]);
       this.inputValue = undefined;
@@ -50,9 +46,11 @@ export class ToolConfigArrayAdderComponent extends SubscriberComponent {
   }
 
   open() {
-    if (!this.disabled) {
-      this._items = this.items?.map((a: any) => new PreparedItem(a));
-      this.popover.open();
+    if (this.disabled) {
+      return;
     }
+
+    this._items = this.items?.map((a: any) => new PreparedItem(a));
+    this.popover.open();
   }
 }

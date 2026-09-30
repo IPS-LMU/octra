@@ -1,0 +1,5 @@
+@use "../base-control/octra-form-base-control";
+
+:host(.ng-invalid.ng-touched) input {
+  border-bottom: 2px solid red;
+}

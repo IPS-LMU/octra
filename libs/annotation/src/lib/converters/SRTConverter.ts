@@ -1,4 +1,5 @@
 import { OAudiofile } from '@octra/media';
+import { FormGeneratorJSONSchema } from '@octra/utilities';
 import { FileInfo } from '@octra/web-media';
 import { OAnnotJSON, OLabel, OSegment, OSegmentLevel } from '../annotjson';
 import { Converter, ExportResult, IFile, ImportResult, OctraAnnotationFormatType } from './Converter';
@@ -13,11 +14,22 @@ export class SRTConverterImportOptions {
     if (partial) Object.assign(this, partial);
   }
 }
-// https://matroska.org/technical/specs/subtitles/srt.html
-export class SRTConverter extends Converter {
-  override _name: OctraAnnotationFormatType = 'SRT';
 
+export class SRTConverterExportOptions {
+  exportLevels?: string[];
+  transformPattern?: string;
+
+  constructor(partial?: Partial<SRTConverterExportOptions>) {
+    if (partial) Object.assign(this, partial);
+  }
+}
+
+// https://matroska.org/technical/specs/subtitles/srt.html
+export class SRTConverter extends Converter<SRTConverterImportOptions, SRTConverterExportOptions> {
+  override _name: OctraAnnotationFormatType = 'SRT';
   override defaultImportOptions = new SRTConverterImportOptions();
+
+  private readonly EXPORT_EXCLUDED_LEVEL_NAMES = ['bundle', 'ort', 'wor', 'tro', 'mau'];
 
   public constructor() {
     super();
@@ -39,7 +51,7 @@ export class SRTConverter extends Converter {
     this._conversion.export = true;
     this._conversion.import = true;
     this._encoding = 'UTF-8';
-    this._multitiers = false;
+    this._multitiers = true;
   }
 
   public static getSamplesFromTimeString(timeString: string, sampleRate: number) {
@@ -71,7 +83,7 @@ export class SRTConverter extends Converter {
     return -1;
   }
 
-  public export(annotation: OAnnotJSON, audiofile: OAudiofile, levelnum: number): ExportResult {
+  public export(annotation: OAnnotJSON, audiofile: OAudiofile, options?: SRTConverterExportOptions): ExportResult {
     if (!annotation) {
       return {
         error: 'Annotation is undefined or null',
@@ -81,37 +93,55 @@ export class SRTConverter extends Converter {
     let result = '';
     let filename = '';
 
-    if (levelnum === undefined || levelnum < 0 || levelnum > annotation.levels.length) {
-      return {
-        error: `Missing level number`,
-      };
-    }
+    const transcripts: {
+      speaker: string;
+      sampleStart: number;
+      sampleDur: number;
+      value: string;
+    }[] = [];
 
-    if (levelnum < annotation.levels.length) {
-      const level = annotation.levels[levelnum];
+    const transform = (speaker: string, transcript: string) => {
+      return options?.transformPattern
+        ? options.transformPattern.replace(`{{LEVEL_NAME}}`, speaker).replace('{{TRANSCRIPT}}', transcript)
+        : transcript;
+    };
 
-      let counter = 1;
-      if (level.type === 'SEGMENT') {
-        for (const item of level.items as OSegment[]) {
-          const transcript = item.getFirstLabelWithoutName('Speaker')?.value ?? '';
-          const start = this.getTimeStringFromSamples(item.sampleStart, annotation.sampleRate);
-          const end = this.getTimeStringFromSamples(item.sampleStart + item.sampleDur, annotation.sampleRate);
+    // prepare all transcripts
+    for (let i = 0; i < annotation.levels.length; i++) {
+      const level = annotation.levels[i];
 
-          if (transcript !== '') {
-            result += `${counter}\n`;
-            result += `${start} --> ${end}\n`;
-            result += `${transcript}\n\n`;
-            counter++;
+      if ((options?.exportLevels ?? []).includes(level.name)) {
+        if (level.type === 'SEGMENT' && !this.EXPORT_EXCLUDED_LEVEL_NAMES.includes(level.name.toLowerCase())) {
+          for (const item of level.items as OSegment[]) {
+            const speaker = item.labels.find((a) => a.name.toLowerCase() === 'speaker')?.value || level.name;
+            const value = item.getFirstLabelWithoutName('Speaker')?.value || '';
+
+            if (value !== '') {
+              transcripts.push({
+                sampleStart: item.sampleStart,
+                sampleDur: item.sampleDur,
+                value,
+                speaker,
+              });
+            }
           }
         }
       }
-
-      filename = `${annotation.name}`;
-      if (annotation.levels.length > 1) {
-        filename += `-${level.name}`;
-      }
-      filename += `${this._extensions[0]}`;
     }
+
+    transcripts.sort((a, b) => a.sampleStart - b.sampleStart);
+
+    for (let i = 0; i < transcripts.length; i++) {
+      const transcript = transcripts[i];
+      const start = this.getTimeStringFromSamples(transcript.sampleStart, audiofile.sampleRate);
+      const end = this.getTimeStringFromSamples(transcript.sampleStart + transcript.sampleDur, audiofile.sampleRate);
+
+      result += `${i + 1}\n`;
+      result += `${start} --> ${end}\n`;
+      result += transform(transcript.speaker, transcript.value) + '\n\n';
+    }
+
+    filename = `${annotation.name}${this._extensions[0]}`;
 
     return {
       file: {
@@ -123,13 +153,13 @@ export class SRTConverter extends Converter {
     };
   }
 
-  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): any | undefined {
+  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): FormGeneratorJSONSchema {
     return {
       $gui_support: true,
       type: 'object',
+      description: 'The following set of options is related to speakers.',
       properties: {
         speakerIdentifierPattern: {
-          title: 'speakerIdentifierPattern',
           toggleable: true,
           type: 'string',
           default: '\\[(SPEAKER_[0-9]+)] *: *',
@@ -149,6 +179,38 @@ export class SRTConverter extends Converter {
           type: 'number',
           default: 2000,
           description: 'Defines max. duration an empty segment between two segments may have to be combined together. Set empty to deactivate it.',
+        },
+      },
+    };
+  }
+
+  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): FormGeneratorJSONSchema {
+    const levelNames = annotation.levels.map((a) => a.name);
+
+    return {
+      $gui_support: true,
+      type: 'object',
+      required: ['exportLevels', 'transformPattern'],
+      properties: {
+        exportLevels: {
+          title: 'exportLevels',
+          toggleable: false,
+          type: 'array',
+          items: {
+            type: 'string',
+            enum: levelNames,
+          },
+          description: 'Defines an array of level indices for export.',
+          default: levelNames,
+        },
+        transformPattern: {
+          title: 'transformTranscriptionUnit',
+          type: 'string',
+          default: levelNames.length === 1 ? '{{TRANSCRIPT}}' : '[{{LEVEL_NAME}}]: {{TRANSCRIPT}}',
+          examples: ['e.g. [{{LEVEL_NAME}}]: {{TRANSCRIPT}} => [SPEAKER_00]: Some transcript...'],
+          dependsOn: ['exportLevels'],
+          pattern: '\\{\\{TRANSCRIPT\\}\\}',
+          description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
         },
       },
     };
@@ -199,6 +261,22 @@ class SRTImporter {
     if (!this.audiofile) {
       return {
         error: `The audio file does not exist.`,
+      };
+    }
+
+    if (!this.audiofile?.sampleRate) {
+      return {
+        error: 'Missing sample rate',
+      };
+    }
+    if (!this.audiofile?.name) {
+      return {
+        error: 'Missing audiofile name',
+      };
+    }
+    if (!this.audiofile?.duration) {
+      return {
+        error: 'Missing audiofile duration',
       };
     }
 

@@ -153,14 +153,24 @@ export class ShortcutService {
   }
 
   disableAll() {
-    this.previouslyEnabled = this._groups.filter((a) => a.enabled).map((a) => a.name);
+    this.previouslyEnabled = [
+      ...this._groups.filter((a) => a.enabled).map((a) => a.name),
+      ...this._generalShortcuts.filter((a) => a.enabled).map((a) => a.name),
+    ];
     this._groups.forEach((group) => {
       group.enabled = false;
     });
+    this._generalShortcuts.forEach((group) => {
+      group.enabled = false;
+    });
+    const t = '';
   }
 
   enableAll() {
     this._groups.forEach((group) => {
+      group.enabled = this.previouslyEnabled.includes(group.name);
+    });
+    this._generalShortcuts.forEach((group) => {
       group.enabled = this.previouslyEnabled.includes(group.name);
     });
     this.previouslyEnabled = [];

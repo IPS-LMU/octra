@@ -1,0 +1,16 @@
+@use '../base-control/octra-form-base-control';
+
+.ocf-control-group {
+  display: block;
+  margin-top: 15px;
+}
+
+.ocf-control-title {
+  font-weight: 500;
+}
+
+.ocf-group-title {
+  margin-top: 3px;
+  margin-bottom: 3px;
+  font-size: 18px;
+}

@@ -1,0 +1,41 @@
+<div
+  class="border border-1 p-1 rounded rounded-3 array-control-items-list"
+  [ngClass]="{
+    disabled: disabled,
+  }"
+  [ngbPopover]="popover"
+  [disablePopover]="!touched || errorMessages.length === 0"
+  triggers="mouseover:mouseleave"
+>
+  <ng-template #popover>
+    <span class="text-danger small d-block">
+      @for (message of errorMessages; track message) {
+        <span class="d-block">{{ message }}</span>
+      }
+    </span>
+  </ng-template>
+  <div class="row p-0 align-items-center">
+    <div class="col">
+      @if (value !== undefined && value.length > 0) {
+        @if (itemsType === 'text' || itemsType === 'number' || itemsType === 'integer') {
+          @for (item of value; track item; let i = $index) {
+            <div class="array-item">
+              <span class="me-1">{{ item }}</span>
+              @if (!disabled) {
+                <i class="bi bi-x-lg pointer" (click)="onItemDelete(i)"></i>
+              }
+            </div>
+          }
+        }
+      }
+    </div>
+    <div class="col-auto">
+      <octra-form-array-adder
+        (itemsAdd)="onItemsAdd($event)"
+        [type]="itemsType"
+        [disabled]="disabled"
+        [items]="items"
+      ></octra-form-array-adder>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,36 @@
+<div class="form-check form-switch ocf-form-switch">
+  <input
+    class="form-check-input"
+    type="checkbox"
+    role="switch"
+    [id]="id"
+    [name]="name"
+    [disabled]="disabled"
+    [required]="required"
+    [ngModel]="value"
+    [ngModelOptions]="{ standalone: true }"
+    (ngModelChange)="onValueChange($event)"
+    (blur)="markAsTouched()"
+    [ngbPopover]="popover"
+    [disablePopover]="!touched || errorMessages.length === 0"
+    triggers="mouseover:mouseleave"
+  />
+  <ng-template #popover>
+    <span class="text-danger small d-block">
+      @for (message of errorMessages; track message) {
+        <span class="d-block">{{ message }}</span>
+      }
+    </span>
+  </ng-template>
+  @if (showLabel) {
+    <label
+      class="form-check-label mb-0 ocf-form-check-label"
+      [for]="id"
+      [ngClass]="{
+        'opacity-50': disabled,
+      }"
+    >
+      {{ title }}
+    </label>
+  }
+</div>

@@ -202,11 +202,9 @@ export class AnnotationStoreService {
           this.audio.audioManager.resource.info.duration.clone(),
         );
 
-        const result = new TextConverter().export(
-          annotation,
-          this.audio.audioManager.resource.getOAudioFile(),
-          transcript.selectedLevelIndex!,
-        )!.file!;
+        const result = new TextConverter().export(annotation, this.audio.audioManager.resource.getOAudioFile(), {
+          exportLevel: transcript.currentLevel!.name,
+        })!.file!;
 
         return result.content;
       }

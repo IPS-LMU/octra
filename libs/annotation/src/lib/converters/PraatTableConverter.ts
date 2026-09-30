@@ -58,16 +58,10 @@ export class PraatTableConverter extends Converter {
       return res + 'tmin\ttier\ttext\ttmax\n';
     };
 
-    const addEntry = (
-      res: string,
-      level: OAnyLevel<OSegment>,
-      segment: OSegment,
-    ) => {
+    const addEntry = (res: string, level: OAnyLevel<OSegment>, segment: OSegment) => {
       const tmin = segment.sampleStart / annotation.sampleRate;
-      const tmax =
-        (segment.sampleStart + segment.sampleDur) / annotation.sampleRate;
-      const transcript =
-        segment.getFirstLabelWithoutName('Speaker')?.value ?? '';
+      const tmax = (segment.sampleStart + segment.sampleDur) / annotation.sampleRate;
+      const transcript = segment.getFirstLabelWithoutName('Speaker')?.value ?? '';
 
       return `${res}${tmin}\t${level.name}\t${transcript}\t${tmax}\n`;
     };
@@ -95,10 +89,11 @@ export class PraatTableConverter extends Converter {
     };
   }
 
-  override needsOptionsForImport(
-    file: IFile,
-    audiofile: OAudiofile,
-  ): any | undefined {
+  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): any | undefined {
+    return undefined;
+  }
+
+  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any {
     return undefined;
   }
 
@@ -114,16 +109,11 @@ export class PraatTableConverter extends Converter {
       };
     }
 
-    const result = new OAnnotJSON(
-      audiofile.name,
-      file.name,
-      audiofile.sampleRate,
-    );
+    const result = new OAnnotJSON(audiofile.name, file.name, audiofile.sampleRate);
 
     const content = file.content;
     const lines: string[] = content.split('\n');
-    const startWithLine =
-      /tmin\ttier\ttext\ttmax/g.exec(lines[0]) !== null ? 1 : 0;
+    const startWithLine = /tmin\ttier\ttext\ttmax/g.exec(lines[0]) !== null ? 1 : 0;
 
     // check if filename is equal with audio file
     const filename = FileInfo.extractFileName(file.name).name;
@@ -174,44 +164,27 @@ export class PraatTableConverter extends Converter {
             } else {
               const last = (
                 olevel.items.length > 0 &&
-                !(
-                  olevel.items[olevel.items.length - 1] === undefined ||
-                  olevel.items[olevel.items.length - 1] === undefined
-                )
+                !(olevel.items[olevel.items.length - 1] === undefined || olevel.items[olevel.items.length - 1] === undefined)
                   ? olevel.items[olevel.items.length - 1]
                   : undefined
               ) as OSegment;
               if (
-                (last !== undefined &&
-                  Math.round((last.sampleStart + last.sampleDur) / sampleRate) <
-                    Math.round(Number(tmin))) ||
+                (last !== undefined && Math.round((last.sampleStart + last.sampleDur) / sampleRate) < Math.round(Number(tmin))) ||
                 (!last && tmin > start)
               ) {
                 if (last) {
                   // add empty segment
                   olevel.items.push(
-                    new OSegment(
-                      id++,
-                      last.sampleStart + last.sampleDur,
-                      Math.round(
-                        tmin * sampleRate - (last.sampleStart + last.sampleDur),
-                      ),
-                      [new OLabel(tier, '')],
-                    ),
+                    new OSegment(id++, last.sampleStart + last.sampleDur, Math.round(tmin * sampleRate - (last.sampleStart + last.sampleDur)), [
+                      new OLabel(tier, ''),
+                    ]),
                   );
                 } else {
                   // add empty segment
                   olevel.items.push(
-                    new OSegment(
-                      id++,
-                      start * sampleRate,
-                      Math.round(
-                        tmin * sampleRate -
-                          start * sampleRate -
-                          tmin * sampleRate,
-                      ),
-                      [new OLabel(tier, '')],
-                    ),
+                    new OSegment(id++, start * sampleRate, Math.round(tmin * sampleRate - start * sampleRate - tmin * sampleRate), [
+                      new OLabel(tier, ''),
+                    ]),
                   );
                 }
 
@@ -221,12 +194,7 @@ export class PraatTableConverter extends Converter {
 
             if (puffer > 0) {
               // fill
-              const pufferItem = new OSegment(
-                id,
-                Math.round(start * sampleRate),
-                Math.round(puffer * sampleRate),
-                [new OLabel(tier, '')],
-              );
+              const pufferItem = new OSegment(id, Math.round(start * sampleRate), Math.round(puffer * sampleRate), [new OLabel(tier, '')]);
               start = start + puffer;
               olevel.items.push(pufferItem);
               puffer = 0;
@@ -234,12 +202,7 @@ export class PraatTableConverter extends Converter {
             }
             const olabels: OLabel[] = [];
             olabels.push(new OLabel(tier, text));
-            const osegment = new OSegment(
-              id,
-              Math.round(start * sampleRate),
-              Math.round((rightBoundary - start) * sampleRate),
-              olabels,
-            );
+            const osegment = new OSegment(id, Math.round(start * sampleRate), Math.round((rightBoundary - start) * sampleRate), olabels);
 
             olevel.items.push(osegment);
             start += rightBoundary - start;

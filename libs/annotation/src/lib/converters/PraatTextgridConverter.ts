@@ -104,16 +104,13 @@ export class PraatTextgridConverter extends Converter {
           const segment = level.items[j] as OSegment;
 
           const secondsStart = segment.sampleStart! / audiofile.sampleRate;
-          const secondsEnd =
-            (segment.sampleStart! + segment.sampleDur!) / audiofile.sampleRate;
+          const secondsEnd = (segment.sampleStart! + segment.sampleDur!) / audiofile.sampleRate;
 
           result +=
             `        intervals [${j + 1}]:\n` +
             `            xmin = ${secondsStart} \n` +
             `            xmax = ${secondsEnd} \n` +
-            `            text = "${
-              segment.getFirstLabelWithoutName('Speaker')?.value ?? ''
-            }" \n`;
+            `            text = "${segment.getFirstLabelWithoutName('Speaker')?.value ?? ''}" \n`;
         }
       }
     }
@@ -130,10 +127,11 @@ export class PraatTextgridConverter extends Converter {
     };
   }
 
-  override needsOptionsForImport(
-    file: IFile,
-    audiofile: OAudiofile,
-  ): any | undefined {
+  override needsOptionsForImport(file: IFile, audiofile: OAudiofile): any | undefined {
+    return undefined;
+  }
+
+  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any {
     return undefined;
   }
 
@@ -152,11 +150,7 @@ export class PraatTextgridConverter extends Converter {
     const name = audiofile.name.substr(0, audiofile.name.lastIndexOf('.'));
     const fileName = FileInfo.extractFileName(file.name).name;
 
-    const result = new OAnnotJSON(
-      audiofile.name,
-      file.name,
-      audiofile.sampleRate,
-    );
+    const result = new OAnnotJSON(audiofile.name, file.name, audiofile.sampleRate);
 
     let content = file.content;
     // replace
@@ -167,10 +161,7 @@ export class PraatTextgridConverter extends Converter {
     let segNum = 1;
     // check if header is first
     if (lines.length > 14) {
-      if (
-        contains(lines[0], 'File type = "ooTextFile"') &&
-        contains(lines[1], 'Object class = "TextGrid"')
-      ) {
+      if (contains(lines[0], 'File type = "ooTextFile"') && contains(lines[1], 'Object class = "TextGrid"')) {
         // is TextGrid
 
         let lvlNum = 0;
@@ -207,10 +198,7 @@ export class PraatTextgridConverter extends Converter {
                   };
                 }
                 lvlName = test[1];
-                const olevel =
-                  classStr === 'IntervalTier'
-                    ? new OSegmentLevel(lvlName)
-                    : new OEventLevel(lvlName);
+                const olevel = classStr === 'IntervalTier' ? new OSegmentLevel(lvlName) : new OEventLevel(lvlName);
                 i++;
 
                 // ignore xmin and xmax, interval size
@@ -295,11 +283,7 @@ export class PraatTextgridConverter extends Converter {
 
                     const olabels: OLabel[] = [];
                     olabels.push(new OLabel(lvlName, mark));
-                    const oevent = new OEvent(
-                      segNum,
-                      Math.round(numberStr * audiofile.sampleRate),
-                      olabels,
-                    );
+                    const oevent = new OEvent(segNum, Math.round(numberStr * audiofile.sampleRate), olabels);
                     (olevel.items as OEvent[]).push(oevent);
                   }
 

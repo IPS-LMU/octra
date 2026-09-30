@@ -29,10 +29,10 @@
     "rxjs": ">=7.5.0",
     "@octra/api-types": "^0.4.0",
     "@octra/ngx-octra-api": "^0.4.2",
-    "ngx-jodit": "^3.2.2",
-    "@jsverse/transloco": "^8.2.1",
-    "@angular/service-worker": "22.0.8",
-    "@angular/platform-browser": "22.0.8"
+    "ngx-jodit": ">3.2.2",
+    "@jsverse/transloco": ">8.2.1",
+    "@angular/service-worker": ">18.0.0",
+    "@angular/platform-browser": ">18.0.0"
   },
   "dependencies": {},
   "sideEffects": false

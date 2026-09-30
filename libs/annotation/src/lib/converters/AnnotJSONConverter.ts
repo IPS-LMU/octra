@@ -59,23 +59,20 @@ export class AnnotJSONConverter extends Converter {
     return undefined;
   }
 
+  override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): any {
+    return undefined;
+  }
+
   public import(file: IFile, audiofile: OAudiofile): ImportResult {
     if (audiofile) {
-      let result = new OAnnotJSON(
-        audiofile.name,
-        FileInfo.extractFileName(file.name).name,
-        audiofile.sampleRate,
-      );
+      let result = new OAnnotJSON(audiofile.name, FileInfo.extractFileName(file.name).name, audiofile.sampleRate);
       const content = file.content;
 
       if (content !== '') {
         try {
           result = JSON.parse(content);
 
-          if (
-            result.annotates !== audiofile.name &&
-            result.annotates !== FileInfo.extractFileName(audiofile.name).name
-          ) {
+          if (result.annotates !== audiofile.name && result.annotates !== FileInfo.extractFileName(audiofile.name).name) {
             return {
               annotjson: undefined,
               audiofile: undefined,

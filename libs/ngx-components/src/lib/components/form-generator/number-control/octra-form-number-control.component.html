@@ -1,0 +1,23 @@
+<input
+  type="number"
+  class="form-control ocf-form-control"
+  [id]="id"
+  [name]="name"
+  [step]="type === 'integer' ? 1 : 0.1"
+  [disabled]="disabled"
+  [required]="required"
+  [ngModel]="value"
+  (ngModelChange)="onValueChange($event)"
+  [ngModelOptions]="{ standalone: true }"
+  (blur)="markAsTouched()"
+  [ngbPopover]="popover"
+  [disablePopover]="!touched || errorMessages.length === 0"
+  triggers="mouseover:mouseleave"
+/>
+<ng-template #popover>
+  <span class="text-danger small d-block">
+    @for (message of errorMessages; track message) {
+      <span class="d-block">{{ message }}</span>
+    }
+  </span>
+</ng-template>

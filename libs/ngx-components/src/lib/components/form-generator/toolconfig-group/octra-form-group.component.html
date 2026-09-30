@@ -1,0 +1,298 @@
+<div
+  class="card"
+  [ngClass]="{
+    'border-0': !group?.title,
+  }"
+>
+  @if (group?.title) {
+    <div class="card-header">
+      <h4 class="ocf-group-title">{{ group.title }}</h4>
+    </div>
+  }
+  <div
+    class="card-body"
+    [ngClass]="{
+      'border-0 p-0 m-0': !group?.title,
+    }"
+  >
+    @if (group?.description) {
+      <p class="ocf-group-description">{{ group.description }}</p>
+    }
+    @if (group?.textAbove) {
+      <p class="py-2 my-0" [innerHTML]="group.textAbove"></p>
+    }
+    <div class="list-group">
+      @if (group !== undefined) {
+        @for (control of group!.controls; track control.id) {
+          @if (control.type === 'switch' && !control.ignore) {
+            <ng-container
+              *ngTemplateOutlet="
+                controlRow;
+                context: {
+                  control: control,
+                  content: switchContent,
+                  options: options,
+                  showTitle: options.labelPlacement === 'left',
+                  labelFor: 'switch-' + control.id,
+                  group: group,
+                  index: $index,
+                  showToggles: showToggles,
+                }
+              "
+            ></ng-container>
+            <ng-template #switchContent let-control="control">
+              <octra-form-switch-control
+                [id]="'switch-' + control.id"
+                [name]="'switch_' + control.id"
+                [title]="control.title"
+                [showLabel]="options.labelPlacement === 'top'"
+                [required]="control.required"
+                [schema]="control.schema"
+                [disabled]="!control.checkToggleStateOfControl()"
+                [(ngModel)]="control.value"
+                (ngModelChange)="somethingChanged.emit()"
+                (focusin)="control.focused = true"
+                (focusout)="control.focused = false"
+              ></octra-form-switch-control>
+            </ng-template>
+          }
+          @if ((control.type === 'number' || control.type === 'integer') && !control.ignore) {
+            <ng-container
+              *ngTemplateOutlet="
+                controlRow;
+                context: {
+                  control: control,
+                  content: numberContent,
+                  options: options,
+                  showTitle: true,
+                  labelFor: 'number-' + control.id,
+                  group: group,
+                  index: $index,
+                  showToggles: showToggles,
+                }
+              "
+            ></ng-container>
+            <ng-template #numberContent let-control="control">
+              <octra-form-number-control
+                [id]="'number-' + control.id"
+                [name]="'number_' + control.id"
+                [type]="control.type"
+                [required]="control.required"
+                [schema]="control.schema"
+                [disabled]="!control.checkToggleStateOfControl()"
+                [(ngModel)]="control.value"
+                (ngModelChange)="somethingChanged.emit()"
+                (focusin)="control.focused = true"
+                (focusout)="control.focused = false"
+              ></octra-form-number-control>
+            </ng-template>
+          }
+          @if (control.type === 'text' && !control.ignore) {
+            <ng-container
+              *ngTemplateOutlet="
+                controlRow;
+                context: {
+                  control: control,
+                  content: textContent,
+                  options: options,
+                  showTitle: true,
+                  labelFor: 'text-' + control.id,
+                  group: group,
+                  index: $index,
+                  showToggles: showToggles,
+                }
+              "
+            ></ng-container>
+            <ng-template #textContent let-control="control">
+              <octra-form-text-control
+                [id]="'text-' + control.id"
+                [name]="'text-' + control.id"
+                [required]="control.required"
+                [placeholder]="control.placeholder"
+                [schema]="control.schema"
+                [disabled]="!control.checkToggleStateOfControl()"
+                [(ngModel)]="control.value"
+                (ngModelChange)="somethingChanged.emit()"
+                (focusin)="control.focused = true"
+                (focusout)="control.focused = false"
+              ></octra-form-text-control>
+            </ng-template>
+          }
+          @if (control.type === 'select' && !control.ignore) {
+            <ng-container
+              *ngTemplateOutlet="
+                controlRow;
+                context: {
+                  control: control,
+                  content: selectContent,
+                  options: options,
+                  showTitle: true,
+                  labelFor: 'select-' + control.id,
+                  group: group,
+                  index: $index,
+                  showToggles: showToggles,
+                }
+              "
+            ></ng-container>
+            <ng-template #selectContent let-control="control">
+              <octra-form-select-control
+                [id]="'select-' + control.id"
+                [name]="'select-' + control.id"
+                [items]="control.context"
+                [required]="control.required"
+                [schema]="control.schema"
+                [disabled]="!control.checkToggleStateOfControl()"
+                [ngModel]="control.value"
+                (ngModelChange)="onSelectChanged($event, control); somethingChanged.emit()"
+                (focusin)="control.focused = true"
+                (focusout)="control.focused = false"
+              ></octra-form-select-control>
+            </ng-template>
+          }
+
+          @if (control.type === 'array' && !control.ignore) {
+            <ng-container
+              *ngTemplateOutlet="
+                controlRow;
+                context: {
+                  control: control,
+                  content: arrayContent,
+                  options: options,
+                  showTitle: true,
+                  labelFor: 'array-' + control.id,
+                  group: group,
+                  index: $index,
+                  showToggles: showToggles,
+                }
+              "
+            ></ng-container>
+            <ng-template #arrayContent let-control="control">
+              <octra-form-array-control
+                [id]="'array-' + control.id"
+                [name]="'array_' + control.id"
+                [itemsType]="control.itemsType"
+                [items]="control.context"
+                [required]="control.required"
+                [schema]="control.schema"
+                [disabled]="!control.checkToggleStateOfControl()"
+                [(ngModel)]="control.value"
+                (ngModelChange)="somethingChanged.emit()"
+              ></octra-form-array-control>
+            </ng-template>
+          }
+
+          @if (control.type === 'group') {
+            <octra-form-group
+              [group]="control"
+              [options]="options"
+              [showToggles]="(showToggles && options.showToggles !== 'hide') || options.showToggles === 'static'"
+              (somethingChanged)="somethingChanged.emit()"
+            ></octra-form-group>
+          }
+        }
+
+        @if (group?.textBottom) {
+          <p class="py-2 my-0" [innerHTML]="group.textBottom"></p>
+        }
+      }
+
+      <ng-template
+        #controlRow
+        let-control="control"
+        let-content="content"
+        let-options="options"
+        let-showTitle="showTitle"
+        let-labelFor="labelFor"
+        let-group="group"
+        let-index="index"
+        let-showToggles="showToggles"
+      >
+        <ng-template #toggle let-control="control" let-visible="visible">
+          <div
+            class="form-check mb-0 ocf-form-check"
+            [ngStyle]="{
+              visibility: visible ? 'inherit' : 'hidden',
+            }"
+          >
+            <input
+              class="form-check-input ocf-form-check-input"
+              type="checkbox"
+              [id]="'check_toggleable_' + control.id"
+              [name]="'check_toggleable_' + control.id"
+              [(ngModel)]="control.toggled"
+              (ngModelChange)="somethingChanged.emit()"
+            />
+          </div>
+        </ng-template>
+
+        <div class="list-group-item">
+          <div class="row g-3 align-items-center ocf-control-outer-row" (mouseenter)="control.focused = true" (mouseleave)="control.focused = false">
+            @if (showToggles && options.labelPlacement === 'top') {
+              <div class="col-auto">
+                <ng-container *ngTemplateOutlet="toggle; context: { control: control, options: options, visible: control.toggleable }"></ng-container>
+              </div>
+            }
+            <div class="col">
+              <div class="row col-12 g-0 align-items-center">
+                <div
+                  [ngClass]="{
+                    'col-md-3': options.labelPlacement === 'left',
+                    'col-md-12': options.labelPlacement === 'top',
+                  }"
+                >
+                  <div class="d-flex flex-row flex-auto align-items-center">
+                    @if (options.labelPlacement === 'left' && showToggles && control.toggleable) {
+                      <ng-container *ngTemplateOutlet="toggle; context: { control: control, options: options, visibility: true }"></ng-container>
+                    }
+
+                    @if (showTitle) {
+                      <label
+                        class="form-check-label mb-0 ocf-form-check-label"
+                        [for]="labelFor"
+                        [ngClass]="{
+                          'opacity-50': !control.checkToggleStateOfControl(),
+                        }"
+                      >
+                        <span class="ocf-control-title">{{ control.title }}</span>
+                        @if (control.required) {
+                          <span class="text-danger ms-1">*</span>
+                        }
+                      </label>
+                    }
+                  </div>
+                </div>
+                <div class="col">
+                  <ng-container *ngTemplateOutlet="content; context: { control: control }"></ng-container>
+                  @if (control.textAbove) {
+                    <div class="ocf-control-above-text mb-3" [innerHTML]="control.textAbove"></div>
+                  }
+                  @if (control.examples) {
+                    <div class="ocf-control-examples">
+                      <code>{{ control.examples }}</code>
+                    </div>
+                  }
+                  @if (control.textBottom) {
+                    <div class="ocf-control-bottom-text mt-3" [innerHTML]="control.textBottom"></div>
+                  }
+                </div>
+                <div class="col-auto text-center px-2">
+                  <octra-question-mark
+                    [text]="control.description"
+                    class="ocf-octra-question-mark"
+                    [ngStyle]="{
+                      visibility:
+                        control.description &&
+                        (options.questionMarkVisibility === 'static' || (options.questionMarkVisibility === 'onhover' && control.focused))
+                          ? 'visible'
+                          : 'hidden',
+                    }"
+                  ></octra-question-mark>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

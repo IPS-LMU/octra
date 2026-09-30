@@ -14,9 +14,7 @@
         }
       </div>
       <div class="text-end mt-3">
-        <button class="btn btn-primary btn-sm" (click)="add(); p.close()">
-          apply
-        </button>
+        <button type="button" class="btn btn-primary btn-sm" (click)="p.close(); add()">{{ 'g.apply' | transloco }}</button>
       </div>
     </div>
   } @else {
@@ -27,17 +25,11 @@
     }
     @if (type === 'number' || type === 'integer') {
       <div>
-        <input
-          type="number"
-          class="form-control"
-          [step]="type === 'integer' ? 1 : 0.1"
-          name="89zuas"
-          [(ngModel)]="inputValue"
-        />
+        <input type="number" class="form-control" [step]="type === 'integer' ? 1 : 0.1" name="89zuas" [(ngModel)]="inputValue" />
       </div>
     }
     <div class="text-end mt-3">
-      <button class="btn btn-primary btn-sm" (click)="add()">add</button>
+      <button type="button" class="btn btn-primary btn-sm" (click)="add()">{{ 'g.add' | transloco }}</button>
     </div>
   }
 </ng-template>
@@ -52,14 +44,7 @@
   [ngClass]="{
     'opacity-50': disabled,
   }"
-  style="
-    background-color: cornflowerblue;
-    margin-top: 7px;
-    height: 20px;
-    width: 20px;
-    font-size: 0.85rem;
-    padding: 0px 3px;
-  "
+  style="background-color: cornflowerblue; height: 20px; width: 20px; font-size: 0.85rem; padding: 0px 3px"
 >
   <i class="bi bi-plus-lg text-light"></i>
 </span>

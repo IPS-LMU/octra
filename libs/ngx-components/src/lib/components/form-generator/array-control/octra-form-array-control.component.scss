@@ -1,0 +1,20 @@
+@use "../base-control/octra-form-base-control";
+
+.array-item {
+  user-focus: none;
+  user-select: none;
+  display: inline-block;
+  padding: 5px;
+  background-color: whitesmoke;
+  border-radius: 5px;
+  margin-right: 5px;
+  font-size: 0.9rem;
+}
+
+.array-control-items-list.disabled {
+  background-color: var(--bs-secondary-bg);
+}
+
+:host(.ng-invalid.ng-touched) {
+  border-bottom: 2px solid red;
+}

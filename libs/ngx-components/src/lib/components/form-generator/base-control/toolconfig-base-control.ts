@@ -81,7 +81,6 @@ export abstract class ToolconfigBaseControlComponent<T> implements ControlValueA
     this.onTouched();
     this.onValidationStateChange();
   }
-
   // Hook for subclasses that need to react immediately (e.g. open/close an error popover)
   // whenever touched or errors change, since blur doesn't trigger validate() on its own.
   protected onValidationStateChange(): void {}
@@ -89,7 +88,7 @@ export abstract class ToolconfigBaseControlComponent<T> implements ControlValueA
   protected abstract isEmpty(value: T | undefined | null): boolean;
 
   protected validateJSONSchema(): null | ValidationErrors {
-    const ajv = new Ajv({ allErrors: true, strict: false });
+    const ajv = new Ajv({ allErrors: true, strict: false});
     const validate = ajv.compile(this.schema);
     validate(this.value);
 

@@ -161,6 +161,8 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
   }
 
   override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): FormGeneratorJSONSchema {
+    const levelNames = annotation.levels.map((a) => a.name);
+
     return {
       $gui_support: true,
       type: 'object',
@@ -172,17 +174,18 @@ export class WebVTTConverter extends Converter<WebVTTConverterImportOptions, Web
           type: 'array',
           items: {
             type: 'string',
-            enum: annotation.levels.map((a) => a.name),
+            enum: levelNames,
           },
           description: 'Defines an array of level indices for export.',
-          default: annotation.levels.map((a) => a.name),
+          default: levelNames,
         },
         transformPattern: {
           title: 'transformTranscriptionUnit',
           type: 'string',
-          default: '[{{LEVEL_NAME}}]: {{TRANSCRIPT}}',
-          pattern: '(\\{\\{TRANSCRIPT\\}\\})',
+          default: levelNames.length === 1 ? '{{TRANSCRIPT}}' : '[{{LEVEL_NAME}}]: {{TRANSCRIPT}}',
+          examples: ['e.g. [{{LEVEL_NAME}}]: {{TRANSCRIPT}} => [SPEAKER_00]: Some transcript...'],
           dependsOn: ['exportLevels'],
+          pattern: '\\{\\{TRANSCRIPT\\}\\}',
           description: 'For each speaker a new level should be created and each speaker segment should be moved to its level.',
         },
       },

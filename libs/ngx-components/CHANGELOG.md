@@ -2,6 +2,12 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.0.1](https://github.com/IPS-LMU/octra/compare/ngx-components-2.0.0...ngx-components-2.0.1) (2026-09-30)
+
+### Bug Fixes
+
+* **ngx-components:** fix peer dependencies ([dbc2d4a](https://github.com/IPS-LMU/octra/commit/dbc2d4a046e9eb2d948ab7bc39ffa6b86fd25b72))
+
 # [2.0.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.9.5...ngx-components-2.0.0) (2026-09-30)
 
 ### Bug Fixes

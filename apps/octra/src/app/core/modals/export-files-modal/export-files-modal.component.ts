@@ -2,12 +2,15 @@ import { NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgbActiveModal, NgbCollapse, NgbModalOptions, NgbPopover, NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 import { Converter, ExportResult } from '@octra/annotation';
+import { OctraFormConfiguratorComponent } from '@octra/ngx-components';
+import { ErrorObject } from 'ajv/dist/types';
 import { timer } from 'rxjs';
 import { AppInfo } from '../../../app.info';
 import { NavbarService } from '../../component/navbar/navbar.service';
+import { translateOrUndefined } from '../../shared';
 import { AudioService, UserInteractionsService } from '../../shared/service';
 import { AnnotationStoreService } from '../../store/login-mode/annotation/annotation.store.service';
 import { NamingDragAndDropComponent } from '../../tools/naming-drag-and-drop/naming-drag-and-drop.component';
@@ -18,7 +21,7 @@ import { OctraModal } from '../types';
   selector: 'octra-export-files-modal',
   templateUrl: './export-files-modal.component.html',
   styleUrls: ['./export-files-modal.component.scss'],
-  imports: [NgClass, NgbPopover, NgbTooltip, FormsModule, TableConfiguratorComponent, TranslocoPipe, NgbCollapse],
+  imports: [NgClass, NgbPopover, NgbTooltip, FormsModule, TableConfiguratorComponent, TranslocoPipe, NgbCollapse, OctraFormConfiguratorComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExportFilesModalComponent extends OctraModal implements OnInit {
@@ -27,6 +30,8 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   annotationStoreService = inject(AnnotationStoreService);
   protected override activeModal: NgbActiveModal;
   protected cd = inject(ChangeDetectorRef);
+  private transloco = inject(TranslocoService);
+  jsonText = '';
 
   public static options: NgbModalOptions = {
     size: 'xl',
@@ -36,7 +41,12 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   };
 
   AppInfo = AppInfo;
-  public exportStates: string[] = [];
+  public exportStates: {
+    status: string;
+    options: any;
+    validOptions: boolean;
+    value: any;
+  }[] = [];
   public preparing = {
     name: '',
     preparing: false,
@@ -129,7 +139,31 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     );
 
     for (const converter of this.converters) {
-      this.exportStates.push('close');
+      const oannotjson = this.annotationStoreService.transcript?.serialize(
+        this.audio.audioManager.resource.info.fullname,
+        this.audio.audioManager.sampleRate,
+        this.audio.audioManager.resource.info.duration,
+      );
+      const options = converter.needsOptionsForExport(oannotjson, this.audio.audioManager.resource.getOAudioFile());
+
+      if (options) {
+        // translate option labels
+        const root = `converters.${converter.name}.exportOptions`;
+        for (const key of Object.keys(options.properties)) {
+          const propertyDefinition = options.properties[key];
+          if (propertyDefinition.title) {
+            propertyDefinition.title = translateOrUndefined(this.transloco, `${root}.${key}.title`) ?? propertyDefinition.title;
+            propertyDefinition.description = translateOrUndefined(this.transloco, `${root}.${key}.description`) ?? propertyDefinition.description;
+          }
+        }
+      }
+
+      this.exportStates.push({
+        status: 'close',
+        validOptions: false,
+        options,
+        value: {},
+      });
     }
 
     if (this.tableConfigurator) {
@@ -156,28 +190,34 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
   }
 
   onLineClick(converter: Converter, index: number) {
-    if (converter.multitiers || (!converter.multitiers && this.annotationStoreService.transcript!.levels.length === 1)) {
-      this.updateParentFormat(converter);
-    }
-    this.toggleLine(index);
+    this.toggleLine(converter, index);
   }
 
   sanitize(url: string): SafeUrl {
     return this.sanitizer.bypassSecurityTrustUrl(url);
   }
 
-  toggleLine(index: number) {
+  toggleLine(converter: Converter, index: number) {
     for (let i = 0; i < this.exportStates.length; i++) {
-      if (this.exportStates[i] === 'active') {
-        this.exportStates[i] = 'close';
+      if (this.exportStates[i].status === 'active') {
+        this.exportStates[i].status = 'close';
       }
     }
 
     if (index < this.exportStates.length) {
-      if (this.exportStates[index] === 'active') {
-        this.exportStates[index] = 'inactive';
+      if (this.exportStates[index].status === 'active') {
+        this.exportStates[index].status = 'inactive';
       } else {
-        this.exportStates[index] = 'active';
+        this.exportStates[index].status = 'active';
+        const oannotjson = this.annotationStoreService.transcript?.serialize(
+          this.audio.audioManager.resource.info.fullname,
+          this.audio.audioManager.sampleRate,
+          this.audio.audioManager.resource.info.duration,
+        );
+        const oAudio = this.audio.audioManager.resource.getOAudioFile();
+        if (!converter.needsOptionsForExport(oannotjson, oAudio)) {
+          this.updateParentFormat(converter, '{}');
+        }
       }
     }
     this.cd.markForCheck();
@@ -191,16 +231,19 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     this.cd.markForCheck();
   }
 
-  onSelectionChange(converter: Converter, value: any) {
-    if (value !== '') {
-      this.updateParentFormat(converter, value);
-    }
+  onValidationChange(
+    $event: {
+      valid: boolean;
+      errors?: null | ErrorObject[];
+    },
+    index: number,
+  ) {
+    this.exportStates[index].validOptions = $event.valid;
+    this.cd.markForCheck();
   }
 
-  updateParentFormat(converter: Converter, levelnum?: number) {
-    if (levelnum === undefined && !converter.multitiers) {
-      levelnum = 0;
-    }
+  updateParentFormat(converter: Converter, jsonOptions: string) {
+    const options = JSON.parse(jsonOptions);
 
     if (!this.preparing.preparing) {
       if (this.annotationStoreService.transcript?.levels === undefined) {
@@ -217,16 +260,8 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
         preparing: true,
       };
       this.subscribe(timer(300), () => {
-        if (converter.name === 'BundleJSON') {
-          // only this converter needs an array buffer
-          /*
-            this.transcriptionService.audiofile.arraybuffer =
-              this.transcriptionService.audioManager.resource.arraybuffer!;
-             */
-        }
-
         const oAudioFile = this.audio.audioManager.resource.getOAudioFile();
-        const result: ExportResult = converter.export(oannotjson, oAudioFile, levelnum);
+        const result: ExportResult = converter.export(oannotjson, oAudioFile, options);
 
         if (!result.error && result.file) {
           this.parentformat.download = result.file.name;
@@ -241,8 +276,13 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
             preparing: false,
           };
         } else {
+          this.preparing = {
+            name: converter.name,
+            preparing: false,
+          };
           console.error(`Annotation conversion error: ${result.error}`);
         }
+        this.cd.markForCheck();
       });
     }
     this.cd.markForCheck();
@@ -254,7 +294,6 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
       preparing: true,
     };
     this.parentformat.download = this.audio.audioManager.resource.info.name + '.json';
-
     if (this.parentformat.uri !== undefined) {
       window.URL.revokeObjectURL(this.parentformat.uri.toString());
     }
@@ -266,17 +305,16 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
     };
   }
 
-  onDownloadClick(i: number) {
-    this.subscribe(timer(500), () => {
-      this.exportStates[i] = 'inactive';
-    });
+  onDownloadClick(i: number, form?: OctraFormConfiguratorComponent) {
+    if (form && !this.exportStates[i].validOptions) {
+      form.touchForm();
+    }
   }
 
   onHidden() {
     for (let i = 0; i < this.exportStates.length; i++) {
-      this.exportStates[i] = 'inactive';
+      this.exportStates[i].status = 'inactive';
     }
-
     this.tools.audioCutting.status = 'idle';
     this.tools.audioCutting.progressbarType = 'idle';
     this.tools.audioCutting.progressbarType = 'idle';
@@ -295,11 +333,6 @@ export class ExportFilesModalComponent extends OctraModal implements OnInit {
       const url = this.parentformat.uri.toString();
       window.URL.revokeObjectURL(url);
     }
-    this.cd.markForCheck();
-  }
-
-  onPlaintextTimestampOptionChanged(converter: Converter) {
-    this.updateParentFormat(converter, this.selectedLevel);
     this.cd.markForCheck();
   }
 }

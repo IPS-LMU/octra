@@ -2,6 +2,23 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.0.0](https://github.com/IPS-LMU/octra/compare/annotation-1.3.6...annotation-2.0.0) (2026-09-30)
+
+### Bug Fixes
+
+* **annotation:** SRTConverter strips part of speaker label on import. ([a459582](https://github.com/IPS-LMU/octra/commit/a45958236739916dfe60a6ebdc26e75591740da4))
+* **ngx-components:** octra fails to open annotation on invalid boundaries ([9d637c7](https://github.com/IPS-LMU/octra/commit/9d637c7bc3037068ccb59852372b6c503bfe6992))
+
+### Features
+
+* **annotation:** converters like SRT now support export options using JSON schema ([eb7ead8](https://github.com/IPS-LMU/octra/commit/eb7ead8c890038f0990171da093ba10686fd6088))
+* **octra:** new editor - Matrix-Editor ([4715bfb](https://github.com/IPS-LMU/octra/commit/4715bfbe91dd37336446efc6f917b97748427cc2))
+
+### BREAKING CHANGES
+
+* **annotation:** declaration for export method changed
+* **octra:** The Linear-Editor is dicontinued and removed from the set of supported editors
+
 ## [1.3.6](https://github.com/IPS-LMU/octra/compare/annotation-1.3.5...annotation-1.3.6) (2026-03-05)
 
 

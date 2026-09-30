@@ -2,6 +2,12 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.2.0](https://github.com/IPS-LMU/octra/compare/utilities-2.1.3...utilities-2.2.0) (2026-09-30)
+
+### Features
+
+* **utilities:** new interfaces for FormGeneratorJSON schema ([8b932d8](https://github.com/IPS-LMU/octra/commit/8b932d8a3c9503688fc6ebb9fe60a188ecd8fa3b))
+
 ## [2.1.3](https://github.com/IPS-LMU/octra/compare/utilities-2.1.2...utilities-2.1.3) (2026-07-01)
 
 

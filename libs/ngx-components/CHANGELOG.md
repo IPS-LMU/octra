@@ -2,6 +2,23 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.0.0](https://github.com/IPS-LMU/octra/compare/ngx-components-1.9.5...ngx-components-2.0.0) (2026-09-30)
+
+### Bug Fixes
+
+* **ngx-components:** some of the components are not migrated to OnPush CD ([b6dfe0e](https://github.com/IPS-LMU/octra/commit/b6dfe0e1eab986cb13674ae468425595e60bceac))
+* **octra:** hotkeys do not work after meta keys released outside the window ([9bad8b6](https://github.com/IPS-LMU/octra/commit/9bad8b636603dd6404356559bccd37923e69bb80))
+
+### Features
+
+* **ngx-components:** easy skeleton loader directive ([25ef40a](https://github.com/IPS-LMU/octra/commit/25ef40ac5554298265cbe57b641a5fbd19c29073))
+* **ngx-components:** improved form generator using JSON schema ([b56780f](https://github.com/IPS-LMU/octra/commit/b56780f9e259ec4b4b9c46e4b0f4afa21549d25a))
+* **octra:** new editor - Matrix-Editor ([4715bfb](https://github.com/IPS-LMU/octra/commit/4715bfbe91dd37336446efc6f917b97748427cc2))
+
+### BREAKING CHANGES
+
+* **octra:** The Linear-Editor is dicontinued and removed from the set of supported editors
+
 ## [1.9.5](https://github.com/IPS-LMU/octra/compare/ngx-components-1.9.4...ngx-components-1.9.5) (2026-04-29)
 
 

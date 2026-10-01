@@ -5,6 +5,7 @@ import { downloadFile } from '@octra/ngx-utilities';
 import { SubscriptionManager } from '@octra/utilities';
 import { AudioManager } from '@octra/web-media';
 import { Subject, Subscription } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AudioService {
@@ -60,9 +61,9 @@ export class AudioService {
     // state transitions (e.g. an app-version check completing mid-download),
     // which can abort the request with an opaque "ServiceWorker intercepted
     // the request" error - see ngsw-bypass usage in asr.effects.service.ts
-    downloadFile<ArrayBuffer>(this.http, url, 'arraybuffer', {
+    downloadFile<ArrayBuffer>(this.http, url, 'arraybuffer',  environment.production ? {
       'ngsw-bypass': 'true',
-    }).subscribe({
+    }: undefined).subscribe({
       next: (event) => {
         subj.next(0.5 * event.progress);
         if (event.progress === 1 && event.result) {

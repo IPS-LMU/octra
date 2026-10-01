@@ -804,7 +804,11 @@ export class AsrEffects {
         {
           headers: {
             'Content-Type': 'multipart/form-data',
-            'ngsw-bypass': 'true',
+            ...(environment.production
+              ? {
+                  'ngsw-bypass': 'true',
+                }
+              : {}),
           },
           responseType: 'text',
         },
@@ -861,7 +865,11 @@ export class AsrEffects {
       .post(`${selectedLanguage.host}uploadFileMulti`, formData, {
         responseType: 'text',
         headers: {
-          'ngsw-bypass': 'true',
+          ...(environment.production
+            ? {
+                'ngsw-bypass': 'true',
+              }
+            : {}),
         },
       })
       .pipe(
@@ -911,7 +919,11 @@ export class AsrEffects {
         {
           headers: {
             'Content-Type': 'multipart/form-data',
-            'ngsw-bypass': 'true',
+            ...(environment.production
+              ? {
+                  'ngsw-bypass': 'true',
+                }
+              : {}),
           },
           responseType: 'text',
         },

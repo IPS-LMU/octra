@@ -13,6 +13,7 @@ import { YesNoModalComponent } from '../../../../modals/yes-no-modal/yes-no-moda
 import { findCompatibleFileFromIO, isValidAnnotation, LuxonShortDateTimePipe } from '../../../../shared';
 import { AlertService } from '../../../../shared/service';
 import { AuthenticationStoreService } from '../../../../store/authentication';
+import { environment } from '../../../../../../environments/environment';
 
 class PreparedTask extends TaskDto {
   transcript?: string;
@@ -46,9 +47,14 @@ class PreparedTask extends TaskDto {
         // range requests on seek. Letting the SW intercept those exposes them
         // to unrelated SW-internal state transitions and can abort playback
         // with an opaque "ServiceWorker intercepted the request" error.
-        url: appendURLQueryParams(this.api.prepareFileURL(audioFile.url!), {
-          'ngsw-bypass': true,
-        }),
+        url: appendURLQueryParams(
+          this.api.prepareFileURL(audioFile.url!),
+          environment.production
+            ? {
+                'ngsw-bypass': 'true',
+              }
+            : undefined,
+        ),
         type: audioFile.fileType!,
       };
 

@@ -2,6 +2,12 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.0.1](https://github.com/IPS-LMU/octra/compare/annotation-2.0.0...annotation-2.0.1) (2026-10-06)
+
+### Bug Fixes
+
+* **annotation:** SRT and WebVTTConverter don't combine segments using threshold properly ([bdfa8ed](https://github.com/IPS-LMU/octra/commit/bdfa8edbdab9b7d62b0a7bae655072fd4eae609e))
+
 # [2.0.0](https://github.com/IPS-LMU/octra/compare/annotation-1.3.6...annotation-2.0.0) (2026-09-30)
 
 ### Bug Fixes

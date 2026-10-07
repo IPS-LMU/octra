@@ -15,10 +15,6 @@
     }
   },
   "include": ["src/**/*.ts"],
-  "exclude": [
-    "src/**/*.spec.ts",
-    "src/**/*.test.ts"
-  ],
   "angularCompilerOptions": {
     "extendedDiagnostics": {
       "checks": {

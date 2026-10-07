@@ -1,27 +1,27 @@
-/// <reference types='vitest' />
-import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import * as path from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig(() => ({
-  // @ts-expect-error ignore
   root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/libs/media',
+  resolve: {
+    tsconfigPaths: true,
+  },
   plugins: [
-    nxViteTsPaths(),
-    nxCopyAssetsPlugin(['*.md']),
+    viteStaticCopy({
+      targets: [{ src: '*.md', dest: '.' }],
+    }),
     dts({
       entryRoot: 'src',
-      // @ts-expect-error ignore
       tsconfigPath: path.join(import.meta.dirname, 'tsconfig.lib.json'),
       pathsToAliases: false,
     }),
   ],
   // Uncomment this if you are using workers.
   // worker: {
-  //   plugins: () => [ nxViteTsPaths() ],
+  //   plugins: () => [],
   // },
   // Configuration for building your library.
   // See: https://vite.dev/guide/build.html#library-mode

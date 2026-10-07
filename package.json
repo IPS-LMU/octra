@@ -51,8 +51,6 @@
     "affected:apps": "nx affected:apps",
     "affected:libs": "nx affected:libs",
     "affected:build": "nx affected:build",
-    "affected:e2e": "nx affected:e2e",
-    "affected:test": "nx affected:test",
     "affected:lint": "nx affected:lint",
     "affected:dep-graph": "nx affected:dep-graph",
     "affected": "nx affected",
@@ -134,7 +132,6 @@
     "@nx/eslint-plugin": "23.2.1",
     "@nx/node": "23.2.1",
     "@nx/vite": "23.2.1",
-    "@nx/vitest": "23.2.1",
     "@nx/web": "23.2.1",
     "@nx/workspace": "23.2.1",
     "@schematics/angular": "22.1.8",
@@ -147,7 +144,6 @@
     "@types/platform": "^1.3.3",
     "@types/video.js": "^7.3.52",
     "@typescript-eslint/utils": "^8.40.0",
-    "@vitest/ui": "^4.1.3",
     "angular-eslint": "22.5.0",
     "autoprefixer": "^10.4.0",
     "concat": "^1.0.3",
@@ -171,7 +167,7 @@
     "typescript-eslint": "^8.40.0",
     "vite": "^8.0.0",
     "vite-plugin-dts": "~4.5.4",
-    "vitest": "~4.1.3",
+    "vite-plugin-static-copy": "^4.1.1",
     "yargs": "^18.0.0"
   },
   "nx": {

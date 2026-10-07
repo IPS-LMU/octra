@@ -36,8 +36,9 @@ You can find the manual for users here: [OCTRA Manual](https://clarin.phonetik.u
 
 ## Features
 
-* Three different editors
-* NEW: Online Mode powered by Octra-Backend
+* Four different editors
+* NEW: Emu-webApp (phonetic annotation) can now be used inside OCTRA
+* Online Mode powered by Octra-Backend
 * Noise markers (placeholders) in the form of icons in text. Icons can be UTF-8 symbols, too.
 * Auto-saving of the transcription progress to prevent data loss
 * Import/Export support for various file formats like AnnotJSON, Textgrid, Text, Table and more.
@@ -53,8 +54,8 @@ You can find the manual for users here: [OCTRA Manual](https://clarin.phonetik.u
 * Visible transcripts in 2D-Editor
 * Costom table generator
 * ASR support for transcription and segmentation
-* NEW: Each mode saves its own application state to the browser
-* NEW: Redo & Undo for signal displays
+* Each mode saves its own application state to the browser
+* Redo & Undo for signal displays
 
 ## Remarks
 

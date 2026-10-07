@@ -28,7 +28,8 @@ Octra supports different editors that you can choose according to your preferenc
 
 * 2D-Editor: This editor breaks the whole view of the signal to pieces and shows the pieces as lines one after one. Here you can set boundaries und define segments too.
 * Dictaphone Editor: An typical, easy-to-use editor with just a texteditor and an audioplayer.
-* Linear-Editor: This editor shows two signaldisplays: One for the whole view of the signal and one as loupe. You can set boundaries and define segments.
+* NEW: Matrix-Editor: View and edit the annotation on a big table. When you enter a transcript you see a signal display and a WYSIWYG-Editor to change the transcript.
+* NEW: Emu-webApp: The Emu-webApp is not available for audio files up to 50 MB. With the Emu-webApp you are able to do phonetic annotations.
 
 ## User Manual
 

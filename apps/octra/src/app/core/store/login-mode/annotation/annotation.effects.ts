@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { DOCUMENT, inject, Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
@@ -21,17 +21,25 @@ import { OctraAPIService } from '@octra/ngx-octra-api';
 import { appendURLQueryParams, extractFileNameFromURL, hasProperty, SubscriptionManager } from '@octra/utilities';
 import {
   catchError,
+  concatMap,
   delay,
+  distinctUntilChanged,
+  EMPTY,
   exhaustMap,
   finalize,
   forkJoin,
+  fromEvent,
   interval,
   map,
+  mergeMap,
   Observable,
   of,
   shareReplay,
+  startWith,
   Subscription,
+  switchMap,
   tap,
+  throwError,
   timer,
   withLatestFrom,
 } from 'rxjs';
@@ -89,6 +97,7 @@ export class AnnotationEffects {
   private appStorage = inject(AppStorageService);
   private transloco = inject(TranslocoService);
   private annotationStoreService = inject(AnnotationStoreService);
+  private readonly document = inject(DOCUMENT);
 
   transcrSendingModal: {
     ref?: NgbModalWrapper<TranscriptionSendingModalComponent>;
@@ -930,45 +939,46 @@ export class AnnotationEffects {
       }),
     ),
   );
-
   initAutoSave$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnotationActions.initTranscriptionService.do),
       withLatestFrom(this.store),
-      exhaustMap(([a, state]) => {
-        if (state.application.mode === LoginMode.ONLINE) {
-          this.subscrManager.removeByTag('auto save');
-          this.subscrManager.add(
-            interval(300000) // every 5 minutes
-              .pipe(withLatestFrom(this.store))
-              .subscribe({
-                next: ([, state]) => {
-                  this.saveTaskToServer(state, TaskStatus.busy)
-                    .pipe(
-                      exhaustMap(() => {
-                        return of(AnnotationActions.autoSave.success());
-                      }),
-                      catchError((e: any) => {
-                        return of(
-                          AnnotationActions.autoSave.fail({
-                            error: e?.error?.message ?? e?.message,
-                          }),
-                        );
-                      }),
-                    )
-                    .subscribe({
-                      next: (a) => {
-                        this.store.dispatch(a);
-                      },
-                    });
-                },
-              }),
-            'auto save',
-          );
-
-          return of(AnnotationActions.autoSave.start());
+      exhaustMap(([, stateAtInit]) => {
+        if (stateAtInit.application.mode !== LoginMode.ONLINE) {
+          return EMPTY;
         }
-        return of();
+
+        this.subscrManager.removeByTag('auto save');
+
+        const visible$ = fromEvent(this.document, 'visibilitychange').pipe(
+          startWith(null),
+          map(() => this.document.visibilityState === 'visible'),
+          distinctUntilChanged(),
+        );
+
+        this.subscrManager.add(
+          visible$
+            .pipe(
+              switchMap((visible) => (visible ? interval(5 * 60 * 1000) : of(null))),
+              withLatestFrom(this.store),
+              concatMap(([, state]) =>
+                this.saveTaskToServer(state, TaskStatus.busy).pipe(
+                  mergeMap((dto?: TaskDto) => (dto ? of(AnnotationActions.autoSave.success()) : EMPTY)),
+                  catchError((e: any) =>
+                    of(
+                      AnnotationActions.autoSave.fail({
+                        error: e?.error?.message ?? e?.message,
+                      }),
+                    ),
+                  ),
+                ),
+              ),
+            )
+            .subscribe((action) => this.store.dispatch(action)),
+          'auto save',
+        );
+
+        return of(AnnotationActions.autoSave.start());
       }),
     ),
   );
@@ -2227,43 +2237,47 @@ export class AnnotationEffects {
   }
 
   private saveTaskToServer(state: RootState, status: TaskStatus): Observable<TaskDto | undefined> {
-    if (!this.audio.audioManager?.resource) {
+    if (!this.audio.audioManager?.resource || !state.onlineMode.currentSession?.currentProject || !state.onlineMode.currentSession?.task) {
       return of(undefined);
     }
 
-    const result = new AnnotJSONConverter().export(
-      state.onlineMode.transcript
-        .clone()
-        .serialize(
-          this.audio.audioManager.resource.info.fullname,
-          this.audio.audioManager.resource.info.sampleRate,
-          this.audio.audioManager.resource.info.duration.clone(),
-        ),
-    )?.file?.content;
+    try {
+      const result = new AnnotJSONConverter().export(
+        state.onlineMode.transcript
+          .clone()
+          .serialize(
+            this.audio.audioManager.resource.info.fullname,
+            this.audio.audioManager.resource.info.sampleRate,
+            this.audio.audioManager.resource.info.duration.clone(),
+          ),
+      )?.file?.content;
 
-    const outputs = result
-      ? [
-          new File([result], state.onlineMode.audio.fileName.substring(0, state.onlineMode.audio.fileName.lastIndexOf('.')) + '_annot.json', {
-            type: 'application/json',
-          }),
-        ]
-      : [];
+      const outputs = result
+        ? [
+            new File([result], state.onlineMode.audio.fileName.substring(0, state.onlineMode.audio.fileName.lastIndexOf('.')) + '_annot.json', {
+              type: 'application/json',
+            }),
+          ]
+        : [];
 
-    return this.apiService.saveTask(
-      state.onlineMode.currentSession!.currentProject!.id,
-      state.onlineMode.currentSession!.task!.id,
-      {
-        assessment: state.onlineMode.currentSession.assessment,
-        comment: state.onlineMode.currentSession.comment,
-        status,
-      },
-      state.onlineMode.logging.logs
-        ? new File([JSON.stringify(state.onlineMode.logging.logs)], 'log.json', {
-            type: 'application/json',
-          })
-        : undefined,
-      outputs,
-    );
+      return this.apiService.saveTask(
+        state.onlineMode.currentSession.currentProject.id,
+        state.onlineMode.currentSession.task.id,
+        {
+          assessment: state.onlineMode.currentSession.assessment,
+          comment: state.onlineMode.currentSession.comment,
+          status,
+        },
+        state.onlineMode.logging.logs
+          ? new File([JSON.stringify(state.onlineMode.logging.logs)], 'log.json', {
+              type: 'application/json',
+            })
+          : undefined,
+        outputs,
+      );
+    } catch (e) {
+      return throwError(() => e);
+    }
   }
 
   sendToParentWindow$ = createEffect(() =>
@@ -2302,7 +2316,7 @@ export class AnnotationEffects {
           this.audio.audioManager.resource.info.duration,
         );
         const result = converter.export(oannotjson, this.audio.audioManager.resource.getOAudioFile(), {
-          levelName: oannotjson.levels[0].name
+          levelName: oannotjson.levels[0].name,
         });
 
         if (!result.error && result.file) {

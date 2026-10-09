@@ -2,6 +2,12 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.0.2](https://github.com/IPS-LMU/octra/compare/annotation-2.0.1...annotation-2.0.2) (2026-10-09)
+
+### Bug Fixes
+
+* **annotation:** loading SRT in online mode blocked by ELAN-Converter ([d6e4a27](https://github.com/IPS-LMU/octra/commit/d6e4a272c8d53453e93bcb3aeab794a31ed5ba92))
+
 ## [2.0.1](https://github.com/IPS-LMU/octra/compare/annotation-2.0.0...annotation-2.0.1) (2026-10-06)
 
 ### Bug Fixes

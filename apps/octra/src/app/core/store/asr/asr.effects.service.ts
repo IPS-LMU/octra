@@ -824,11 +824,16 @@ export class AsrEffects {
   private extractResultData = (result: string): Promise<{ file: File; text: string; url: string }> => {
     return new Promise<{ file: File; text: string; url: string }>((resolve, reject) => {
       // convert result to json
-      const x2js = new X2JS();
-      let json: any = x2js.xml2js(result);
-      json = json.WebServiceResponseLink;
+      let json: any;
+      try {
+        json = result?.trimStart().startsWith('<') ? new X2JS().xml2js(result) : undefined;
+      } catch (e) {
+        reject(new Error(`Invalid response from ASR service: ${(e as Error).message}`));
+        return;
+      }
+      json = json?.WebServiceResponseLink;
 
-      if (json.success === 'true') {
+      if (json?.success === 'true') {
         const file = FileInfo.fromURL(json.downloadLink, 'text/plain');
         file
           .updateContentFromURL(this.http)
@@ -844,7 +849,7 @@ export class AsrEffects {
             reject(error);
           });
       } else {
-        reject(new Error(this.extractErrorMessage(json.output)));
+        reject(new Error(this.extractErrorMessage(json?.output ?? 'Unknown error from ASR service')));
       }
     });
   };
@@ -875,11 +880,15 @@ export class AsrEffects {
       .pipe(
         take(1),
         exhaustMap((result) => {
-          const x2js = new X2JS();
-          let json: any = x2js.xml2js(result);
-          json = json.UploadFileMultiResponse;
+          let json: any;
+          try {
+            json = result?.trimStart().startsWith('<') ? new X2JS().xml2js(result) : undefined;
+          } catch (e) {
+            return throwError(() => new Error(`Invalid response from upload service: ${(e as Error).message}`));
+          }
+          json = json?.UploadFileMultiResponse;
 
-          if (json.success === 'true') {
+          if (json?.success === 'true') {
             if (json.fileList?.entry) {
               if (!Array.isArray(json.fileList.entry)) {
                 return of([json.fileList.entry.value]);

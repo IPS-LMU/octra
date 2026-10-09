@@ -514,48 +514,63 @@ export class ApplicationEffects {
     }>((resolve, reject) => {
       this.http
         .get(`${url}?ASRType=call${asrName}ASR`, { responseType: 'text' })
-        .subscribe((result) => {
-          const x2js = new X2JS();
-          const response: any = x2js.xml2js(result);
-          const asrQuotaInfo: {
-            asrName: string;
-            monthlyQuota?: number;
-            usedQuota?: number;
-          } = {
-            asrName,
-          };
-
-          if (response.basQuota) {
-            const info = {
-              monthlyQuota:
-                response.basQuota &&
-                response.basQuota.monthlyQuota &&
-                isNumber(response.basQuota.monthlyQuota)
-                  ? Number(response.basQuota.monthlyQuota)
-                  : null,
-              secsAvailable:
-                response.basQuota &&
-                response.basQuota.secsAvailable &&
-                isNumber(response.basQuota.secsAvailable)
-                  ? Number(response.basQuota.secsAvailable)
-                  : null,
+        .subscribe({
+          next: (result) => {
+            const asrQuotaInfo: {
+              asrName: string;
+              monthlyQuota?: number;
+              usedQuota?: number;
+            } = {
+              asrName,
             };
 
-            if (info.monthlyQuota && info.monthlyQuota !== 999999) {
-              asrQuotaInfo.monthlyQuota = info.monthlyQuota;
+            let response: any;
+            try {
+              response = result?.trimStart().startsWith('<')
+                ? new X2JS().xml2js(result)
+                : undefined;
+            } catch (e) {
+              console.error(`could not parse ASR quota info for ${asrName}`, e);
+              resolve(asrQuotaInfo);
+              return;
             }
 
-            if (
-              info.monthlyQuota &&
-              info.secsAvailable !== undefined &&
-              info.secsAvailable !== null &&
-              info.secsAvailable !== 999999
-            ) {
-              asrQuotaInfo.usedQuota = info.monthlyQuota - info.secsAvailable;
-            }
-          }
+            if (response?.basQuota) {
+              const info = {
+                monthlyQuota:
+                  response.basQuota &&
+                  response.basQuota.monthlyQuota &&
+                  isNumber(response.basQuota.monthlyQuota)
+                    ? Number(response.basQuota.monthlyQuota)
+                    : null,
+                secsAvailable:
+                  response.basQuota &&
+                  response.basQuota.secsAvailable &&
+                  isNumber(response.basQuota.secsAvailable)
+                    ? Number(response.basQuota.secsAvailable)
+                    : null,
+              };
 
-          resolve(asrQuotaInfo);
+              if (info.monthlyQuota && info.monthlyQuota !== 999999) {
+                asrQuotaInfo.monthlyQuota = info.monthlyQuota;
+              }
+
+              if (
+                info.monthlyQuota &&
+                info.secsAvailable !== undefined &&
+                info.secsAvailable !== null &&
+                info.secsAvailable !== 999999
+              ) {
+                asrQuotaInfo.usedQuota = info.monthlyQuota - info.secsAvailable;
+              }
+            }
+
+            resolve(asrQuotaInfo);
+          },
+          error: (e) => {
+            console.error(`could not load ASR quota info for ${asrName}`, e);
+            resolve({ asrName });
+          },
         });
     });
   }

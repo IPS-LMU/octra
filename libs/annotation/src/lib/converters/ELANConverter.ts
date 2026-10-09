@@ -160,8 +160,14 @@ export class ELANConverter extends Converter {
 
     result.annotjson = new OAnnotJSON(audiofile.name, FileInfo.extractFileName(file.name).name, audiofile.sampleRate);
 
-    const x2js = new X2JS();
-    const jsonXML = x2js.xml2js<ELAN30Object>(file.content);
+    let jsonXML: ELAN30Object | undefined;
+    try {
+      jsonXML = file.content?.trimStart().startsWith('<') ? new X2JS().xml2js<ELAN30Object>(file.content) : undefined;
+    } catch (e) {
+      return {
+        error: `Invalid ELAN file: ${(e as Error).message}`,
+      };
+    }
 
     let counter = 1;
 

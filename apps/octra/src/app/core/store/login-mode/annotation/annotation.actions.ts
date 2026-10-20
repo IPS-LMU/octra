@@ -599,6 +599,7 @@ export class AnnotationActions {
     events: {
       start: emptyProps(),
       stop: emptyProps(),
+      stopped: emptyProps(),
       success: emptyProps(),
       fail: props<{
         error: string;

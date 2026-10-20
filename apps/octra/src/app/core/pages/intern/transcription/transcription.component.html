@@ -9,8 +9,10 @@
         class="col-12 col-sm-9"
         style="text-align: left; padding-left: 20px"
       >
-        {{ audio.audioManager.resource.info!.fullname }}:
-        <i>{{ (annotationStoreService.task$ | async)?.orgtext }}</i>
+        <span class="w-100 d-block text-truncate pointer" [ngbPopover]="orgtextPopover"  [placement]="'bottom-left'" [disablePopover]="(annotationStoreService.task$ | async)?.orgtext === undefined || (annotationStoreService.task$ | async)?.orgtext === ''" triggers="mouseenter:mouseleave" [openDelay]="500" popoverClass="full-width-popover">{{ audio.audioManager.resource.info!.fullname }}: <i>{{ (annotationStoreService.task$ | async)?.orgtext }}</i></span>
+        <ng-template #orgtextPopover>
+          <pre style="white-space: break-spaces; font-family: Helvetica Neue, Helvetica, Arial,serif; font-size:1rem;">{{(annotationStoreService.task$ | async)?.orgtext}}</pre>
+        </ng-template>
       </div>
       @if ((annotationStoreService.textInput$ | async) !== undefined) {
         <div class="col-12 col-sm-3" style="text-align: right; padding-right: 20px">

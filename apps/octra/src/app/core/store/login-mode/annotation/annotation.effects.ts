@@ -989,7 +989,7 @@ export class AnnotationEffects {
       withLatestFrom(this.store),
       exhaustMap(([a, state]) => {
         this.subscrManager.removeByTag('auto save');
-        return of(AnnotationActions.autoSave.stop());
+        return of(AnnotationActions.autoSave.stopped());
       }),
     ),
   );

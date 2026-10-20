@@ -589,3 +589,8 @@ ul.pagination.pagination-sm {
 .ocf-group-title {
   font-size: 1.3rem;
 }
+
+.full-width-popover,
+.full-width-popover .popover-body {
+  max-width:100%;
+}

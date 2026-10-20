@@ -133,7 +133,7 @@
     <octra-browser-test></octra-browser-test>
   }
 </div>
-<div class="section order-3 order-md-2">
+<div class="section order-3 order-md-2 mb-4">
   <footer class="footer">
     <div class="row">
       <div class="col-md-4">
@@ -155,15 +155,18 @@
   </footer>
 </div>
 <section class="order-1 order-md-3">
-  <div class="container-md p-2">
-    <hr class="d-none d-md-block" />
-    <div class="text-center mb-3 p-0 p-md-3" style="background-color: #279440">
-      <img src="assets/img/socialmedia/Octra2_thumbnail_github2x.webp" alt="octra logo" class="img-fluid" style="max-height: 200px" />
+  <div class="w-100 py-3 py-md-5 mb-3" style="background-color:#279440;">
+    <div class="container-md">
+      <div class="text-center">
+        <img src="assets/img/socialmedia/Octra2_thumbnail_github2x.webp" alt="octra logo" class="img-fluid" style="max-height: 200px" />
+      </div>
     </div>
+  </div>
+  <div class="container-md p-2">
     <p style="text-align: justify">
-      OCTRA is a free, open-source web-application for the orthographic transcription of audio files. It supports four different editors for
-      different needs. You can switch between these editors, they share the same transcript. Your proceedings are saved automatically to your browser.
-      If your web browser or computer crashes just reopen your web browser and continue your work. <a [routerLink]="['/features']">See features</a>
+      OCTRA is a free, open-source web-application for the orthographic transcription of audio files. It supports four different editors for different
+      needs. You can switch between these editors, they share the same transcript. Your proceedings are saved automatically to your browser. If your
+      web browser or computer crashes just reopen your web browser and continue your work. <a [routerLink]="['/features']">See features</a>
     </p>
     <p>Overall OCTRA supports following features:</p>
     <ul>
@@ -172,14 +175,17 @@
         <ul>
           <li>Dictaphone-Editor: A simple editor without a signal display. It consists of an audio player and a text-editor.</li>
           <li>
-            Matrix-Editor (NEW): The whole annotation is shown as a big table where each line represents one transcription unit. You can enter one after one of the units for transcription correction. When a unit is entered you see a corresponding signal display and you are able to play the audio and correct the transcript in a WYSIWYG-Editor.
+            Matrix-Editor (NEW): The whole annotation is shown as a big table where each line represents one transcription unit. You can enter one
+            after one of the units for transcription correction. When a unit is entered you see a corresponding signal display and you are able to
+            play the audio and correct the transcript in a WYSIWYG-Editor.
           </li>
           <li>
             2D-Editor: A multiline signal display shows the whole audio signal. You can scroll through the lines, add segment boundaries and much
             more. Using the ENTER key you can open a transcription window that shows the selected audio signal and a text-editor.
           </li>
           <li>
-            Emu-WebApp (NEW): For audio files up to 50 MB you are able to do phonetic annotation inside Octra. That allows project administrators to distribute phonetic annotation tasks to transcribers using the Octra-Backend.
+            Emu-WebApp (NEW): For audio files up to 50 MB you are able to do phonetic annotation inside Octra. That allows project administrators to
+            distribute phonetic annotation tasks to transcribers using the Octra-Backend.
           </li>
         </ul>
       </li>

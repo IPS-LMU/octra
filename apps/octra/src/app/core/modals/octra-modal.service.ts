@@ -96,15 +96,16 @@ export class OctraModalService implements OnDestroy {
     return ref;
   }
 
-  openErrorModal(text: string) {
+  async openErrorModal(title: string, body: string) {
     const ref = this.openModalRef<ErrorModalComponent>(ErrorModalComponent, ErrorModalComponent.options);
-    ref.componentInstance.text = text;
+    ref.componentInstance.title = title;
+    ref.componentInstance.body = body;
 
     this.onModalAction.emit({
       type: 'open',
       name: 'error',
     });
-    ref.result.then((result) => {
+    return ref.result.then((result) => {
       this.onModalAction.emit({
         type: 'close',
         name: 'error',

@@ -52,14 +52,7 @@ export class LoginModeActions extends AnnotationActions {
       do: props<{
         mode: LoginMode;
         actionAfterSuccess: Action;
-      }>(),
-      success: props<{
-        mode: LoginMode;
-        actionAfterSuccess: Action;
-      }>(),
-      fail: props<{
-        error: string;
-      }>(),
+      }>()
     },
   });
 

@@ -13,7 +13,9 @@ export const initialState: ApplicationState = {
   loading: {
     status: LoadingStatus.INITIALIZE,
     progress: 0,
+    label: '',
     errors: [],
+    numberOfRetries: 0,
   },
   reloaded: false,
   idb: {
@@ -68,11 +70,35 @@ export const reducer = createReducer(
     ...state,
     mode: LoginMode.ONLINE,
   })),
+  on(AnnotationActions.startNewAnnotation.do, (state: ApplicationState, { resetFailedRetries }) => ({
+    ...state,
+    mode: LoginMode.ONLINE,
+    loading: {
+      ...state.loading,
+      numberOfRetries: resetFailedRetries ? 0 : state.loading.numberOfRetries,
+    },
+  })),
+  on(AnnotationActions.markOnlineTaskAsFailed.do, (state: ApplicationState) => ({
+    ...state,
+    loading: {
+      ...state.loading,
+      numberOfRetries: state.loading.numberOfRetries + 1,
+    },
+  })),
+  on(AnnotationActions.startAnnotation.success, (state: ApplicationState) => ({
+    ...state,
+    loading: {
+      ...state.loading,
+      numberOfRetries: 0,
+    },
+  })),
   on(AnnotationActions.redirectToProjects.success, (state: ApplicationState) => ({
     ...state,
     loading: {
       ...state.loading,
+      label: 'Redirect back to projects...',
       status: LoadingStatus.FINISHED,
+      numberOfRetries: 0,
     },
   })),
   on(ApplicationActions.addError, (state: ApplicationState, { error }) => ({
@@ -89,6 +115,7 @@ export const reducer = createReducer(
     appConfiguration: new AppSettings(settings),
     loading: {
       ...state.loading,
+      label: 'Load settings...',
       status: LoadingStatus.LOADING,
       progress: 50,
     },
@@ -101,6 +128,7 @@ export const reducer = createReducer(
     ...state,
     loading: {
       ...state.loading,
+      label: 'Finished...',
       status: LoadingStatus.FINISHED,
     },
   })),
@@ -156,6 +184,7 @@ export const reducer = createReducer(
       ...state,
       mode,
       loggedIn: true,
+      numberOfRetries: 0,
     }),
   ),
   on(AuthenticationActions.logout.success, (state: ApplicationState) => {
@@ -220,6 +249,7 @@ export const reducer = createReducer(
     loading: {
       ...state.loading,
       status: LoadingStatus.WAITING,
+      label: 'Waiting...',
       progress: 50,
       errors: [],
     },
@@ -229,6 +259,7 @@ export const reducer = createReducer(
     loading: {
       ...state.loading,
       status: LoadingStatus.INITIALIZE,
+      label: 'Load audio file...',
       progress: 50,
       errors: [],
     },
@@ -239,6 +270,7 @@ export const reducer = createReducer(
       loading: {
         ...state.loading,
         status: LoadingStatus.LOADING,
+        label: `Load audio file ${50 + Math.round(value * 50)}%...`,
         progress: 50 + Math.round(value * 50),
         errors: [],
       },
@@ -249,16 +281,29 @@ export const reducer = createReducer(
     loading: {
       ...state.loading,
       status: LoadingStatus.FINISHED,
+      label: 'Audio loaded successfully...',
       progress: 100,
       errors: [],
     },
   })),
-  on(AnnotationActions.loadAudio.fail, (state: ApplicationState, { error }) => ({
+  on(AnnotationActions.loadAudio.fail, (state: ApplicationState, { error }) => {
+    return {
+      ...state,
+      loading: {
+        ...state.loading,
+        label: `Loading audio failed.`,
+        status: LoadingStatus.FAILED,
+        errors: [error],
+      },
+    };
+  }),
+  on(AnnotationActions.markOnlineTaskAsFailed.do, (state: ApplicationState, { mode, errorMessage, numberOfRetries }) => ({
     ...state,
     loading: {
       ...state.loading,
+      label: `Loading audio failed. Try loading another tasks automatically... number of retries: ${numberOfRetries + 1}`,
       status: LoadingStatus.FAILED,
-      errors: [error],
+      errors: [errorMessage],
     },
   })),
   on(

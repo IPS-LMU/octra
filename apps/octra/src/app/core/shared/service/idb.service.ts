@@ -145,7 +145,7 @@ export class IDBService {
   }
 
   public saveModeOptions(mode: LoginMode, options: IIDBModeOptions) {
-    return this.database.saveModeData(mode, 'options', options);
+    return this.database.saveModeData(mode, 'options', options, true);
   }
 
   public loadModeOptions(mode: LoginMode): Observable<IIDBModeOptions> {

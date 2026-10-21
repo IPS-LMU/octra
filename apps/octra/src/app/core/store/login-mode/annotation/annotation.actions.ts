@@ -44,6 +44,31 @@ export class AnnotationActions {
         audioDuration: SampleUnit;
       }>(),
       fail: props<{
+        audioFile?: TaskInputOutputDto;
+        task: TaskDto;
+        currentProject: ProjectDto;
+        mode: LoginMode;
+        error: string;
+      }>(),
+    },
+  });
+
+  static markOnlineTaskAsFailed = createActionGroup({
+    source: 'annotation/online/tasks mark as failed',
+    events: {
+      do: props<{
+        audioFile?: TaskInputOutputDto;
+        task: TaskDto;
+        currentProject: ProjectDto;
+        mode: LoginMode;
+        errorMessage: string;
+        numberOfRetries: number;
+      }>(),
+      success: props<{
+        currentProject: ProjectDto;
+        mode: LoginMode;
+      }>(),
+      fail: props<{
         error: string;
       }>(),
     },
@@ -336,6 +361,7 @@ export class AnnotationActions {
       do: props<{
         project: ProjectDto;
         mode: LoginMode;
+        resetFailedRetries?: boolean;
         actionAfterFail?: Action;
       }>(),
     },
@@ -366,6 +392,7 @@ export class AnnotationActions {
     events: {
       do: props<{
         mode: LoginMode;
+        resetPreviousSession?: boolean;
       }>(),
       success: emptyProps(),
     },

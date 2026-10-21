@@ -19,7 +19,8 @@ export class ErrorModalComponent extends OctraModal {
   };
 
   @ViewChild('modal', { static: true }) modal!: TemplateRef<any>;
-  text = '';
+  title = 'Error';
+  body = '';
   showOKButton = true;
 
   constructor() {

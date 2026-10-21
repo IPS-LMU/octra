@@ -1015,7 +1015,7 @@ export class ApplicationEffects {
               backdrop: a.showOKButton ? true : 'static',
             },
             {
-              text: a.error,
+              body: a.error,
               showOKButton: a.showOKButton,
             },
           );
@@ -1058,7 +1058,7 @@ export class ApplicationEffects {
               backdrop: 'static',
             },
             {
-              text: `Can't load application settings: ${a.error}`,
+              body: `Can't load application settings: ${a.error}`,
             },
           );
 

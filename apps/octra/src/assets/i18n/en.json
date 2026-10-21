@@ -496,6 +496,10 @@
     },
     "free one task": {
       "text": "Are you sure you want to release task <b>{{taskID}}</b>? Doing so will remove your progress on this task and, where applicable, make the task available to another user. This action cannot be undone."
+    },
+    "loading task failed": {
+      "title": "Loading task failed",
+      "body": "An error has occurred:<br/>{{error}}<p>Even after three attempts, Octra was unable to find a working task for this project. Please report this error message to the project administrator of the selected project or use the feedback feature in the upper right corner.<br/><br/>You have been automatically redirected back to the project selection page. In the meantime, you can also select a different project."
     }
   },
   "p": {

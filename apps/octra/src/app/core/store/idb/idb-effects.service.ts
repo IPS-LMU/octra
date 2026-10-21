@@ -3,6 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { ASRContext, IAnnotJSON, OAnnotJSON, OctraAnnotation, OctraAnnotationSegment } from '@octra/annotation';
 import { ProjectDto, TaskDto } from '@octra/api-types';
+import { ConsoleEntry } from '@octra/ngx-components';
 import { hasProperty } from '@octra/utilities';
 import { SessionStorageService } from 'ngx-webstorage';
 import { catchError, exhaustMap, filter, forkJoin, from, map, mergeAll, mergeMap, Observable, of, Subject, tap, timer, withLatestFrom } from 'rxjs';
@@ -19,7 +20,6 @@ import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { LoginModeActions } from '../login-mode/login-mode.actions';
 import { UserActions } from '../user/user.actions';
 import { IDBActions } from './idb.actions';
-import { ConsoleEntry } from '@octra/ngx-components';
 
 @Injectable({
   providedIn: 'root',
@@ -477,6 +477,29 @@ export class IDBEffects {
             ),
           ),
         );
+      }),
+    ),
+  );
+
+  resetPreviousSession$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AnnotationActions.redirectToProjects.do),
+      exhaustMap((action) => {
+        if (action.resetPreviousSession) {
+          return this.idbService
+            .saveModeOptions((action as any).mode, {
+              transcriptID: null,
+              project: null,
+              logging: null,
+            })
+            .pipe(
+              map(() => {
+                return IDBActions.saveModeOptions.success({
+                  mode: (action as any).mode,
+                });
+              }),
+            );
+        }
       }),
     ),
   );

@@ -257,6 +257,10 @@ export class AnnotationEffects {
         } else {
           return of(
             AnnotationActions.loadAudio.fail({
+              mode: a.mode,
+              task: a.task,
+              currentProject: a.currentProject,
+              audioFile: audioFile,
               error: `No audio file found in given IO.`,
             }),
           );
@@ -341,13 +345,15 @@ export class AnnotationEffects {
           if (state.application.mode === undefined || !a.audioFile) {
             this.store.dispatch(
               AnnotationActions.loadAudio.fail({
+                mode: a.mode,
+                task: a.task,
+                currentProject: a.currentProject,
                 error: `An error occured. Please click on "Back" and try it again.`,
               }),
             );
             return;
           }
 
-          let filename = a.audioFile!.filename;
           if (state.application.mode === LoginMode.ONLINE || state.application.mode === LoginMode.URL || state.application.mode === LoginMode.DEMO) {
             // online, url or demo
             if (a.audioFile) {
@@ -380,6 +386,10 @@ export class AnnotationEffects {
                 error: (err) => {
                   this.store.dispatch(
                     AnnotationActions.loadAudio.fail({
+                      mode: state.application.mode!,
+                      task: a.task,
+                      currentProject: a.currentProject,
+                      audioFile: a.audioFile,
                       error: 'Loading audio file failed',
                     }),
                   );
@@ -389,6 +399,10 @@ export class AnnotationEffects {
             } else {
               this.store.dispatch(
                 AnnotationActions.loadAudio.fail({
+                  mode: state.application.mode!,
+                  task: a.task,
+                  currentProject: a.currentProject,
+                  audioFile: a.audioFile,
                   error: `No audio source found. Please click on "Back" and try it again.`,
                 }),
               );
@@ -412,6 +426,10 @@ export class AnnotationEffects {
               } else {
                 this.store.dispatch(
                   AnnotationActions.loadAudio.fail({
+                    mode: LoginMode.LOCAL,
+                    task: a.task,
+                    currentProject: a.currentProject,
+                    audioFile: a.audioFile,
                     error: 'audio from sessionfile not loaded. Reload needed.',
                   }),
                 );
@@ -419,6 +437,10 @@ export class AnnotationEffects {
             } else {
               this.store.dispatch(
                 AnnotationActions.loadAudio.fail({
+                  mode: LoginMode.LOCAL,
+                  task: a.task,
+                  currentProject: a.currentProject,
+                  audioFile: a.audioFile,
                   error: 'sessionfile is undefined',
                 }),
               );
@@ -439,10 +461,119 @@ export class AnnotationEffects {
             this.routingService.navigate('reload audio local', ['/intern/transcr/reload-file'], AppInfo.queryParamsHandling).catch((error) => {
               console.error(error);
             });
+          } else if (state.application.mode === LoginMode.ONLINE) {
+            // loading failed, retry three times max
+            this.store.dispatch(
+              AnnotationActions.markOnlineTaskAsFailed.do({
+                audioFile: a.audioFile,
+                currentProject: a.currentProject,
+                mode: a.mode,
+                task: a.task,
+                numberOfRetries: state.application.loading.numberOfRetries,
+                errorMessage: a.error,
+              }),
+            );
           } else {
-            // it's an error
-            this.modalsService.openErrorModal(a.error);
+            this.modalsService.openErrorModal("Loading Audio Failed", a.error);
           }
+        }),
+      ),
+    { dispatch: false },
+  );
+
+  markOnlineTaskAsFailed$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AnnotationActions.markOnlineTaskAsFailed.do),
+        withLatestFrom(this.store),
+        tap(([action, state]) => {
+          const currentMode = getModeState(state);
+
+          // save failed status first
+          this.subscrManager.add(
+            this.apiService
+              .saveTask(
+                action.currentProject.id,
+                action.task.id,
+                {
+                  status: TaskStatus.failed,
+                },
+                new File(
+                  [
+                    JSON.stringify([
+                      {
+                        timestamp: 1,
+                        type: 'error',
+                        context: 'loading',
+                        value: action.errorMessage,
+                      },
+                    ]),
+                  ],
+                  'log.json',
+                  {
+                    type: 'application/json',
+                  },
+                ),
+              )
+              .subscribe({
+                next: () => {
+                  if (state.application.loading.numberOfRetries < 3) {
+                    // retry starting new task after 5 seconds waiting
+                    this.subscrManager.add(
+                      timer(5000).subscribe({
+                        next: () => {
+                          this.store.dispatch(
+                            LoginModeActions.clearOnlineSession.do({
+                              mode: action.mode,
+                              actionAfterSuccess: AnnotationActions.startNewAnnotation.do({
+                                mode: action.mode,
+                                project: action.currentProject,
+                                actionAfterFail: LoginModeActions.endTranscription.do({
+                                  clearSession: true,
+                                  mode: LoginMode.ONLINE,
+                                  project: action.currentProject,
+                                  task: action.task,
+                                  currentEditor: '2D-Editor',
+                                  keepPreviousInformation: false,
+                                }),
+                              }),
+                            }),
+                          );
+                        },
+                      }),
+                    );
+                  } else {
+                    this.modalsService
+                      .openErrorModal(
+                        this.transloco.translate("modals.loading task failed.title"),
+                        this.transloco.translate('modals.loading task failed.body', {
+                          error: `<code class="p-3 text-danger bg-dark d-block my-3" style="color: #ff2d00 !important; font-weight: bold;">${action.errorMessage}</code>`,
+                        }),
+                      )
+                      .catch((err) => {
+                        console.error(err);
+                      });
+
+                    this.store.dispatch(
+                      LoginModeActions.clearOnlineSession.do({
+                        mode: action.mode,
+                        actionAfterSuccess: AnnotationActions.redirectToProjects.do({
+                          mode: action.mode,
+                          resetPreviousSession: true,
+                        }),
+                      }),
+                    );
+                  }
+                },
+                error: (e) => {
+                  this.store.dispatch(
+                    AnnotationActions.markOnlineTaskAsFailed.fail({
+                      error: e?.error?.message ?? e?.message,
+                    }),
+                  );
+                },
+              }),
+          );
         }),
       ),
     { dispatch: false },
@@ -617,7 +748,7 @@ export class AnnotationEffects {
         ofType(AnnotationActions.showNoRemainingTasksModal.do),
         tap((a) => {
           const ref = this.modalsService.openModalRef(ErrorModalComponent, ErrorModalComponent.options);
-          (ref.componentInstance as ErrorModalComponent).text = this.transloco.translate('projects-list.no remaining tasks');
+          (ref.componentInstance as ErrorModalComponent).body = this.transloco.translate('projects-list.no remaining tasks');
         }),
       ),
     { dispatch: false },
@@ -1012,7 +1143,7 @@ export class AnnotationEffects {
         ofType(AnnotationActions.initTranscriptionService.fail),
         withLatestFrom(this.store),
         tap(([action, state]) => {
-          this.modalsService.openErrorModal(action.error);
+          this.modalsService.openErrorModal("Initialization Error", action.error);
         }),
       ),
     { dispatch: false },
@@ -1570,7 +1701,7 @@ export class AnnotationEffects {
           this.transcrSendingModal.timeout?.unsubscribe();
           this.transcrSendingModal.ref?.close();
 
-          this.modalsService.openErrorModal(action.error);
+          this.modalsService.openErrorModal("Sending Annotation failed", action.error);
         }),
       ),
     { dispatch: false },
@@ -1644,17 +1775,6 @@ export class AnnotationEffects {
             }),
           }),
         );
-      }),
-    ),
-  );
-
-  afterClearOnlineSession$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(LoginModeActions.clearOnlineSession.do),
-      exhaustMap((a) => {
-        this.audio.destroy(true);
-        this.subscrManager.destroy();
-        return of(a.actionAfterSuccess);
       }),
     ),
   );

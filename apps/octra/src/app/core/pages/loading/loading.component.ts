@@ -26,18 +26,19 @@ export class LoadingComponent extends DefaultComponent implements OnInit {
   private router = inject(Router);
   private cd = inject(ChangeDetectorRef);
 
-  @Output() loaded = false;
+  loaded = false;
   public text = '';
-  public state = '';
   public warning = '';
 
   loading: {
     status: LoadingStatus;
     progress: number;
     errors: string[];
+    label: string;
   } = {
     status: LoadingStatus.INITIALIZE,
     progress: 0,
+    label: "",
     errors: [],
   };
 

@@ -524,7 +524,7 @@ export class OctraDatabase extends Dexie {
         removeEmptyStrings: false,
         removeUndefined: true,
       });
-      // write undefined or null
+      // write null
       if (overwrite) {
         return from(
           table.put(

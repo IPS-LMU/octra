@@ -56,7 +56,7 @@ export class HelpToolsComponent extends DefaultComponent {
       alert('Import successful. Octra will be reloaded next.');
       document.location.href = joinURL(getBaseHrefURL(), 'login');
     } catch (e: any) {
-      this.modalService.openErrorModal(e.message);
+      this.modalService.openErrorModal("Backup Import failed", e.message);
     }
   }
 

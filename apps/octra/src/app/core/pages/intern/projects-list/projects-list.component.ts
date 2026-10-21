@@ -23,6 +23,7 @@ import { AnnotationActions } from '../../../store/login-mode/annotation/annotati
 import { AnnotationStoreService } from '../../../store/login-mode/annotation/annotation.store.service';
 import { MyTasksComponent } from './my-tasks/my-tasks.component';
 import { ProjectRequestModalComponent } from './project-request-modal/project-request-modal.component';
+import { NavbarService } from '../../../component/navbar/navbar.service';
 
 class PreparedProjectDto extends ProjectDto {
   collapsed = true;
@@ -75,6 +76,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
   private actions$ = inject(Actions);
   private settings = inject(SettingsService);
   private cd = inject(ChangeDetectorRef);
+  private navbarService = inject(NavbarService);
 
   projects?: ProjectListDto;
   shownProjects?: PreparedProjectDto[];
@@ -98,7 +100,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
 
   constructor() {
     super();
-    const authStoreService = this.authStoreService;
+    this.navbarService.showInterfaces = false;
 
     this.subscribe(this.actions$.pipe(ofType(AnnotationActions.startAnnotation.fail, AnnotationActions.startAnnotation.success)), {
       next: () => {
@@ -106,7 +108,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
         this.cd.markForCheck();
       },
     });
-    this.subscribe(authStoreService.me$, {
+    this.subscribe(this.authStoreService.me$, {
       next: (me) => {
         this.projectRoles = me?.projectRoles ?? [];
         this.istProjectAdmin = this.projectRoles.find((a) => a.role === 'project_admin') !== undefined;
@@ -114,7 +116,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
       },
     });
     this.subscribe(
-      authStoreService.sameUserWithOpenTask$.pipe(
+      this.authStoreService.sameUserWithOpenTask$.pipe(
         distinctUntilChanged((a, b) => a?.projectID === b?.projectID && a?.taskID === b?.taskID),
         tap((result) => {
           this.sameUserWithOpenTask = result;
@@ -214,7 +216,7 @@ export class ProjectsListComponent extends DefaultComponent implements OnInit {
             );
           } else {
             const ref = this.modalService.openModalRef<ErrorModalComponent>(ErrorModalComponent, ErrorModalComponent.options);
-            ref.componentInstance.text = error.message;
+            ref.componentInstance.body = error.message;
           }
           this.cd.markForCheck();
         },

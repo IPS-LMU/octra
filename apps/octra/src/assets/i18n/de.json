@@ -496,6 +496,10 @@
     },
     "free one task": {
       "text": "Bist Du sicher, dass Du die Aufgabe <b>{{taskID}}</b> freigeben möchtest? Damit wird dein Fortschritt für diese Aufgabe entfernt und die Aufgabe ggf. einem anderen Nutzer zur Verfügung gestellt. Diese Aktion kann nicht rückgängig gemacht werden."
+    },
+    "loading task failed": {
+      "title": "Laden der Aufgabe fehlgeschlagen",
+      "body": "Ein Fehler ist aufgetreten:<br/>{{error}}<p>Octra konnte auch nach drei Versuchen keine funktionierende Aufgabe dieses Projekts finden. Bitte berichte dem Projektadmin des gewählten Projekts von dieser Fehlermeldung oder nutze die Feedback Funktion rechts oben.<br/><br/>Du wurdest automatisch zur Projektauswahl zurück geleitet. Du kannst in der Zwischenzeit auch ein anderes Projekt wählen.</p>"
     }
   },
   "p": {

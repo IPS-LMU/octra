@@ -31,8 +31,8 @@ const { createUndoRedoReducer } = undoRedo({
     AnnotationActions.changeCurrentLevelItems.do.type,
     AnnotationActions.removeCurrentLevelItems.do.type,
     AnnotationActions.changeCurrentItemById.do.type,
-    AnnotationActions.combinePhrases.success.type
-  ]
+    AnnotationActions.combinePhrases.success.type,
+  ],
 });
 
 export class LoginModeReducers {
@@ -62,13 +62,14 @@ export class LoginModeReducers {
         }
         return state;
       }),
-      on(LoginModeActions.redirectToProjects.do, (state: AnnotationState, { mode }) => {
+      on(LoginModeActions.redirectToProjects.do, (state: AnnotationState, { mode, resetPreviousSession }) => {
         if (this.mode === mode) {
           return {
             ...state,
             savingNeeded: false,
             isSaving: false,
             audio: initialState.audio,
+            previousSession: resetPreviousSession ? undefined : state.previousSession,
             histories: {},
           };
         }

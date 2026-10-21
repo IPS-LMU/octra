@@ -28,7 +28,7 @@
   </div>
   @if (settService.log === '') {
     <div class="description">
-      {{ text }}{{ state }}<br />
+      {{ text }}<br />{{ loading?.label }}<br />
       <div class="text-info">{{ warning }}</div>
       @if (warning !== undefined && warning !== '') {
         <div>

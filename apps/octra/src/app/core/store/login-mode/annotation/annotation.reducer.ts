@@ -14,7 +14,7 @@ import { editorComponents } from '../../../../editors/components';
 import { IIDBModeOptions } from '../../../shared/octra-database';
 import { AuthenticationActions } from '../../authentication';
 import { IDBActions } from '../../idb/idb.actions';
-import { getModeState, LoginMode } from '../../index';
+import { LoginMode } from '../../index';
 import { LoginModeActions } from '../login-mode.actions';
 import { AnnotationActions } from './annotation.actions';
 import { AnnotationState } from './index';
@@ -451,7 +451,7 @@ export class AnnotationStateReducers {
           logs: [],
         },
       })),
-      on(AnnotationActions.startNewAnnotation.do, (state, { mode }) => {
+      on(AnnotationActions.startNewAnnotation.do, (state, { mode, resetFailedRetries }) => {
         if (mode === this.mode) {
           return {
             ...state,

@@ -56,6 +56,8 @@ export interface ApplicationState {
     status: LoadingStatus;
     progress: number;
     errors: string[];
+    label: string;
+    numberOfRetries: number;
   };
   reloaded: boolean;
   idb: {

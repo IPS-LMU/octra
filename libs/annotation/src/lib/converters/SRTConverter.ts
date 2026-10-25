@@ -29,7 +29,7 @@ export class SRTConverter extends Converter<SRTConverterImportOptions, SRTConver
   override _name: OctraAnnotationFormatType = 'SRT';
   override defaultImportOptions = new SRTConverterImportOptions();
 
-  private readonly EXPORT_EXCLUDED_LEVEL_NAMES = ['bundle', 'ort', 'wor', 'tro', 'mau'];
+  private readonly EXPORT_EXCLUDED_LEVEL_NAMES = ['bundle', 'tro', 'mau', 'wor'];
 
   public constructor() {
     super();
@@ -111,7 +111,7 @@ export class SRTConverter extends Converter<SRTConverterImportOptions, SRTConver
       const level = annotation.levels[i];
 
       if ((options?.exportLevels ?? []).includes(level.name)) {
-        if (level.type === 'SEGMENT' && !this.EXPORT_EXCLUDED_LEVEL_NAMES.includes(level.name.toLowerCase())) {
+        if (level.type === 'SEGMENT') {
           for (const item of level.items as OSegment[]) {
             const speaker = item.labels.find((a) => a.name.toLowerCase() === 'speaker')?.value || level.name;
             const value = item.getFirstLabelWithoutName('Speaker')?.value || '';
@@ -185,7 +185,10 @@ export class SRTConverter extends Converter<SRTConverterImportOptions, SRTConver
   }
 
   override needsOptionsForExport(annotation: OAnnotJSON, audiofile: OAudiofile): FormGeneratorJSONSchema {
-    const levelNames = annotation.levels.map((a) => a.name);
+    const levelNames = annotation.levels.filter((a) => a.type === 'SEGMENT').map((a) => a.name);
+    const levelNamesWithoutExcludedNames = annotation.levels
+      .filter((a) => a.type === 'SEGMENT' && !this.EXPORT_EXCLUDED_LEVEL_NAMES.includes(a.name.toLowerCase()))
+      .map((a) => a.name);
 
     return {
       $gui_support: true,
@@ -201,12 +204,12 @@ export class SRTConverter extends Converter<SRTConverterImportOptions, SRTConver
             enum: levelNames,
           },
           description: 'Defines an array of level indices for export.',
-          default: levelNames,
+          default: levelNamesWithoutExcludedNames,
         },
         transformPattern: {
           title: 'transformTranscriptionUnit',
           type: 'string',
-          default: levelNames.length === 1 ? '{{TRANSCRIPT}}' : '[{{LEVEL_NAME}}]: {{TRANSCRIPT}}',
+          default: levelNamesWithoutExcludedNames.length === 1 ? '{{TRANSCRIPT}}' : '[{{LEVEL_NAME}}]: {{TRANSCRIPT}}',
           examples: ['e.g. [{{LEVEL_NAME}}]: {{TRANSCRIPT}} => [SPEAKER_00]: Some transcript...'],
           dependsOn: ['exportLevels'],
           pattern: '\\{\\{TRANSCRIPT\\}\\}',
@@ -575,7 +578,7 @@ class SRTImporter {
       }
 
       // 2. remove empty segments with duration <= threshold by merging them into a neighbour with the same speaker
-      for (let i = 0; i < items.length; ) {
+      for (let i = 0; i < items.length;) {
         const item = items[i];
 
         if (this.isEmptySegment(item) && item.sampleDur <= thresholdInSamples) {
@@ -598,7 +601,7 @@ class SRTImporter {
 
       // 3. combine neighbouring segments with the same speaker. Remaining empty segments are longer than the threshold
       // and must not be merged with segments containing text.
-      for (let i = 0; i < items.length - 1; ) {
+      for (let i = 0; i < items.length - 1;) {
         const item = items[i];
         const nextItem = items[i + 1];
         const itemIsEmpty = this.isEmptySegment(item);

@@ -1,0 +1,23 @@
+@if (showVideo && safeVideoURL) { @if(provider === "youtube") {
+<iframe
+  [src]="safeVideoURL"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  referrerpolicy="strict-origin-when-cross-origin"
+  allowfullscreen
+></iframe>
+} } @else {
+<div class="youtube-thumbnail" style="cursor: pointer" (click)="showVideo = true">
+  <div class="d-inline-block position-absolute top-50 start-50 translate-middle text-center" style="z-index:2;">
+    <i class="bi bi-play-circle" style="font-size: 5rem; color: white"></i><br />
+    <span class="text-light"> Click on <i class="bi bi-play-circle"></i> to load the Youtube player and play the video</span>
+  </div>
+  <div class="position-absolute w-100 h-100" style="background-color:black;opacity:0.5;z-index:1">
+
+  </div>
+  @if (safeThumbnailURL) {
+  <img [ngSrc]="safeThumbnailURL" fill alt="click here to load video" />
+  }
+</div>
+}

@@ -155,7 +155,7 @@
   </footer>
 </div>
 <section class="order-1 order-md-3">
-  <div class="w-100 py-3 py-md-5 mb-3" style="background-color:#279440;">
+  <div class="w-100 py-3 py-md-5 mb-3" style="background-color: #279440">
     <div class="container-md">
       <div class="text-center">
         <img src="assets/img/socialmedia/Octra2_thumbnail_github2x.webp" alt="octra logo" class="img-fluid" style="max-height: 200px" />
@@ -163,6 +163,27 @@
     </div>
   </div>
   <div class="container-md p-2">
+    <div class="text-center">
+      <octra-video-player
+        class="my-3"
+        [videos]="[
+          {
+            language: 'other',
+            url: 'https://www.youtube-nocookie.com/embed/JHSFe9ab5Jg?si=vSMYZW5QpMqb_NsD',
+            provider: 'youtube',
+            thumbnail: 'assets/img/octra_short_presentation_thumbnail.webp'
+          },
+          {
+            language: 'de',
+            url: 'https://www.youtube-nocookie.com/embed/IrJTfCE32lE?si=yXxOp3jSLOsHvp15',
+            provider: 'youtube',
+            thumbnail: 'assets/img/octra_short_presentation_thumbnail.webp'
+          },
+        ]"
+        [activeLanguage]="appStorage.language"
+        style="width: 100%; max-width: 600px"
+      ></octra-video-player>
+    </div>
     <p style="text-align: justify">
       OCTRA is a free, open-source web-application for the orthographic transcription of audio files. It supports four different editors for different
       needs. You can switch between these editors, they share the same transcript. Your proceedings are saved automatically to your browser. If your

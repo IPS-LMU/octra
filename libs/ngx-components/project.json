@@ -2,7 +2,7 @@
   "name": "ngx-components",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/ngx-components/src",
-  "prefix": "lib",
+  "prefix": "octra",
   "projectType": "library",
   "tags": [],
   "targets": {

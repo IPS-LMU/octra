@@ -15,3 +15,4 @@ export * from './form-generator/switch-control/octra-form-switch-control.compone
 export * from './form-generator/text-control/octra-form-text-control.component';
 export * from './form-generator/octra-form-configurator.component';
 export * from './form-generator/toolconfig-group/octra-form-group.component';
+export * from './video';

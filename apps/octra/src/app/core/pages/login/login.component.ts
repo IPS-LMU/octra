@@ -20,6 +20,7 @@ import { AuthenticationStoreService } from '../../store/authentication';
 import { BrowserTestComponent } from '../browser-test/browser-test.component';
 import { ComponentCanDeactivate } from './login.deactivateguard';
 import { LoginService } from './login.service';
+import { VideoPlayer } from '@octra/ngx-components';
 
 @Component({
   selector: 'octra-login',
@@ -35,12 +36,10 @@ import { LoginService } from './login.service';
     AsyncPipe,
     TranslocoPipe,
     RouterLink,
+    VideoPlayer,
   ],
 })
-export class LoginComponent
-  extends DefaultComponent
-  implements ComponentCanDeactivate
-{
+export class LoginComponent extends DefaultComponent implements ComponentCanDeactivate {
   private elementRef = inject(ElementRef);
   appStorage = inject(AppStorageService);
   api = inject(OctraAPIService);
@@ -102,18 +101,20 @@ export class LoginComponent
     super();
     const elementRef = this.elementRef;
 
-    this.compatibilityService.testCompatibility({
-      hideSupportedFeatures: true
-    }).then((result) => {
-      this.compatibleBrowser = result;
-      setTimeout(() => {
-        elementRef.nativeElement.scroll({
-          top: 0,
-          left: 0,
-        });
-        this.cd.markForCheck();
-      }, 0);
-    });
+    this.compatibilityService
+      .testCompatibility({
+        hideSupportedFeatures: true,
+      })
+      .then((result) => {
+        this.compatibleBrowser = result;
+        setTimeout(() => {
+          elementRef.nativeElement.scroll({
+            top: 0,
+            left: 0,
+          });
+          this.cd.markForCheck();
+        }, 0);
+      });
     const subject = 'Octra Server is offline';
     const body = `Hello,
 
@@ -122,9 +123,7 @@ I just want to let you know, that the OCTRA server is currently offline.
  Best,
  an OCTRA user
  `;
-    const url = `mailto:${
-      this.settingsService.appSettings.octra.supportEmail
-    }?subject=${encodeURI(subject)}&body=${encodeURI(body)}`;
+    const url = `mailto:${this.settingsService.appSettings.octra.supportEmail}?subject=${encodeURI(subject)}&body=${encodeURI(body)}`;
 
     this.email_link = `<br/><a href="${url}">${this.settingsService.appSettings.octra.supportEmail}</a>`;
   }
@@ -147,19 +146,11 @@ I just want to let you know, that the OCTRA server is currently offline.
       password: string;
     };
   }) {
-    this.authStoreService.loginOnline(
-      $event.type,
-      $event.credentials?.usernameEmail,
-      $event.credentials?.password,
-    );
+    this.authStoreService.loginOnline($event.type, $event.credentials?.usernameEmail, $event.credentials?.password);
   }
 
   onOnlineCredentialsSubmit() {
-    this.authStoreService.loginOnline(
-      AccountLoginMethod.local,
-      this.state.online.user.nameOrEmail,
-      this.state.online.user.password,
-    );
+    this.authStoreService.loginOnline(AccountLoginMethod.local, this.state.online.user.nameOrEmail, this.state.online.user.password);
   }
 
   canDeactivate(): Observable<boolean> | boolean {
@@ -169,9 +160,7 @@ I just want to let you know, that the OCTRA server is currently offline.
   getDropzoneFileString(file: File | SessionFile) {
     if (file !== undefined) {
       const fsize: FileSize = getFileSize(file.size);
-      return `${file.name} (${Math.round(fsize.size * 100) / 100} ${
-        fsize.label
-      })`;
+      return `${file.name} (${Math.round(fsize.size * 100) / 100} ${fsize.label})`;
     }
     return '';
   }

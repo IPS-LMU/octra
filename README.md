@@ -22,6 +22,14 @@
 </div>
 </div>
 
+
+<div align="center">
+
+## Short Presentation Video
+
+[![OCTRA Short Presentation Video](https://img.youtube.com/vi/JHSFe9ab5Jg/maxresdefault.jpg)](https://www.youtube.com/watch?v=JHSFe9ab5Jg)
+
+</div>
 ## Editors:
 
 Octra supports different editors that you can choose according to your preferences. You can also switch between these easily while you are working on the same task.

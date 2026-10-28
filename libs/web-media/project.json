@@ -3,25 +3,14 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/web-media/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/vite:build",
-      "outputs": ["{options.outputPath}"],
+      "outputs": ["{projectRoot}/{options.outDir}", "{workspaceRoot}/dist/libs/web-media"],
       "generateExportsField": true,
+      "dependsOn": ["media:build", "utilities:build"],
       "options": {
-        "outputPath": "dist/libs/web-media",
-        "tsConfig": "libs/web-media/tsconfig.lib.json"
-      },
-      "dependsOn": ["media:build", "utilities:build"]
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "options": {
-        "lintFilePatterns": [
-          "libs/web-media",
-          "web-media/**/*.ts",
-          "web-media/package.json"
-        ]
+        "outDir": "../../dist/libs/web-media"
       }
     },
     "version": {
@@ -48,6 +37,5 @@
         "distFolderPath": "dist/libs/web-media"
       }
     }
-  },
-  "tags": []
+  }
 }

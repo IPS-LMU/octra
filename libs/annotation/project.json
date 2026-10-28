@@ -3,25 +3,14 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/annotation/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/vite:build",
-      "outputs": ["{options.outputPath}"],
+      "outputs": ["{projectRoot}/{options.outDir}", "{workspaceRoot}/dist/libs/annotation"],
       "generateExportsField": true,
+      "dependsOn": ["media:build", "utilities:build"],
       "options": {
-        "outputPath": "dist/libs/annotation",
-        "tsConfig": "libs/annotation/tsconfig.lib.json"
-      },
-      "dependsOn": ["media:build", "utilities:build"]
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "options": {
-        "lintFilePatterns": [
-          "libs/annotation",
-          "annotation/**/*.ts",
-          "annotation/package.json"
-        ]
+        "outDir": "../../dist/libs/annotation"
       }
     },
     "version": {
@@ -48,6 +37,5 @@
         "distFolderPath": "dist/libs/annotation"
       }
     }
-  },
-  "tags": []
+  }
 }

@@ -3,31 +3,20 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/assets/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/vite:build",
-      "outputs": ["{options.outputPath}"],
+      "outputs": ["{projectRoot}/{options.outDir}", "{workspaceRoot}/dist/libs/assets"],
       "generateExportsField": true,
       "options": {
-        "outputPath": "dist/libs/assets",
-        "tsConfig": "libs/assets/tsconfig.lib.json",
         "assets": [
           {
             "glob": "inputs_outputs.set.json",
             "input": "./libsass/assets/src/lib/schemata/",
             "output": "./asas"
           }
-        ]
-      }
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "options": {
-        "lintFilePatterns": [
-          "libs/assets",
-          "assets/**/*.ts",
-          "assets/package.json"
-        ]
+        ],
+        "outDir": "../../dist/libs/assets"
       }
     },
     "version": {
@@ -54,6 +43,5 @@
         "distFolderPath": "dist/libs/assets"
       }
     }
-  },
-  "tags": []
+  }
 }

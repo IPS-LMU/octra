@@ -9,6 +9,8 @@
     "build": {
       "executor": "@angular/build:application",
       "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "dependsOn": ["ngx-components:build"],
       "options": {
         "outputPath": "dist/apps/octra",
         "index": "apps/octra/src/index.html",
@@ -24,11 +26,7 @@
           "apps/octra/src/ocb_info.json",
           "apps/octra/src/manifest.json"
         ],
-        "styles": [
-          "node_modules/video.js/dist/video-js.min.css",
-          "node_modules/jodit/es2021/jodit.min.css",
-          "apps/octra/src/styles.scss"
-        ],
+        "styles": ["node_modules/video.js/dist/video-js.min.css", "node_modules/jodit/es2021/jodit.min.css", "apps/octra/src/styles.scss"],
         "allowedCommonJsDependencies": [
           "jodit-angular",
           "ajv",
@@ -127,12 +125,11 @@
             }
           ]
         }
-      },
-      "defaultConfiguration": "production",
-      "dependsOn": ["ngx-components:build"]
+      }
     },
     "serve": {
       "executor": "@angular/build:dev-server",
+      "defaultConfiguration": "development",
       "configurations": {
         "production": {
           "port": 5321,
@@ -145,15 +142,17 @@
           "buildTarget": "octra:build:development"
         }
       },
-      "defaultConfiguration": "development"
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
+      "readyWhen": {
+        "signal": true
+      }
     },
     "serve-static": {
       "continuous": true,
       "executor": "@nx/web:file-server",
+      "readyWhen": {
+        "signal": true
+      },
+      "dependsOn": ["build"],
       "options": {
         "buildTarget": "octra:build",
         "staticFilePath": "dist/apps/octra/browser",

@@ -9,6 +9,8 @@
     "build": {
       "executor": "@nx/angular:package",
       "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "defaultConfiguration": "production",
+      "dependsOn": ["utilities:build"],
       "options": {
         "project": "libs/ngx-utilities/ng-package.json",
         "tsConfig": "libs/ngx-utilities/tsconfig.lib.json"
@@ -18,12 +20,7 @@
           "tsConfig": "libs/ngx-utilities/tsconfig.lib.prod.json"
         },
         "development": {}
-      },
-      "defaultConfiguration": "production",
-      "dependsOn": ["utilities:build"]
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint"
+      }
     },
     "version": {
       "executor": "@jscutlery/semver:version",

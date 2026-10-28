@@ -3,24 +3,13 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/utilities/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/vite:build",
-      "outputs": ["{options.outputPath}"],
+      "outputs": ["{projectRoot}/{options.outDir}", "{workspaceRoot}/dist/libs/utilities"],
       "generateExportsField": true,
       "options": {
-        "outputPath": "dist/libs/utilities",
-        "tsConfig": "libs/utilities/tsconfig.lib.json"
-      }
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "options": {
-        "lintFilePatterns": [
-          "libs/utilities",
-          "utilities/**/*.ts",
-          "utilities/package.json"
-        ]
+        "outDir": "../../dist/libs/utilities"
       }
     },
     "version": {
@@ -47,6 +36,5 @@
         "distFolderPath": "dist/libs/utilities"
       }
     }
-  },
-  "tags": []
+  }
 }

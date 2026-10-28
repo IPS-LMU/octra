@@ -3,23 +3,12 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/media/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/vite:build",
-      "outputs": ["{options.outputPath}"],
+      "outputs": ["{projectRoot}/{options.outDir}", "{workspaceRoot}/dist/libs/media"],
       "options": {
-        "outputPath": "dist/libs/media",
-        "tsConfig": "libs/media/tsconfig.lib.json"
-      }
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "options": {
-        "lintFilePatterns": [
-          "libs/media",
-          "media/**/*.ts",
-          "media/package.json"
-        ]
+        "outDir": "../../dist/libs/media"
       }
     },
     "version": {
@@ -46,6 +35,5 @@
         "distFolderPath": "dist/libs/media"
       }
     }
-  },
-  "tags": []
+  }
 }

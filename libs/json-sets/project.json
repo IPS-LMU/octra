@@ -3,24 +3,13 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/json-sets/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/vite:build",
-      "outputs": ["{options.outputPath}"],
+      "outputs": ["{projectRoot}/{options.outDir}", "{workspaceRoot}/dist/libs/json-sets"],
       "generateExportsField": true,
       "options": {
-        "outputPath": "dist/libs/json-sets",
-        "tsConfig": "libs/json-sets/tsconfig.lib.json"
-      }
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "options": {
-        "lintFilePatterns": [
-          "libs/json-sets",
-          "json-sets/**/*.ts",
-          "json-sets/package.json"
-        ]
+        "outDir": "../../dist/libs/json-sets"
       }
     },
     "version": {
@@ -47,6 +36,5 @@
         "distFolderPath": "dist/libs/json-sets"
       }
     }
-  },
-  "tags": []
+  }
 }

@@ -12,17 +12,6 @@
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
     },
-    "@nx/eslint:lint": {
-      "cache": true,
-      "inputs": [
-        "default",
-        "^default",
-        "{workspaceRoot}/.eslintrc.json",
-        "{workspaceRoot}/.eslintignore",
-        "{workspaceRoot}/eslint.config.mjs",
-        "{workspaceRoot}/tools/eslint-rules/**/*"
-      ]
-    },
     "@nx/js:tsc": {
       "cache": true,
       "dependsOn": ["^build"],
@@ -32,7 +21,25 @@
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
-    }
+    },
+    "lint": [
+      {
+        "filter": {
+          "plugin": "@nx/eslint/plugin"
+        },
+        "inputs": [
+          "default",
+          "^default",
+          "{workspaceRoot}/.eslintrc.json",
+          "{workspaceRoot}/.eslintignore",
+          "{workspaceRoot}/eslint.config.mjs",
+          "{workspaceRoot}/tools/eslint-rules/**/*",
+          {
+            "externalDependencies": ["eslint"]
+          }
+        ]
+      }
+    ]
   },
   "generators": {
     "@nx/angular:application": {
@@ -56,6 +63,14 @@
   },
   "plugins": [
     {
+      "plugin": "@nx/js/typescript",
+      "options": {
+        "typecheck": {
+          "targetName": "typecheck"
+        }
+      }
+    },
+    {
       "plugin": "@nx/vite/plugin",
       "options": {
         "buildTargetName": "build",
@@ -71,12 +86,27 @@
     {
       "plugin": "@nx/eslint/plugin",
       "options": {
-        "targetName": "eslint:lint"
-      }
+        "targetName": "lint"
+      },
+      "include": [
+        "apps/octra/**/*",
+        "apps/web-components/**/*",
+        "libs/annotation/**/*",
+        "libs/assets/**/*",
+        "libs/json-sets/**/*",
+        "libs/media/**/*",
+        "libs/ngx-components/**/*",
+        "libs/ngx-utilities/**/*",
+        "libs/utilities/**/*",
+        "libs/web-media/**/*"
+      ]
     }
   ],
   "analytics": false,
   "migrate": {
     "agentic": false
+  },
+  "affected": {
+    "legacy": true
   }
 }

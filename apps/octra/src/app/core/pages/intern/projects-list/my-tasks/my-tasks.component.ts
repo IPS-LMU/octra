@@ -13,7 +13,7 @@ import { YesNoModalComponent } from '../../../../modals/yes-no-modal/yes-no-moda
 import { findCompatibleFileFromIO, isValidAnnotation, LuxonShortDateTimePipe } from '../../../../shared';
 import { AlertService } from '../../../../shared/service';
 import { AuthenticationStoreService } from '../../../../store/authentication';
-import { environment } from '../../../../../../environments/environment';
+import { ngswBypass } from '../../../../shared/ngsw-bypass';
 
 class PreparedTask extends TaskDto {
   transcript?: string;
@@ -49,11 +49,7 @@ class PreparedTask extends TaskDto {
         // with an opaque "ServiceWorker intercepted the request" error.
         url: appendURLQueryParams(
           this.api.prepareFileURL(audioFile.url!),
-          environment.production
-            ? {
-                'ngsw-bypass': 'true',
-              }
-            : undefined,
+          ngswBypass(),
         ),
         type: audioFile.fileType!,
       };

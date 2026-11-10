@@ -5,15 +5,14 @@ import { downloadFile } from '@octra/ngx-utilities';
 import { SubscriptionManager } from '@octra/utilities';
 import { AudioManager } from '@octra/web-media';
 import { Subject, Subscription } from 'rxjs';
-import { environment } from '../../../../environments/environment';
+import { ngswBypass } from '../ngsw-bypass';
 
 @Injectable({ providedIn: 'root' })
 export class AudioService {
   private http = inject(HttpClient);
 
   public missingPermission = new EventEmitter<void>();
-  private subscrmanager: SubscriptionManager<Subscription> =
-    new SubscriptionManager<Subscription>();
+  private subscrmanager: SubscriptionManager<Subscription> = new SubscriptionManager<Subscription>();
   private afterloaded: EventEmitter<any> = new EventEmitter<any>();
 
   private _audiomanagers: AudioManager[] = [];
@@ -39,10 +38,7 @@ export class AudioService {
    *
    * audio data; for longer data, a MediaElementAudioSourceNode should be used.
    */
-  public loadAudio: (
-    url: string,
-    audioInput: TaskInputOutputDto,
-  ) => Subject<any> = (url: string, audioInput: TaskInputOutputDto) => {
+  public loadAudio: (url: string, audioInput: TaskInputOutputDto) => Subject<any> = (url: string, audioInput: TaskInputOutputDto) => {
     // guard against duplicate downloads of the same audio file being triggered
     // in parallel (e.g. by racing effects on app startup)
     const runningRequest = this._loadingRequests.get(url);
@@ -61,19 +57,12 @@ export class AudioService {
     // state transitions (e.g. an app-version check completing mid-download),
     // which can abort the request with an opaque "ServiceWorker intercepted
     // the request" error - see ngsw-bypass usage in asr.effects.service.ts
-    downloadFile<ArrayBuffer>(this.http, url, 'arraybuffer',  environment.production ? {
-      'ngsw-bypass': 'true',
-    }: undefined).subscribe({
+    downloadFile<ArrayBuffer>(this.http, url, 'arraybuffer', ngswBypass()).subscribe({
       next: (event) => {
         subj.next(0.5 * event.progress);
         if (event.progress === 1 && event.result) {
           this.subscrmanager.add(
-            AudioManager.create(
-              audioInput.filename,
-              audioInput.type,
-              event.result,
-              url,
-            ).subscribe({
+            AudioManager.create(audioInput.filename, audioInput.type, event.result, url).subscribe({
               next: (result) => {
                 if (result.audioManager && result.progress === 1) {
                   // finished

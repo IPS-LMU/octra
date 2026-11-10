@@ -16,6 +16,7 @@ import { LoginMode, RootState } from '../index';
 import { AnnotationActions } from '../login-mode/annotation/annotation.actions';
 import { ASRActions } from './asr.actions';
 import { ASRProcessStatus, ASRQueueItemType, ASRStateQueue, ASRStateQueueItem } from './index';
+import { ngswBypass } from '../../shared/ngsw-bypass';
 
 @Injectable({
   providedIn: 'root',
@@ -804,11 +805,7 @@ export class AsrEffects {
         {
           headers: {
             'Content-Type': 'multipart/form-data',
-            ...(environment.production
-              ? {
-                  'ngsw-bypass': 'true',
-                }
-              : {}),
+            ...ngswBypass(),
           },
           responseType: 'text',
         },
@@ -870,11 +867,7 @@ export class AsrEffects {
       .post(`${selectedLanguage.host}uploadFileMulti`, formData, {
         responseType: 'text',
         headers: {
-          ...(environment.production
-            ? {
-                'ngsw-bypass': 'true',
-              }
-            : {}),
+          ...ngswBypass(),
         },
       })
       .pipe(
@@ -928,11 +921,7 @@ export class AsrEffects {
         {
           headers: {
             'Content-Type': 'multipart/form-data',
-            ...(environment.production
-              ? {
-                  'ngsw-bypass': 'true',
-                }
-              : {}),
+            ...ngswBypass(),
           },
           responseType: 'text',
         },

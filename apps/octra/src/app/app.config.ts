@@ -1,5 +1,5 @@
 import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
-import { ApplicationConfig, importProvidersFrom, isDevMode, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { provideRouter, withEnabledBlockingInitialNavigation } from '@angular/router';
 import { provideServiceWorker } from '@angular/service-worker';
@@ -30,6 +30,7 @@ import { ALoginGuard, DeALoginGuard } from './core/pages';
 import { ReloadFileGuard } from './core/pages/intern/reload-file/reload-file.activateguard';
 import { PagesModule } from './core/pages/pages.module';
 import { TranscActivateGuard } from './core/shared/guard/transcr.activateguard';
+import { isServiceWorkerEnabled } from './core/shared/ngsw-bypass';
 import { SettingsService } from './core/shared/service';
 import { AppStorageService } from './core/shared/service/appstorage.service';
 import { CompatibilityService } from './core/shared/service/compatibility.service';
@@ -113,7 +114,7 @@ export const appConfig: ApplicationConfig = {
     ),
     provideRouter(APP_ROUTES, withEnabledBlockingInitialNavigation()),
     provideServiceWorker('ngsw-worker.js', {
-      enabled: !isDevMode(),
+      enabled: isServiceWorkerEnabled(),
       registrationStrategy: 'registerWhenStable:30000',
     }),
     VersionCheckerService,

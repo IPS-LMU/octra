@@ -457,6 +457,12 @@ export class AnnotationStateReducers {
             ...state,
             currentSession: initialState.currentSession,
             transcript: new OctraAnnotation<ASRContext, OctraAnnotationSegment<ASRContext>>(),
+            logging: {
+              ...state.logging,
+              logs: [],
+              startTime: undefined,
+              startReference: undefined,
+            },
           };
         }
         return state;

@@ -275,14 +275,25 @@ export class LoginModeReducers {
         LoginModeActions.startAnnotation.success,
         (state: AnnotationState, { task, project, mode, projectSettings, guidelines, selectedGuidelines }) => {
           if (this.mode === mode) {
+            // logs must always belong to the task that is started. Keep local logs only if they
+            // belong to the same task (e.g. after reload), otherwise use the logs saved on the server.
+            const isSameTask = state.currentSession?.task?.id !== undefined && state.currentSession.task.id === task?.id;
+            const logs =
+              isSameTask && Array.isArray(state.logging.logs) && state.logging.logs.length > 0
+                ? state.logging.logs
+                : Array.isArray(task?.log)
+                  ? task.log
+                  : [];
+
             return {
               ...state,
               projectConfig: projectSettings,
               logging: {
                 ...state.logging,
+                logs,
                 enabled: projectSettings.logging?.forced === true ? true : state.logging.enabled,
                 startTime: Date.now(),
-                startReference: state.logging.logs && state.logging.logs.length > 0 ? state.logging.logs[state.logging.logs.length - 1] : undefined,
+                startReference: logs.length > 0 ? logs[logs.length - 1] : undefined,
               },
               currentSession: {
                 ...state.currentSession,

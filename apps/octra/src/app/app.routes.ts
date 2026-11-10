@@ -10,6 +10,7 @@ import {
   LoadingComponent,
   NewsComponent,
 } from './core/pages';
+import { AuthSuccessPageComponent } from './core/pages/intern/auth-success/auth-success.page.component';
 import { LoginComponent } from './core/pages/login';
 import {
   APP_INITIALIZED_GUARD,
@@ -20,6 +21,8 @@ import { StresstestComponent } from './core/tools/stresstest/stresstest.componen
 
 export const APP_ROUTES: Routes = [
   { path: 'load', component: LoadingComponent },
+  // popup after re-authentication: must not have guards that initialize the app
+  { path: 'auth-success', component: AuthSuccessPageComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   {
     path: 'login',

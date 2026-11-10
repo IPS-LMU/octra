@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TranscActivateGuard } from '../../shared/guard/transcr.activateguard';
 import { AuthComponent } from './auth';
-import { AuthSuccessPageComponent } from './auth-success/auth-success.page.component';
 import { AUTHENTICATED_GUARD } from './intern.activateguard';
 import { ProjectsListComponent } from './projects-list/projects-list.component';
 import { ReloadFileComponent } from './reload-file';
@@ -31,7 +30,6 @@ const MEMBER_ROUTES: Routes = [
     canActivate: [ReloadFileGuard],
   },
   { path: 'auth', component: AuthComponent },
-  { path: 'auth-success', component: AuthSuccessPageComponent },
   { path: '', redirectTo: '/load', pathMatch: 'full' },
 ];
 

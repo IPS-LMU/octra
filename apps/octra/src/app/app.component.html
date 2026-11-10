@@ -14,7 +14,21 @@
   ></octra-version-notification>
 }
 
-<div class="overflow-box position-relative">
+@if (instanceBlocked()) {
+  <div class="container text-center mt-5 instance-blocked">
+    <i class="bi bi-window-stack" style="font-size: 4rem; color: #f0ad4e"></i>
+    <h1 class="mt-3">{{ blockedTexts.title }}</h1>
+    <p class="mt-3">{{ blockedTexts.description }}</p>
+    <button class="btn btn-primary mt-3" type="button" (click)="useThisTab()">
+      {{ blockedTexts.button }}
+    </button>
+    <p class="text-muted mt-2" style="font-size: 0.8rem">
+      {{ blockedTexts.hint }}
+    </p>
+  </div>
+}
+
+<div class="overflow-box position-relative" [class.d-none]="instanceBlocked()">
   <octra-alert id="alerts"></octra-alert>
   <octra-modal></octra-modal>
   <header>

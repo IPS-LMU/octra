@@ -1,10 +1,5 @@
 @if (showForgetPassword || showSignup) {
-  <a
-    class="d-block text-start pointer"
-    (click)="goBack()"
-    style="font-size: 0.8rem; text-decoration: none"
-    >< {{ 'p.back to login' | transloco }}</a
-  >
+  <a class="d-block text-start pointer" (click)="goBack()" style="font-size: 0.8rem; text-decoration: none">< {{ 'p.back to login' | transloco }}</a>
   @if (showForgetPassword) {
     @if (!passwordResetRequested) {
       <form #form="ngForm" (ngSubmit)="resetPassword()">
@@ -17,16 +12,11 @@
             name="email"
             [(ngModel)]="email"
             [required]="true"
-           
             email="true"
           />
           <label for="email">{{ 'g.e-mail' | transloco }}</label>
         </div>
-        <button
-          class="w-100 btn btn-sm btn-primary mt-3"
-          type="submit"
-          [disabled]="!form.valid"
-        >
+        <button class="w-100 btn btn-sm btn-primary mt-3" type="submit" [disabled]="!form.valid">
           {{ 'p.reset password' | transloco }}
         </button>
       </form>
@@ -52,10 +42,7 @@
     </div>
   }
 
-  @if (
-    isAuthAllowed(AccountLoginMethod.shibboleth) &&
-    (type === undefined || type === 'shibboleth')
-  ) {
+  @if (isAuthAllowed(AccountLoginMethod.shibboleth) && (type === undefined || type === 'shibboleth')) {
     <form id="signin-form">
       <button
         class="w-100 btn btn-secondary"
@@ -70,17 +57,10 @@
       </button>
     </form>
   }
-  @if (
-    isAuthAllowed(AccountLoginMethod.shibboleth) &&
-    isAuthAllowed(AccountLoginMethod.local) &&
-    type === undefined
-  ) {
+  @if (isAuthAllowed(AccountLoginMethod.shibboleth) && isAuthAllowed(AccountLoginMethod.local) && type === undefined) {
     <div class="separator my-4 text-center">{{ 'g.or' | transloco }}</div>
   }
-  @if (
-    isAuthAllowed(AccountLoginMethod.local) &&
-    (type === undefined || type === 'local')
-  ) {
+  @if (isAuthAllowed(AccountLoginMethod.local) && (type === undefined || type === 'local')) {
     <form #form="ngForm">
       <div class="form-floating mb-3">
         <input
@@ -91,7 +71,6 @@
           [(ngModel)]="credentials.usernameEmail"
           name="name"
           required
-         
         />
         <label for="inputName">{{ 'p.username or email' | transloco }}</label>
       </div>
@@ -123,11 +102,7 @@
       </button>
       <div class="d-block mt-2 text-center">
         @if (passwordReset) {
-          <a
-            class="pointer"
-            style="font-size: 0.8rem; text-decoration: none"
-            (click)="showForgetPassword = true"
-          >
+          <a class="pointer" style="font-size: 0.8rem; text-decoration: none" (click)="showForgetPassword = true">
             {{ 'p.forgot password' | transloco }}
           </a>
         }
@@ -135,22 +110,14 @@
           <a style="text-decoration: none"> | </a>
         }
         @if (registrations) {
-          <a
-            class="d-inline-block mt-2 text-center pointer"
-            style="font-size: 0.8rem; text-decoration: none"
-            (click)="this.showSignUpForm()"
-          >
+          <a class="d-inline-block mt-2 text-center pointer" style="font-size: 0.8rem; text-decoration: none" (click)="this.showSignUpForm()">
             {{ 'p.sign up' | transloco }}
           </a>
         }
         @if (passwordReset || registrations) {
           <a style="text-decoration: none"> | </a>
         }
-        <a
-          class="d-inline-block mt-2 text-center pointer"
-          style="font-size: 0.8rem; text-decoration: none"
-          [href]="_octraBackendURL" target="_blank"
-        >
+        <a class="d-inline-block mt-2 text-center pointer" style="font-size: 0.8rem; text-decoration: none" [href]="_octraBackendURL" target="_blank">
           powered by OCTRA-Backend
         </a>
       </div>

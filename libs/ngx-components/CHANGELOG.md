@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+# [2.1.0](https://github.com/IPS-LMU/octra/compare/ngx-components-2.0.1...ngx-components-2.1.0) (2026-11-11)
+
+### Bug Fixes
+
+* **ngx-components:** update popup visible on reload ([b1d49d4](https://github.com/IPS-LMU/octra/commit/b1d49d41f78de644a170a1ed8cb94fb0388cf7a2))
+
+### Features
+
+* **ngx-components:** video-player for embedding online videos depending on the selected language ([0468777](https://github.com/IPS-LMU/octra/commit/0468777684f2ff94951b3893843c6705c8f9a302))
+
 ## [2.0.1](https://github.com/IPS-LMU/octra/compare/ngx-components-2.0.0...ngx-components-2.0.1) (2026-09-30)
 
 ### Bug Fixes

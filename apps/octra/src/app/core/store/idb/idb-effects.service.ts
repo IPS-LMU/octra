@@ -484,22 +484,21 @@ export class IDBEffects {
   resetPreviousSession$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AnnotationActions.redirectToProjects.do),
+      filter((action) => !!action.resetPreviousSession),
       exhaustMap((action) => {
-        if (action.resetPreviousSession) {
-          return this.idbService
-            .saveModeOptions((action as any).mode, {
-              transcriptID: null,
-              project: null,
-              logging: null,
-            })
-            .pipe(
-              map(() => {
-                return IDBActions.saveModeOptions.success({
-                  mode: (action as any).mode,
-                });
-              }),
-            );
-        }
+        return this.idbService
+          .saveModeOptions((action as any).mode, {
+            transcriptID: null,
+            project: null,
+            logging: null,
+          })
+          .pipe(
+            map(() => {
+              return IDBActions.saveModeOptions.success({
+                mode: (action as any).mode,
+              });
+            }),
+          );
       }),
     ),
   );

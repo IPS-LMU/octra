@@ -97,17 +97,146 @@ export class OctraAnnotation<S extends ASRContext, T extends OctraAnnotationSegm
   }
 
   public updateIDCounters() {
-    this.idCounters.item = Math.max(
-      1,
-      ...this.levels.map((a) => {
-        if (a instanceof OctraAnnotationSegmentLevel || a instanceof OctraAnnotationEventLevel) {
-          return Math.max(0, ...a.items.map((b) => b.id)) + 1;
+    let maxItemID = 0;
+    for (const level of this.levels) {
+      for (const item of level.items) {
+        if (item.id > maxItemID) {
+          maxItemID = item.id;
         }
-        return 1;
-      }),
-    );
+      }
+    }
+    this.idCounters.item = maxItemID + 1;
     this.idCounters.link = Math.max(0, ...this.links.map((a) => a.id)) + 1;
     this.idCounters.level = Math.max(0, ...this.levels.map((a) => a.id)) + 1;
+  }
+
+  /**
+   * Repairs inconsistent annotations (e.g. caused by older versions):
+   * 1. item IDs are made unique across the whole annotation,
+   * 2. segments are sorted by their end time,
+   * 3. segments without duration are removed; their transcript is appended to the previous segment.
+   */
+  public repairSegmentLevels(): {
+    changed: boolean;
+    duplicateIDs: number;
+    unsortedLevels: number;
+    /**
+     * removed segments without duration that contained text (text is appended to the previous segment)
+     */
+    removedZeroLengthSegments: number;
+    /**
+     * removed empty segments without duration
+     */
+    removedEmptyZeroLengthSegments: number;
+    crossLevelDuplicateIDs: number;
+    /**
+     * names of levels that were damaged (duplicate IDs within the level, wrong order or segments without duration but with text).
+     * Fixing IDs that are only duplicated across levels and removing empty segments without duration don't count as damage.
+     */
+    repairedLevels: string[];
+  } {
+    const result = {
+      changed: false,
+      duplicateIDs: 0,
+      unsortedLevels: 0,
+      removedZeroLengthSegments: 0,
+      removedEmptyZeroLengthSegments: 0,
+      crossLevelDuplicateIDs: 0,
+      repairedLevels: [] as string[],
+    };
+
+    this.updateIDCounters();
+    const usedIDs = new Set<number>();
+    const linkedIDs = new Set<number>(this._links.flatMap((a) => [a.link.fromID, a.link.toID]));
+
+    for (const level of this._levels) {
+      const damageBefore = result.duplicateIDs + result.unsortedLevels + result.removedZeroLengthSegments;
+      const levelIDs = new Set<number>();
+
+      // 1. unique IDs
+      let items = (level.items as any[]).map((item) => {
+        if (levelIDs.has(item.id)) {
+          // duplicate within the same level: level is damaged
+          result.duplicateIDs++;
+          const newItem = item.clone(this._idCounters.item++);
+          usedIDs.add(newItem.id);
+          levelIDs.add(newItem.id);
+          return newItem;
+        }
+
+        if (usedIDs.has(item.id)) {
+          // duplicate across levels: fix silently, but don't touch IDs referenced by links
+          if (linkedIDs.has(item.id)) {
+            console.warn(`Item ID ${item.id} in level ${level.name} is used in other levels, too, but it's referenced by a link. ID not changed.`);
+            levelIDs.add(item.id);
+            return item;
+          }
+          result.crossLevelDuplicateIDs++;
+          const newItem = item.clone(this._idCounters.item++);
+          usedIDs.add(newItem.id);
+          levelIDs.add(newItem.id);
+          // remember the original ID so that a second occurrence within this level is detected as damage
+          levelIDs.add(item.id);
+          return newItem;
+        }
+
+        usedIDs.add(item.id);
+        levelIDs.add(item.id);
+        return item;
+      });
+
+      if (level.type === AnnotationLevelType.SEGMENT) {
+        let segments = items as OctraAnnotationSegment[];
+
+        // 2. sort by time
+        if (segments.some((a, i) => i > 0 && a.time.samples < segments[i - 1].time.samples)) {
+          result.unsortedLevels++;
+          segments = [...segments].sort((a, b) => a.time.samples - b.time.samples);
+        }
+
+        // 3. remove segments without duration
+        const cleaned: OctraAnnotationSegment[] = [];
+        for (const segment of segments) {
+          const previous = cleaned[cleaned.length - 1];
+          if ((previous && segment.time.samples <= previous.time.samples) || (!previous && segment.time.samples <= 0)) {
+            const text = segment.getFirstLabelWithoutName('Speaker')?.value?.trim();
+            if (text) {
+              // segment with text: level is damaged
+              result.removedZeroLengthSegments++;
+            } else {
+              // empty segment without duration: no information lost, remove silently
+              result.removedEmptyZeroLengthSegments++;
+            }
+            const previousText = previous?.getFirstLabelWithoutName('Speaker')?.value?.trim() ?? '';
+            // identical text: stale copy of the previous segment
+            if (previous && text && previousText !== text) {
+              const merged = previous.clone();
+              if (!merged.changeFirstLabelWithoutName('Speaker', previousText ? `${previousText} ${text}` : text)) {
+                merged.labels = [...merged.labels, new OLabel(level.name, text)];
+              }
+              cleaned[cleaned.length - 1] = merged;
+            }
+            continue;
+          }
+          cleaned.push(segment);
+        }
+        items = cleaned;
+      }
+
+      level.overwriteItems(items as any);
+
+      if (result.duplicateIDs + result.unsortedLevels + result.removedZeroLengthSegments > damageBefore) {
+        result.repairedLevels.push(level.name);
+      }
+    }
+
+    result.changed =
+      result.duplicateIDs > 0 ||
+      result.unsortedLevels > 0 ||
+      result.removedZeroLengthSegments > 0 ||
+      result.removedEmptyZeroLengthSegments > 0 ||
+      result.crossLevelDuplicateIDs > 0;
+    return result;
   }
 
   public changeLevelIndex(index: number) {
@@ -159,6 +288,8 @@ export class OctraAnnotation<S extends ASRContext, T extends OctraAnnotationSegm
       const duplicate = level.duplicate(this._idCounters.level++, this._idCounters.item);
 
       this._levels = [...this._levels.slice(0, index + 1), duplicate as OctraAnnotationAnyLevel<T>, ...this._levels.slice(index + 1)];
+      // duplicate() assigned new item IDs without advancing the counter
+      this.updateIDCounters();
 
       return this;
     } else {

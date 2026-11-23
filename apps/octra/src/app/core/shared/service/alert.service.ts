@@ -20,6 +20,7 @@ export class AlertService {
     data: string | any,
     unique = true,
     duration?: number,
+    closable = false,
   ): Promise<{
     id: number;
     component: any;
@@ -55,7 +56,9 @@ export class AlertService {
         const entry: AlertEntry = {
           type,
           animation: 'opened',
-          autohide: true,
+          // closable alerts stay until the user closes them
+          autohide: !closable,
+          closable,
           duration: duration ? duration : 5000,
           message: typeof data === 'string' ? data : '',
           unique,
@@ -101,6 +104,7 @@ export interface AlertEntry {
   unique: boolean;
   id: number;
   autohide: boolean;
+  closable?: boolean;
   component?: {
     id: number;
     class: any;

@@ -6,12 +6,25 @@
       'bg-warning': toast.type === 'warning',
     }"
     (mouseenter)="toast.autohide = false"
-    (mouseleave)="toast.autohide = true"
-    (hide)="toast.autohide = true"
+    (mouseleave)="toast.autohide = !toast.closable"
+    (hide)="toast.autohide = !toast.closable"
     [autohide]="toast.autohide"
     [delay]="toast.duration"
     (hidden)="alertService.closeAlert(toast.id)"
   >
-    {{ toast.message }}
+    @if (toast.closable) {
+      <div class="d-flex align-items-start">
+        <div class="flex-grow-1">{{ toast.message }}</div>
+        <button
+          type="button"
+          class="btn-close ms-2"
+          [class.btn-close-white]="toast.type === 'danger' || toast.type === 'success'"
+          [attr.aria-label]="'g.close' | transloco"
+          (click)="alertService.closeAlert(toast.id)"
+        ></button>
+      </div>
+    } @else {
+      {{ toast.message }}
+    }
   </ngb-toast>
 }

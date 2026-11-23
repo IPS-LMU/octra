@@ -3,6 +3,7 @@
     "language name": "Nederlands"
   },
   "alerts": {
+    "annotation repaired": "De annotatie was beschadigd en is automatisch gerepareerd (laag: {{levels}}). Controleer de segmenten van deze laag, vooral of tekst en audio nog overeenkomen. Segmenten die al verloren waren, konden niet worden hersteld.",
     "authentication needed": "Verifieer alstublieft om functies zoals ASR of woorduitlijning te gebruiken. Nadat u op \"Authenticeren\" heeft geklikt, wordt een apart venster geopend. Als er geen venster wordt geopend, zorg er dan voor dat pop-ups zijn ingeschakeld in uw browser.",
     "need playback": "U moet het afspelen minstens één keer starten voordat u het transcript verzendt."
   },

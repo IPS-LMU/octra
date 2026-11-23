@@ -3,6 +3,7 @@
     "language name": "Italiano"
   },
   "alerts": {
+    "annotation repaired": "L'annotazione era danneggiata ed è stata riparata automaticamente (livello: {{levels}}). Controlla i segmenti di questo livello, in particolare se testo e audio corrispondono ancora. I segmenti già persi non hanno potuto essere ripristinati.",
     "authentication needed": "Per favore autenticati in modo da usare funzionalità come l'ASR o l'allineamento per parola. Dopo aver cliccato su \"Autenticati\" si aprirà una finestra separata. Se non si apre alcuna finestra, assicurati di avere i popup attivati nel tuo browser.",
     "need playback": "Devi attivare il playback almeno una volta prima di sottoporre la trascrizione."
   },

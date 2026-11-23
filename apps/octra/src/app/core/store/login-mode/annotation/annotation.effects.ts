@@ -597,6 +597,30 @@ export class AnnotationEffects {
 
         try {
           const annotation = modeState.transcript.clone();
+
+          // repair inconsistent levels (duplicate IDs, unsorted or zero-length segments)
+          const repairResult = annotation.repairSegmentLevels();
+          if (repairResult.changed) {
+            console.warn(
+              `Annotation repaired (${repairResult.repairedLevels.join(', ') || 'no damaged levels'}): ${repairResult.duplicateIDs} duplicate IDs within levels, ${repairResult.crossLevelDuplicateIDs} duplicate IDs across levels, ${repairResult.unsortedLevels} unsorted levels, ${repairResult.removedZeroLengthSegments} zero-length segments with text removed (text kept in previous segment), ${repairResult.removedEmptyZeroLengthSegments} empty zero-length segments removed.`,
+            );
+          }
+
+          if (repairResult.repairedLevels.length > 0) {
+            // only notify the user if a level was really damaged
+            this.alertService
+              .showAlert(
+                'warning',
+                this.transloco.translate('alerts.annotation repaired', {
+                  levels: repairResult.repairedLevels.join(', '),
+                }),
+                true,
+                undefined,
+                true,
+              )
+              .catch((error) => console.error(error));
+          }
+
           for (const level of annotation.levels) {
             if (level.type === 'SEGMENT') {
               const segmentLevel = level as OctraAnnotationSegmentLevel<OctraAnnotationSegment>;

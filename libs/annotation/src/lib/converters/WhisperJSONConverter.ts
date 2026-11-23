@@ -88,7 +88,9 @@ export class WhisperJSONConverter extends Converter<any, any> {
         }
 
         let speaker = segment.speaker ?? 'OCTRA_1';
-        const oSegment = new OSegment(id++, convertSecondsToSamples(segment.start), convertSecondsToSamples(segment.end - segment.start), [
+        const segmentStart = convertSecondsToSamples(segment.start);
+        // convert start and end separately so that contiguous segments stay contiguous after rounding
+        const oSegment = new OSegment(id++, segmentStart, convertSecondsToSamples(segment.end) - segmentStart, [
           new OLabel(speaker, segment.text),
         ]);
 
@@ -107,7 +109,8 @@ export class WhisperJSONConverter extends Converter<any, any> {
             }
 
             speaker = speakers.length > 0 ? `${word.speaker ?? 'OCTRA_1'}_WORD` : `WORD`;
-            const oWordSegment = new OSegment(id++, convertSecondsToSamples(word.start), convertSecondsToSamples(word.end - word.start), [
+            const wordStart = convertSecondsToSamples(word.start);
+            const oWordSegment = new OSegment(id++, wordStart, convertSecondsToSamples(word.end) - wordStart, [
               new OLabel(speaker, word.word),
             ]);
 
@@ -147,6 +150,9 @@ export class WhisperJSONConverter extends Converter<any, any> {
       };
     }
 
+    // next free item id across all levels
+    let nextID = Math.max(0, ...result.annotjson.levels.map((a) => Math.max(0, ...a.items.map((b) => b.id)))) + 1;
+
     // check if last boundary fits end of audio file
     for (const level of result.annotjson.levels) {
       if (level.type === 'SEGMENT') {
@@ -155,13 +161,13 @@ export class WhisperJSONConverter extends Converter<any, any> {
 
         if (!lastSegment) {
           // fill gap
-          segmentLevel.items.push(new OSegment(1, 0, audiofile.duration, [new OLabel(segmentLevel.name, '')]));
+          segmentLevel.items.push(new OSegment(nextID++, 0, audiofile.duration, [new OLabel(segmentLevel.name, '')]));
         } else {
           if (lastSegment.sampleStart + lastSegment.sampleDur < audiofile.duration) {
             // fill gap
             segmentLevel.items.push(
               new OSegment(
-                lastSegment.id + 1,
+                nextID++,
                 lastSegment.sampleStart + lastSegment.sampleDur,
                 audiofile.duration - (lastSegment.sampleStart + lastSegment.sampleDur),
                 [new OLabel(segmentLevel.name, '')],
@@ -190,20 +196,30 @@ export class WhisperJSONConverter extends Converter<any, any> {
     const previousSegment = currentLevel.items.length > 0 ? currentLevel.items[currentLevel.items.length - 1] : undefined;
 
     if (previousSegment) {
-      if (previousSegment.sampleStart + previousSegment.sampleDur < oSegment.sampleStart) {
+      const previousEnd = previousSegment.sampleStart + previousSegment.sampleDur;
+
+      if (previousEnd < oSegment.sampleStart) {
         // fill gap
-        currentLevel.items.push(
-          new OSegment(
-            1,
-            previousSegment.sampleStart + previousSegment.sampleDur,
-            oSegment.sampleStart - (previousSegment.sampleStart + previousSegment.sampleDur),
-            [new OLabel(currentLevel.name, '')],
-          ),
-        );
-      } else if (previousSegment.sampleStart + previousSegment.sampleDur > oSegment.sampleStart) {
-        console.error('previous segment greater than current');
+        currentLevel.items.push(new OSegment(1, previousEnd, oSegment.sampleStart - previousEnd, [new OLabel(currentLevel.name, '')]));
+      } else if (previousEnd > oSegment.sampleStart) {
+        // overlap: let the segment start at the end of the previous one
+        oSegment.sampleDur = oSegment.sampleStart + oSegment.sampleDur - previousEnd;
+        oSegment.sampleStart = previousEnd;
+      }
+
+      if (oSegment.sampleDur <= 0) {
+        // nothing left of this segment (zero length or completely overlapped): keep its text in the previous segment
+        const lastSegment = currentLevel.items[currentLevel.items.length - 1];
+        const text = oSegment.labels[0]?.value?.trim();
+        if (text && lastSegment.labels.length > 0) {
+          const lastText = lastSegment.labels[0].value.trim();
+          lastSegment.labels[0] = new OLabel(lastSegment.labels[0].name, lastText ? `${lastText} ${text}` : text);
+        }
         return;
       }
+    } else if (oSegment.sampleDur <= 0) {
+      // zero length segment at the beginning
+      return;
     } else if (oSegment.sampleStart > 0) {
       currentLevel.items.push(new OSegment(1, 0, oSegment.sampleStart, [new OLabel(currentLevel.name, '')]));
     }

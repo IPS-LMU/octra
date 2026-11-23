@@ -17,7 +17,7 @@
 <li><span id="s"><span class="tsd-kind-type-parameter">S</span> <span class="tsd-signature-keyword">extends</span> <a href="../interfaces/_octra_annotation.ASRContext.html" class="tsd-signature-type tsd-kind-interface">ASRContext</a></span></li>
 <li><span id="t"><span class="tsd-kind-type-parameter">T</span> <span class="tsd-signature-keyword">extends</span> <a href="_octra_annotation.OctraAnnotationSegment.html" class="tsd-signature-type tsd-kind-class">OctraAnnotationSegment</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">&gt;</span></span></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L37">annotation.ts:37</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L37">annotation.ts:37</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -64,6 +64,7 @@
 <a href="#removeitembyid" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>remove<wbr/>Item<wbr/>By<wbr/>Id</span></a>
 <a href="#removeitembyindex" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>remove<wbr/>Item<wbr/>By<wbr/>Index</span></a>
 <a href="#removelevel" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>remove<wbr/>Level</span></a>
+<a href="#repairsegmentlevels" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>repair<wbr/>Segment<wbr/>Levels</span></a>
 <a href="#serialize" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>serialize</span></a>
 <a href="#updateidcounters" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>update<wbr/>ID<wbr/>Counters</span></a>
 <a href="#deserialize-2" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>deserialize</span></a>
@@ -90,7 +91,7 @@
 <li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">idCounters</span>: <span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">item</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span> <span class="tsd-kind-property">level</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span> <span class="tsd-kind-property">link</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span> <span class="tsd-signature-symbol">}</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L80">annotation.ts:80</a></li></ul></aside></div></li></ul></section></section></details>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L80">annotation.ts:80</a></li></ul></aside></div></li></ul></section></section></details>
 <details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Accessors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
 <h2 class="tsd-anchor-link" id="accessors-1">Accessors<a href="#accessors-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
 <section>
@@ -102,7 +103,7 @@
 <div class="tsd-description">
 <h4 class="tsd-returns-title">Returns <a href="../types/_octra_annotation.OctraAnnotationAnyLevel.html" class="tsd-signature-type tsd-kind-type-alias">OctraAnnotationAnyLevel</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">undefined</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L73">annotation.ts:73</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L73">annotation.ts:73</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="idcounters"><span>id<wbr/>Counters</span><a href="#idcounters" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -111,7 +112,7 @@
 <div class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">item</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span> <span class="tsd-kind-property">level</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span> <span class="tsd-kind-property">link</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span> <span class="tsd-signature-symbol">}</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L50">annotation.ts:50</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L50">annotation.ts:50</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="levels"><span>levels</span><a href="#levels" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -120,7 +121,7 @@
 <div class="tsd-description">
 <h4 class="tsd-returns-title">Returns <a href="../types/_octra_annotation.OctraAnnotationAnyLevel.html" class="tsd-signature-type tsd-kind-type-alias">OctraAnnotationAnyLevel</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L46">annotation.ts:46</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L46">annotation.ts:46</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="links"><span>links</span><a href="#links" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -129,7 +130,7 @@
 <div class="tsd-description">
 <h4 class="tsd-returns-title">Returns <a href="_octra_annotation.OctraAnnotationLink.html" class="tsd-signature-type tsd-kind-class">OctraAnnotationLink</a><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L42">annotation.ts:42</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L42">annotation.ts:42</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="selectedlevelindex"><span>selected<wbr/>Level<wbr/>Index</span><a href="#selectedlevelindex" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -138,7 +139,7 @@
 <div class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">undefined</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L38">annotation.ts:38</a></li></ul></aside></div></li></ul></section></section></details>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L38">annotation.ts:38</a></li></ul></aside></div></li></ul></section></section></details>
 <details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
 <h2 class="tsd-anchor-link" id="methods-1">Methods<a href="#methods-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
 <section>
@@ -156,7 +157,7 @@
 <li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">context</span>: <a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L288">annotation.ts:288</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L419">annotation.ts:419</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="addlevel"><span>add<wbr/>Level</span><a href="#addlevel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -169,7 +170,7 @@
 <li><span><span class="tsd-kind-parameter">level</span>: <a href="../types/_octra_annotation.OctraAnnotationAnyLevel.html" class="tsd-signature-type tsd-kind-type-alias">OctraAnnotationAnyLevel</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L151">annotation.ts:151</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L280">annotation.ts:280</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="addlink"><span>add<wbr/>Link</span><a href="#addlink" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -183,7 +184,7 @@
 <li><span><span class="tsd-kind-parameter">toID</span>: <span class="tsd-signature-type">number</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L385">annotation.ts:385</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L516">annotation.ts:516</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="changecurrentitembyid"><span>change<wbr/>Current<wbr/>Item<wbr/>By<wbr/>Id</span><a href="#changecurrentitembyid" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -197,7 +198,7 @@
 <li><span><span class="tsd-kind-parameter">item</span>: <a href="_octra_annotation.OItem.html" class="tsd-signature-type tsd-kind-class">OItem</a> <span class="tsd-signature-symbol">|</span> <a href="_octra_annotation.OEvent.html" class="tsd-signature-type tsd-kind-class">OEvent</a> <span class="tsd-signature-symbol">|</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L240">annotation.ts:240</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L371">annotation.ts:371</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="changecurrentitembyindex"><span>change<wbr/>Current<wbr/>Item<wbr/>By<wbr/>Index</span><a href="#changecurrentitembyindex" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -211,7 +212,7 @@
 <li><span><span class="tsd-kind-parameter">item</span>: <a href="_octra_annotation.OItem.html" class="tsd-signature-type tsd-kind-class">OItem</a> <span class="tsd-signature-symbol">|</span> <a href="_octra_annotation.OEvent.html" class="tsd-signature-type tsd-kind-class">OEvent</a> <span class="tsd-signature-symbol">|</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L252">annotation.ts:252</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L383">annotation.ts:383</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="changecurrentlevelindex"><span>change<wbr/>Current<wbr/>Level<wbr/>Index</span><a href="#changecurrentlevelindex" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -224,7 +225,7 @@
 <li><span><span class="tsd-kind-parameter">index</span>: <span class="tsd-signature-type">number</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L233">annotation.ts:233</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L364">annotation.ts:364</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="changecurrentsegmentbysampleposition"><span>change<wbr/>Current<wbr/>Segment<wbr/>By<wbr/>Sample<wbr/>Position</span><a href="#changecurrentsegmentbysampleposition" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -238,7 +239,7 @@
 <li><span><span class="tsd-kind-parameter">item</span>: <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L280">annotation.ts:280</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L411">annotation.ts:411</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="changelevelbyid"><span>change<wbr/>Level<wbr/>By<wbr/>Id</span><a href="#changelevelbyid" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -252,7 +253,7 @@
 <li><span><span class="tsd-kind-parameter">level</span>: <a href="../types/_octra_annotation.OctraAnnotationAnyLevel.html" class="tsd-signature-type tsd-kind-type-alias">OctraAnnotationAnyLevel</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L194">annotation.ts:194</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L325">annotation.ts:325</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="changelevelbyindex"><span>change<wbr/>Level<wbr/>By<wbr/>Index</span><a href="#changelevelbyindex" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -266,7 +267,7 @@
 <li><span><span class="tsd-kind-parameter">level</span>: <a href="../types/_octra_annotation.OctraAnnotationAnyLevel.html" class="tsd-signature-type tsd-kind-type-alias">OctraAnnotationAnyLevel</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L204">annotation.ts:204</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L335">annotation.ts:335</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="changelevelindex"><span>change<wbr/>Level<wbr/>Index</span><a href="#changelevelindex" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -279,7 +280,7 @@
 <li><span><span class="tsd-kind-parameter">index</span>: <span class="tsd-signature-type">number</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L113">annotation.ts:113</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L242">annotation.ts:242</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="changelevelnamebyindex"><span>change<wbr/>Level<wbr/>Name<wbr/>By<wbr/>Index</span><a href="#changelevelnamebyindex" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -293,7 +294,7 @@
 <li><span><span class="tsd-kind-parameter">name</span>: <span class="tsd-signature-type">string</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L213">annotation.ts:213</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L344">annotation.ts:344</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="changelinkbyid"><span>change<wbr/>Link<wbr/>By<wbr/>Id</span><a href="#changelinkbyid" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -307,7 +308,7 @@
 <li><span><span class="tsd-kind-parameter">oLink</span>: <a href="_octra_annotation.OLink.html" class="tsd-signature-type tsd-kind-class">OLink</a></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L389">annotation.ts:389</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L520">annotation.ts:520</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="changelinkbyindex"><span>change<wbr/>Link<wbr/>By<wbr/>Index</span><a href="#changelinkbyindex" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -321,7 +322,7 @@
 <li><span><span class="tsd-kind-parameter">oLink</span>: <a href="_octra_annotation.OLink.html" class="tsd-signature-type tsd-kind-class">OLink</a></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L398">annotation.ts:398</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L529">annotation.ts:529</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="changesamplerate"><span>change<wbr/>Sample<wbr/>Rate</span><a href="#changesamplerate" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -334,7 +335,7 @@
 <li><span><span class="tsd-kind-parameter">sampleRate</span>: <span class="tsd-signature-type">number</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_octra_annotation.ASRContext.html" class="tsd-signature-type tsd-kind-interface">ASRContext</a><span class="tsd-signature-symbol">,</span> <a href="_octra_annotation.OctraAnnotationSegment.html" class="tsd-signature-type tsd-kind-class">OctraAnnotationSegment</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_octra_annotation.ASRContext.html" class="tsd-signature-type tsd-kind-interface">ASRContext</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L428">annotation.ts:428</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L559">annotation.ts:559</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="clearallitemsfromcurrentlevel"><span>clear<wbr/>All<wbr/>Items<wbr/>From<wbr/>Current<wbr/>Level</span><a href="#clearallitemsfromcurrentlevel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -343,7 +344,7 @@
 <div class="tsd-description">
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L132">annotation.ts:132</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L261">annotation.ts:261</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="clone"><span>clone</span><a href="#clone" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -352,7 +353,7 @@
 <div class="tsd-description">
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_octra_annotation.ASRContext.html" class="tsd-signature-type tsd-kind-interface">ASRContext</a><span class="tsd-signature-symbol">,</span> <a href="_octra_annotation.OctraAnnotationSegment.html" class="tsd-signature-type tsd-kind-class">OctraAnnotationSegment</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_octra_annotation.ASRContext.html" class="tsd-signature-type tsd-kind-interface">ASRContext</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L518">annotation.ts:518</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L649">annotation.ts:649</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="createeventlevel"><span>create<wbr/>Event<wbr/>Level</span><a href="#createeventlevel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -366,7 +367,7 @@
 <li><span><span class="tsd-kind-parameter">items</span>: <a href="_octra_annotation.OctraAnnotationEvent.html" class="tsd-signature-type tsd-kind-class">OctraAnnotationEvent</a><span class="tsd-signature-symbol">[]</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="_octra_annotation.OctraAnnotationEventLevel.html" class="tsd-signature-type tsd-kind-class">OctraAnnotationEventLevel</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L139">annotation.ts:139</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L268">annotation.ts:268</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="createitemlevel"><span>create<wbr/>Item<wbr/>Level</span><a href="#createitemlevel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -380,7 +381,7 @@
 <li><span><span class="tsd-kind-parameter">items</span>: <a href="_octra_annotation.OItem.html" class="tsd-signature-type tsd-kind-class">OItem</a><span class="tsd-signature-symbol">[]</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="_octra_annotation.OctraAnnotationItemLevel.html" class="tsd-signature-type tsd-kind-class">OctraAnnotationItemLevel</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L143">annotation.ts:143</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L272">annotation.ts:272</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="createsegment"><span>create<wbr/>Segment</span><a href="#createsegment" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -395,7 +396,7 @@
 <li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">context</span>: <a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="_octra_annotation.OctraAnnotationSegment.html" class="tsd-signature-type tsd-kind-class">OctraAnnotationSegment</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_octra_annotation.ASRContext.html" class="tsd-signature-type tsd-kind-interface">ASRContext</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L147">annotation.ts:147</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L276">annotation.ts:276</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="createsegmentlevel"><span>create<wbr/>Segment<wbr/>Level</span><a href="#createsegmentlevel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -409,7 +410,7 @@
 <li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">items</span>: <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">[]</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="_octra_annotation.OctraAnnotationSegmentLevel.html" class="tsd-signature-type tsd-kind-class">OctraAnnotationSegmentLevel</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L118">annotation.ts:118</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L247">annotation.ts:247</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="deserialize"><span>deserialize</span><a href="#deserialize" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -422,7 +423,7 @@
 <li><span><span class="tsd-kind-parameter">jsonObject</span>: <a href="_octra_annotation.OAnnotJSON.html" class="tsd-signature-type tsd-kind-class">OAnnotJSON</a></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L424">annotation.ts:424</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L555">annotation.ts:555</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="duplicatelevel"><span>duplicate<wbr/>Level</span><a href="#duplicatelevel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -435,7 +436,7 @@
 <li><span><span class="tsd-kind-parameter">index</span>: <span class="tsd-signature-type">number</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L156">annotation.ts:156</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L285">annotation.ts:285</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getcurrentsegmentindexbysampleposition"><span>get<wbr/>Current<wbr/>Segment<wbr/>Index<wbr/>By<wbr/>Sample<wbr/>Position</span><a href="#getcurrentsegmentindexbysampleposition" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -448,7 +449,7 @@
 <li><span><span class="tsd-kind-parameter">samples</span>: <a href="_octra_media.SampleUnit.html" class="tsd-signature-type tsd-kind-class">SampleUnit</a></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L263">annotation.ts:263</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L394">annotation.ts:394</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getitembyid"><span>get<wbr/>Item<wbr/>By<wbr/>Id</span><a href="#getitembyid" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -461,7 +462,7 @@
 <li><span><span class="tsd-kind-parameter">id</span>: <span class="tsd-signature-type">number</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="../types/_octra_annotation.AnnotationAnySegment.html" class="tsd-signature-type tsd-kind-type-alias">AnnotationAnySegment</a> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">undefined</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L122">annotation.ts:122</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L251">annotation.ts:251</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="removeitembyid"><span>remove<wbr/>Item<wbr/>By<wbr/>Id</span><a href="#removeitembyid" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -477,7 +478,7 @@
 <li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">changeTranscript</span>: <span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">transcript</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span> <span class="tsd-signature-symbol">=&gt;</span> <span class="tsd-signature-type">string</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L374">annotation.ts:374</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L505">annotation.ts:505</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="removeitembyindex"><span>remove<wbr/>Item<wbr/>By<wbr/>Index</span><a href="#removeitembyindex" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -493,7 +494,7 @@
 <li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">changeTranscript</span>: <span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">transcript</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span> <span class="tsd-signature-symbol">=&gt;</span> <span class="tsd-signature-type">string</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L324">annotation.ts:324</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L455">annotation.ts:455</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="removelevel"><span>remove<wbr/>Level</span><a href="#removelevel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -507,7 +508,45 @@
 <li><span><span class="tsd-kind-parameter">supportedLevelTypes</span>: <a href="../enums/_octra_annotation.AnnotationLevelType.html" class="tsd-signature-type tsd-kind-enum">AnnotationLevelType</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = ...</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#s">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#t">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L169">annotation.ts:169</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L300">annotation.ts:300</a></li></ul></aside></div></li></ul></section>
+<section class="tsd-panel tsd-member">
+<h3 class="tsd-anchor-link" id="repairsegmentlevels"><span>repair<wbr/>Segment<wbr/>Levels</span><a href="#repairsegmentlevels" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul class="tsd-signatures">
+<li class="">
+<div class="tsd-signature tsd-anchor-link" id="repairsegmentlevels-1"><span class="tsd-kind-call-signature">repairSegmentLevels</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{</span><br/>    <span class="tsd-kind-property">changed</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">crossLevelDuplicateIDs</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">duplicateIDs</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">removedEmptyZeroLengthSegments</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">removedZeroLengthSegments</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">repairedLevels</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">unsortedLevels</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span><a href="#repairsegmentlevels-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
+<div class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Repairs inconsistent annotations (e.g. caused by older versions):</p>
+<ol>
+<li>item IDs are made unique across the whole annotation,</li>
+<li>segments are sorted by their end time,</li>
+<li>segments without duration are removed; their transcript is appended to the previous segment.</li>
+</ol>
+</div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{</span><br/>    <span class="tsd-kind-property">changed</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">crossLevelDuplicateIDs</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">duplicateIDs</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">removedEmptyZeroLengthSegments</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">removedZeroLengthSegments</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">repairedLevels</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-kind-property">unsortedLevels</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></h4>
+<ul class="tsd-parameters">
+<li class="tsd-parameter">
+<h5><span class="tsd-kind-property">changed</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></h5></li>
+<li class="tsd-parameter">
+<h5><span class="tsd-kind-property">crossLevelDuplicateIDs</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5></li>
+<li class="tsd-parameter">
+<h5><span class="tsd-kind-property">duplicateIDs</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5></li>
+<li class="tsd-parameter">
+<h5><span class="tsd-kind-property">removedEmptyZeroLengthSegments</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>removed empty segments without duration</p>
+</div></li>
+<li class="tsd-parameter">
+<h5><span class="tsd-kind-property">removedZeroLengthSegments</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+<div class="tsd-comment tsd-typography"><p>removed segments without duration that contained text (text is appended to the previous segment)</p>
+</div></li>
+<li class="tsd-parameter">
+<h5><span class="tsd-kind-property">repairedLevels</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+<div class="tsd-comment tsd-typography"><p>names of levels that were damaged (duplicate IDs within the level, wrong order or segments without duration but with text).
+Fixing IDs that are only duplicated across levels and removing empty segments without duration don't count as damage.</p>
+</div></li>
+<li class="tsd-parameter">
+<h5><span class="tsd-kind-property">unsortedLevels</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5></li></ul><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L119">annotation.ts:119</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="serialize"><span>serialize</span><a href="#serialize" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -522,7 +561,7 @@
 <li><span><span class="tsd-kind-parameter">lastSegmentTime</span>: <a href="_octra_media.SampleUnit.html" class="tsd-signature-type tsd-kind-class">SampleUnit</a></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="_octra_annotation.OAnnotJSON.html" class="tsd-signature-type tsd-kind-class">OAnnotJSON</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L459">annotation.ts:459</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L590">annotation.ts:590</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="updateidcounters"><span>update<wbr/>ID<wbr/>Counters</span><a href="#updateidcounters" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -531,7 +570,7 @@
 <div class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L99">annotation.ts:99</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L99">annotation.ts:99</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="deserialize-2"><code class="tsd-tag">Static</code><span>deserialize</span><a href="#deserialize-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -549,7 +588,7 @@
 <li><span><span class="tsd-kind-parameter">jsonObject</span>: <a href="_octra_annotation.OAnnotJSON.html" class="tsd-signature-type tsd-kind-class">OAnnotJSON</a></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">OctraAnnotation</a><span class="tsd-signature-symbol">&lt;</span><a class="tsd-signature-type tsd-kind-type-parameter" href="#deserializes">S</a><span class="tsd-signature-symbol">,</span> <a class="tsd-signature-type tsd-kind-type-parameter" href="#deserializet">T</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/4962901b5697bbdf1105ac34c2a82480daaffd73/libs/annotation/src/lib/annotation.ts#L480">annotation.ts:480</a></li></ul></aside></div></li></ul></section></section></details></div>
+<li>Defined in <a href="https://github.com/IPS-LMU/octra/blob/d1a9e2a697104be30bfc7841ef31a4edf0b7bee9/libs/annotation/src/lib/annotation.ts#L611">annotation.ts:611</a></li></ul></aside></div></li></ul></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -570,7 +609,7 @@
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Accessors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Accessors</summary>
 <div><a href="#currentlevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>current<wbr/>Level</span></a><a href="#idcounters"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>id<wbr/>Counters</span></a><a href="#levels"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>levels</span></a><a href="#links"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>links</span></a><a href="#selectedlevelindex"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Accessor"><use href="../assets/icons.svg#icon-262144"></use></svg><span>selected<wbr/>Level<wbr/>Index</span></a></div></details>
 <details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Methods</summary>
-<div><a href="#additemtocurrentlevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>add<wbr/>Item<wbr/>To<wbr/>Current<wbr/>Level</span></a><a href="#addlevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>add<wbr/>Level</span></a><a href="#addlink"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>add<wbr/>Link</span></a><a href="#changecurrentitembyid"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Current<wbr/>Item<wbr/>By<wbr/>Id</span></a><a href="#changecurrentitembyindex"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Current<wbr/>Item<wbr/>By<wbr/>Index</span></a><a href="#changecurrentlevelindex"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Current<wbr/>Level<wbr/>Index</span></a><a href="#changecurrentsegmentbysampleposition"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Current<wbr/>Segment<wbr/>By<wbr/>Sample<wbr/>Position</span></a><a href="#changelevelbyid"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Level<wbr/>By<wbr/>Id</span></a><a href="#changelevelbyindex"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Level<wbr/>By<wbr/>Index</span></a><a href="#changelevelindex"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Level<wbr/>Index</span></a><a href="#changelevelnamebyindex"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Level<wbr/>Name<wbr/>By<wbr/>Index</span></a><a href="#changelinkbyid"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Link<wbr/>By<wbr/>Id</span></a><a href="#changelinkbyindex"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Link<wbr/>By<wbr/>Index</span></a><a href="#changesamplerate"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Sample<wbr/>Rate</span></a><a href="#clearallitemsfromcurrentlevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>clear<wbr/>All<wbr/>Items<wbr/>From<wbr/>Current<wbr/>Level</span></a><a href="#clone"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>clone</span></a><a href="#createeventlevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Event<wbr/>Level</span></a><a href="#createitemlevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Item<wbr/>Level</span></a><a href="#createsegment"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Segment</span></a><a href="#createsegmentlevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Segment<wbr/>Level</span></a><a href="#deserialize"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>deserialize</span></a><a href="#duplicatelevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>duplicate<wbr/>Level</span></a><a href="#getcurrentsegmentindexbysampleposition"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Current<wbr/>Segment<wbr/>Index<wbr/>By<wbr/>Sample<wbr/>Position</span></a><a href="#getitembyid"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Item<wbr/>By<wbr/>Id</span></a><a href="#removeitembyid"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>remove<wbr/>Item<wbr/>By<wbr/>Id</span></a><a href="#removeitembyindex"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>remove<wbr/>Item<wbr/>By<wbr/>Index</span></a><a href="#removelevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>remove<wbr/>Level</span></a><a href="#serialize"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>serialize</span></a><a href="#updateidcounters"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>update<wbr/>ID<wbr/>Counters</span></a><a href="#deserialize-2"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>deserialize</span></a></div></details></div></details></div>
+<div><a href="#additemtocurrentlevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>add<wbr/>Item<wbr/>To<wbr/>Current<wbr/>Level</span></a><a href="#addlevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>add<wbr/>Level</span></a><a href="#addlink"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>add<wbr/>Link</span></a><a href="#changecurrentitembyid"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Current<wbr/>Item<wbr/>By<wbr/>Id</span></a><a href="#changecurrentitembyindex"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Current<wbr/>Item<wbr/>By<wbr/>Index</span></a><a href="#changecurrentlevelindex"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Current<wbr/>Level<wbr/>Index</span></a><a href="#changecurrentsegmentbysampleposition"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Current<wbr/>Segment<wbr/>By<wbr/>Sample<wbr/>Position</span></a><a href="#changelevelbyid"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Level<wbr/>By<wbr/>Id</span></a><a href="#changelevelbyindex"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Level<wbr/>By<wbr/>Index</span></a><a href="#changelevelindex"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Level<wbr/>Index</span></a><a href="#changelevelnamebyindex"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Level<wbr/>Name<wbr/>By<wbr/>Index</span></a><a href="#changelinkbyid"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Link<wbr/>By<wbr/>Id</span></a><a href="#changelinkbyindex"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Link<wbr/>By<wbr/>Index</span></a><a href="#changesamplerate"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>change<wbr/>Sample<wbr/>Rate</span></a><a href="#clearallitemsfromcurrentlevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>clear<wbr/>All<wbr/>Items<wbr/>From<wbr/>Current<wbr/>Level</span></a><a href="#clone"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>clone</span></a><a href="#createeventlevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Event<wbr/>Level</span></a><a href="#createitemlevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Item<wbr/>Level</span></a><a href="#createsegment"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Segment</span></a><a href="#createsegmentlevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>create<wbr/>Segment<wbr/>Level</span></a><a href="#deserialize"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>deserialize</span></a><a href="#duplicatelevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>duplicate<wbr/>Level</span></a><a href="#getcurrentsegmentindexbysampleposition"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Current<wbr/>Segment<wbr/>Index<wbr/>By<wbr/>Sample<wbr/>Position</span></a><a href="#getitembyid"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>get<wbr/>Item<wbr/>By<wbr/>Id</span></a><a href="#removeitembyid"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>remove<wbr/>Item<wbr/>By<wbr/>Id</span></a><a href="#removeitembyindex"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>remove<wbr/>Item<wbr/>By<wbr/>Index</span></a><a href="#removelevel"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>remove<wbr/>Level</span></a><a href="#repairsegmentlevels"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>repair<wbr/>Segment<wbr/>Levels</span></a><a href="#serialize"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>serialize</span></a><a href="#updateidcounters"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>update<wbr/>ID<wbr/>Counters</span></a><a href="#deserialize-2"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>deserialize</span></a></div></details></div></details></div>
 <div class="site-menu">
 <nav class="tsd-navigation"><a href="../modules.html">Octra libraries - v2.1.0</a>
 <ul class="tsd-small-nested-navigation" id="tsd-nav-container">
